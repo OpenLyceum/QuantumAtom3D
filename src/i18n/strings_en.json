@@ -7,14 +7,75 @@
     "zeeman": "Zeeman",
     "oscillator": "3D Oscillator"
   },
+  "orbital": {
+    "quantumNumbers": "Quantum numbers",
+    "principal": "n",
+    "orbital": "l",
+    "magnetic": "m",
+    "basis": "Angular functions",
+    "complexBasis": "Complex Y<sub>lm</sub>",
+    "realBasis": "Real (p<sub>x</sub>, d<sub>xy</sub>, …)",
+    "complexState": "{{n}}{{letter}}, m = {{m}}",
+    "realState": "{{n}}{{letter}}<sub>{{subscript}}</sub>",
+    "nuclearCharge": "Nuclear charge Z",
+    "zoom": "Zoom",
+    "showNodes": "Show nodes",
+    "readouts": {
+      "title": "Properties",
+      "energy": "E",
+      "meanRadius": "⟨r⟩",
+      "rmsRadius": "r<sub>rms</sub>",
+      "mostProbableRadius": "r<sub>peak</sub>",
+      "radialNodes": "Radial nodes",
+      "angularNodes": "Angular nodes",
+      "energyValue": "{{value}} eV",
+      "lengthValue": "{{value}} a<sub>0</sub>",
+      "nodeCount": "{{count}}",
+      "conesValue": "cones θ = {{angles}}",
+      "planesValue": "planes φ = {{angles}}",
+      "polarPlaneValue": "xy-plane (θ = 90°)"
+    },
+    "radialChart": {
+      "title": "P(r) = r²|R<sub>nl</sub>|²",
+      "xAxis": "r (a<sub>0</sub>)"
+    },
+    "slice": {
+      "title": "Cross-section",
+      "plane": "Plane",
+      "offset": "Offset",
+      "coloring": "Colour",
+      "phase": "Phase of ψ",
+      "density": "Density |ψ|²",
+      "phaseLegend": "brightness ∝ |ψ|",
+      "densityLegend": "0 → max",
+      "scale": "±{{value}} a<sub>0</sub>"
+    }
+  },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The play area shows a cross-section through the electron's probability cloud, coloured by the phase of the wavefunction or by its density, and a graph of the radial probability distribution P(r).",
+        "controlArea": "The control area has spinners for the quantum numbers n, l and m, a choice between complex and real angular functions, sliders for the nuclear charge, the zoom and the cross-section offset, and a Reset All button.",
+        "interactionHint": "Change n, l and m to see how the orbital's size, shape and nodes change."
       },
-      "currentDetails": "The simulation is in its initial state."
+      "currentDetails": "{{state}} of {{ion}}. Energy {{energy}} electronvolts. Mean radius {{radius}} Bohr radii. {{radialNodes}} radial nodes and {{angularNodes}} angular nodes.",
+      "controls": {
+        "principal": "Principal quantum number n",
+        "principalHelp": "From 1 to 5. Sets the energy and the overall size of the orbital.",
+        "orbital": "Orbital quantum number l",
+        "orbitalHelp": "From 0 to n minus 1. Sets the shape and the number of angular nodes.",
+        "magnetic": "Magnetic quantum number m",
+        "magneticHelp": "From minus l to l. Sets the orientation, or how fast the phase winds around the z-axis.",
+        "basis": "Angular functions",
+        "nuclearChargeHelp": "Larger charge pulls the electron closer; the orbital shrinks as one over Z.",
+        "zoom": "Zoom",
+        "plane": "Cross-section plane",
+        "offsetHelp": "Moves the cross-section along the axis perpendicular to it.",
+        "coloring": "Cross-section colouring",
+        "complexBasis": "Complex spherical harmonics Y l m",
+        "realBasis": "Real orbitals such as p x and d x y",
+        "nuclearCharge": "Nuclear charge Z"
+      }
     },
     "superposition": {
       "screenSummary": {
@@ -53,6 +114,6 @@
     "title": "Simulation",
     "phaseColormap": "Phase colours",
     "phaseColormapHsv": "Hue wheel (HSV)",
-    "phaseColormapTwilight": "Twilight (perceptually uniform)"
+    "phaseColormapUniform": "Uniform (constant lightness)"
   }
 }

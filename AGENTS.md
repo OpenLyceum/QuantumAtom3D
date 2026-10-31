@@ -28,13 +28,18 @@ identifier cannot start with a digit. Its title remains "3D Oscillator".
 | Area | Location |
 |---|---|
 | Colors / constants / namespace | `src/QuantumAtom3DColors.ts`, `QuantumAtom3DConstants.ts` (atomic units), `QuantumAtom3DNamespace.ts` |
-| Shared physics (planned M1) | `src/common/model/` — `math/`, `hydrogen/`, `oscillator/`, `orbital/`, `angular/` |
+| Units | `src/common/model/AtomicUnits.ts` — the only place atomic units meet eV, pm, fs, nm, T |
+| Special functions | `src/common/model/math/` — `specialFunctions.ts` (Laguerre, root finder), `sphericalHarmonics.ts` (Y_lm, P_l^m, Condon–Shortley) |
+| Hydrogen | `src/common/model/hydrogen/` — `HydrogenRadial.ts` (R_nl, nodes, peak, enclosing radius), `HydrogenExpectations.ts` (E_n, ⟨r⟩, ⟨r²⟩), `HydrogenicIons.ts` |
+| States | `src/common/model/orbital/` — `OrbitalTerm.ts`, `OrbitalCatalog.ts` (real orbitals as term lists), `Wavefunction.ts` (CPU evaluator), `NodalSurfaces.ts`, `SliceSampler.ts`, `SliceNodalCurves.ts`, `OrbitalSummary.ts`, `QuantumNumbersModel.ts` |
+| Shared views | `src/common/view/` — `SliceHeatmapNode.ts`, `RadialDistributionChartNode.ts`, `QuantumNumberControl.ts`, `OrbitalReadoutPanel.ts`, `ColormapLegendNode.ts`, `Colormaps.ts`, `formatters.ts` |
+| Planned | `src/common/model/oscillator/` (M7), `angular/` (M5–M6) |
 | GPU engine (planned M2) | `src/common/gpu/` — `GpuContext.ts`, WGSL in `shaders/`, `WebGpuOrbitalRenderer.ts`, `CpuOrbitalRenderer.ts` |
 | Scenery/GPU boundary (planned M2) | `src/common/view/OrbitalViewportNode.ts` (one `Image` around the engine canvas) |
 | Clock | `src/common/TimeModel.ts`, composed by `SuperpositionModel` |
 | Screens | `src/<screen>/` — `*Screen.ts`, `model/`, `view/`; icons in `src/common/QuantumAtom3DScreenIcons.ts` |
 | i18n | `src/i18n/StringManager.ts`, `strings_{en,es,fr}.json` |
-| Preferences / query params | `src/preferences/` — phase colour wheel (`hsv` / `twilight`) |
+| Preferences / query params | `src/preferences/` — phase colour wheel (`hsv` / `uniform`) |
 
 ## Model
 
@@ -56,12 +61,19 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
 
 - Keep the 3D viewport keyboard-operable: arrows orbit and +/− zoom.
 - Give every pointer gesture in 3D a slider equivalent.
-- The keyboard-help files are still the scaffold stubs. Fill each one in when its screen gains
-  interactions.
+- Orbitals' keyboard help covers its spinners, sliders, radio buttons and checkbox. The other four
+  are still scaffold stubs; fill each one in when its screen gains interactions.
+- The n, l, m spinners are exposed to assistive technology as sliders (`role="slider"`), which is
+  how scenery's `NumberSpinner` works. Browser tests should query them by that role.
 
 ## Compliance carve-outs
 
-None yet. When the GPU engine lands (M2), add these two:
+- **Hardcoded colors** in `src/common/view/Colormaps.ts` and `ColormapLegendNode.ts`: these are data
+  colours computed from ψ (the phase wheels and the inferno density ramp). They must not follow the
+  colour profile, or the legend would stop matching the heatmap. Theme chrome around them still comes
+  from `QuantumAtom3DColors.ts`.
+
+When the GPU engine lands (M2), add these two:
 
 - `src/common/gpu/`: GPU-only state, as in FluidDynamics.
 - `src/common/gpu/webgpu-globals.d.ts`: an ambient declaration of the WebGPU flag namespaces. It is
@@ -90,19 +102,8 @@ open PRs that fight the overrides. Revisit when SceneryStack drops or re-pins th
 | Override | Pin | Why |
 |---|---|---|
 | `lodash` | `~4.18.1` | SceneryStack declares `~4.17.12`. Bump clears Dependabot/npm advisories patched in 4.18.x (e.g. GHSA-r5fr-rjxr-66jc, GHSA-f23m-r3pf-42rh). |
-| `three` | `~0.125.2` | SceneryStack declares `^0.104.0`. Floor is 0.125.0 for GHSA-fq6p-x6j3-cmmq (ReDoS). Staying on the 0.125 line avoids a larger API jump; **0.125.x still has open CVEs** (e.g. XSS GHSA-7vvq-7r29-5vg3, fixed only in ≥0.137.0). Remove this override if/when SceneryStack stops depending on `three` or pins a patched line itself. |
+| `three` | `~0.125.2` | Only SceneryStack's transitive dependency; this sim does not use mobius or three.js. SceneryStack declares `^0.104.0`. Floor is 0.125.0 for GHSA-fq6p-x6j3-cmmq (ReDoS). Staying on the 0.125 line avoids a larger API jump; **0.125.x still has open CVEs** (e.g. XSS GHSA-7vvq-7r29-5vg3, fixed only in ≥0.137.0). Remove this override if/when SceneryStack stops depending on `three` or pins a patched line itself. |
 | `brace-expansion` | `~5.0.12` | Transitive via `vite-plugin-pwa` / Workbox. Clears npm audit (originally GHSA-mh99-v99m-4gvg; keep ≥5.0.9 for GHSA-rgw5-rvv9-x895; ≥5.0.12 for the CPU-DoS advisory). |
-
-### `package.json` overrides
-
-The template's overrides are unchanged. The `three` pin is only there for SceneryStack's transitive
-dependency: this sim does not use mobius or three.js.
-
-| Override | Pin | Why |
-|---|---|---|
-| `lodash` | `~4.18.1` | SceneryStack declares `~4.17.12`; 4.18.x clears Dependabot/npm advisories. |
-| `three` | `~0.125.2` | SceneryStack declares `^0.104.0`; floor 0.125.0 for GHSA-fq6p-x6j3-cmmq. Unused by this sim's code. |
-| `brace-expansion` | `~5.0.12` | Transitive via `vite-plugin-pwa` / Workbox; clears npm audit advisories. |
 
 ## Testing
 
@@ -111,12 +112,16 @@ only under root `tests/`, mirroring `src/`.
 
 | Path | Purpose |
 |---|---|
+| `tests/common/model/math/` | Y_lm closed forms, the Condon–Shortley relation, orthonormality on the sphere |
+| `tests/common/model/hydrogen/` | R_nl closed forms, normalization, ⟨r⟩/⟨r²⟩ against quadrature, node positions, r_peak = n²/Z, 1s enclosed probability |
+| `tests/common/model/orbital/` | Real orbitals (orientation, reality, norm), 3D normalization, phase winding, slices, nodal cones and planes, nodal curves lying on ψ = 0, the n/l/m clamping |
+| `tests/common/view/Colormaps.test.ts` | Uniform wheel in gamut with nearly constant luminance; HSV and inferno anchors |
 | `tests/TimeModel.test.ts` | Composable play/pause timer |
-| `tests/memory-leak.test.ts` | Every disposable model, including `SuperpositionModel` |
+| `tests/memory-leak.test.ts` | Every disposable model: `TimeModel`, `SuperpositionModel`, `QuantumNumbersModel`, `OrbitalsModel` |
 | `tests/fuzz/fuzz.spec.ts` | Template-owned Playwright fuzz smoke |
 
-- **Physics tests.** Planned from M1: checks against closed forms (⟨r⟩, normalization, node counts,
-  Landé g_J, oscillator degeneracy) and against quadrature.
+- **Physics tests.** Check against closed forms or independent quadrature, never against the code
+  under test. Landé g_J and oscillator degeneracy come with M6 and M7.
 - **WebGPU.** It is unavailable under Vitest, so test the CPU renderer there. Compare GPU and CPU in
   `tests/browser/` with Chrome flags `--enable-unsafe-webgpu --enable-features=Vulkan`.
 
@@ -154,4 +159,10 @@ without a second edit.
 - **Weak-field Zeeman.** It is only valid for μ_B B much smaller than the fine-structure splitting, which
   for hydrogen n = 2 means B well below 1 T. Cap the anomalous-mode B range, and do not quietly extend it
   into the Paschen–Back regime.
+- **View scale is independent of Z.** `viewHalfWidthProperty` fits the Z = 1 orbital for the current
+  n and l, divided by √2 per zoom level. Raising Z must visibly shrink the orbital, so do not auto-fit
+  on Z.
+- **Phase wheels.** The heatmap multiplies the hue by |ψ|, so a phase wheel must have constant
+  lightness, as the OKLCH `uniform` wheel does. Wheels with dark hues, such as twilight, hide whole
+  lobes.
 - **PWA.** After `npm run build`, the sim is installable offline via Workbox (`dist/manifest.webmanifest`).

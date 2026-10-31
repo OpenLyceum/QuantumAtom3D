@@ -17,14 +17,14 @@ const NUMBER_CONTROL_SLIDER_TRACK_SIZE = new Dimension2(110, 3);
 const CHECKBOX_BOX_WIDTH = 16;
 
 /** Options for standalone HSlider instances in control panels. */
-export const QUANTUM_ATOM3_D_SLIDER_OPTIONS = {
+export const QUANTUM_ATOM_3D_SLIDER_OPTIONS = {
   trackSize: STANDALONE_SLIDER_TRACK_SIZE,
   thumbSize: SLIDER_THUMB_SIZE,
   trackFillEnabled: QuantumAtom3DColors.textColorProperty,
 } satisfies HSliderOptions;
 
 /** Base NumberControl options; spread into each instance and add titleNodeOptions as needed. */
-export const QUANTUM_ATOM3_D_NUMBER_CONTROL_OPTIONS = {
+export const QUANTUM_ATOM_3D_NUMBER_CONTROL_OPTIONS = {
   arrowButtonOptions: { ...FLAT_RECTANGULAR_BUTTON_OPTIONS, scale: 0.75 },
   layoutFunction: NumberControl.createLayoutFunction4({
     sliderPadding: 4,
@@ -46,7 +46,7 @@ export const QUANTUM_ATOM3_D_NUMBER_CONTROL_OPTIONS = {
  * mode). Do not use {@link QuantumAtom3DColors.controlSurfaceColorProperty} here — that
  * colour is for white chrome (push buttons, combo lists, Preferences).
  */
-export const QUANTUM_ATOM3_D_CHECKBOX_OPTIONS = {
+export const QUANTUM_ATOM_3D_CHECKBOX_OPTIONS = {
   boxWidth: CHECKBOX_BOX_WIDTH,
   spacing: 4,
   checkboxColor: QuantumAtom3DColors.textColorProperty,

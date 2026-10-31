@@ -5,7 +5,7 @@
  * sim-specific query parameter is declared and documented. Public-facing
  * parameters (intended for end users / sharing links) must set `public: true`.
  *
- * Usage: append e.g. `?phaseColormap=twilight` to the sim URL.
+ * Usage: append e.g. `?phaseColormap=uniform` to the sim URL.
  */
 
 import { logGlobal } from "scenerystack/phet-core";
@@ -16,7 +16,7 @@ import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
 const quantumAtom3DQueryParameters = QueryStringMachine.getAll({
   /**
    * Initial colour wheel for the complex phase of ψ, seeding the Phase colours
-   * preference. Example: `?phaseColormap=twilight`.
+   * preference. Example: `?phaseColormap=uniform`.
    */
   phaseColormap: {
     type: "string",

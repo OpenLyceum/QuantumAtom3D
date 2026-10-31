@@ -39,6 +39,7 @@ onReadyToLaunch(() => {
 
   const screens = [
     new OrbitalsScreen({
+      preferences: simPreferences,
       name: stringManager.getScreenNames().orbitalsStringProperty,
       tandem: Tandem.ROOT.createTandem("orbitalsScreen"),
       backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,

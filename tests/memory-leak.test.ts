@@ -9,11 +9,18 @@
  * tests below using forceGC().
  */
 
+import { QuantumNumbersModel } from "../src/common/model/orbital/QuantumNumbersModel.js";
 import { TimeModel } from "../src/common/TimeModel.js";
+import { OrbitalsModel } from "../src/orbitals/model/OrbitalsModel.js";
 import { SuperpositionModel } from "../src/superposition/model/SuperpositionModel.js";
 import { describeDisposalLeaks } from "./helpers/memoryLeak.js";
 
 describeDisposalLeaks([
   { name: "TimeModel", create: () => new TimeModel(), idempotentDispose: true },
   { name: "SuperpositionModel", create: () => new SuperpositionModel(), idempotentDispose: true },
+  {
+    name: "QuantumNumbersModel",
+    create: () => new QuantumNumbersModel({ maxN: 5, initialN: 2, initialL: 1, initialM: 0 }),
+  },
+  { name: "OrbitalsModel", create: () => new OrbitalsModel() },
 ]);

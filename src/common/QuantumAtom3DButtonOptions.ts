@@ -21,7 +21,7 @@ export const LIGHT_SURFACE_TEXT_FILL = QuantumAtom3DColors.controlSurfaceTextCol
  * Combo-box chrome for panels. Item labels must use {@link LIGHT_SURFACE_TEXT_FILL}, not
  * {@link QuantumAtom3DColors.textColorProperty} — that color is for labels on the dark panel fill.
  */
-export const QUANTUM_ATOM3_D_COMBO_BOX_OPTIONS = {
+export const QUANTUM_ATOM_3D_COMBO_BOX_OPTIONS = {
   buttonFill: QuantumAtom3DColors.controlSurfaceColorProperty,
   listFill: QuantumAtom3DColors.controlSurfaceColorProperty,
   buttonStroke: QuantumAtom3DColors.panelBorderColorProperty,

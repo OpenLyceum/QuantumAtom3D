@@ -7,14 +7,75 @@
     "zeeman": "Zeeman",
     "oscillator": "3D Oscillator"
   },
+  "orbital": {
+    "quantumNumbers": "Números cuánticos",
+    "principal": "n",
+    "orbital": "l",
+    "magnetic": "m",
+    "basis": "Funciones angulares",
+    "complexBasis": "Complejas Y<sub>lm</sub>",
+    "realBasis": "Reales (p<sub>x</sub>, d<sub>xy</sub>, …)",
+    "complexState": "{{n}}{{letter}}, m = {{m}}",
+    "realState": "{{n}}{{letter}}<sub>{{subscript}}</sub>",
+    "nuclearCharge": "Carga nuclear Z",
+    "zoom": "Zoom",
+    "showNodes": "Mostrar nodos",
+    "readouts": {
+      "title": "Propiedades",
+      "energy": "E",
+      "meanRadius": "⟨r⟩",
+      "rmsRadius": "r<sub>rms</sub>",
+      "mostProbableRadius": "r<sub>pico</sub>",
+      "radialNodes": "Nodos radiales",
+      "angularNodes": "Nodos angulares",
+      "energyValue": "{{value}} eV",
+      "lengthValue": "{{value}} a<sub>0</sub>",
+      "nodeCount": "{{count}}",
+      "conesValue": "conos θ = {{angles}}",
+      "planesValue": "planos φ = {{angles}}",
+      "polarPlaneValue": "plano xy (θ = 90°)"
+    },
+    "radialChart": {
+      "title": "P(r) = r²|R<sub>nl</sub>|²",
+      "xAxis": "r (a<sub>0</sub>)"
+    },
+    "slice": {
+      "title": "Corte",
+      "plane": "Plano",
+      "offset": "Desplazamiento",
+      "coloring": "Color",
+      "phase": "Fase de ψ",
+      "density": "Densidad |ψ|²",
+      "phaseLegend": "brillo ∝ |ψ|",
+      "densityLegend": "0 → máx",
+      "scale": "±{{value}} a<sub>0</sub>"
+    }
+  },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El área de juego muestra un corte de la nube de probabilidad del electrón, coloreado según la fase de la función de onda o según su densidad, y una gráfica de la distribución radial de probabilidad P(r).",
+        "controlArea": "El área de control tiene selectores para los números cuánticos n, l y m, una elección entre funciones angulares complejas y reales, deslizadores para la carga nuclear, el zoom y el desplazamiento del corte, y un botón Restablecer todo.",
+        "interactionHint": "Cambia n, l y m para ver cómo cambian el tamaño, la forma y los nodos del orbital."
       },
-      "currentDetails": "La simulación está en su estado inicial."
+      "currentDetails": "{{state}} de {{ion}}. Energía {{energy}} electronvoltios. Radio medio {{radius}} radios de Bohr. {{radialNodes}} nodos radiales y {{angularNodes}} nodos angulares.",
+      "controls": {
+        "principal": "Número cuántico principal n",
+        "principalHelp": "De 1 a 5. Fija la energía y el tamaño global del orbital.",
+        "orbital": "Número cuántico orbital l",
+        "orbitalHelp": "De 0 a n menos 1. Fija la forma y el número de nodos angulares.",
+        "magnetic": "Número cuántico magnético m",
+        "magneticHelp": "De menos l a l. Fija la orientación, o la rapidez con que la fase gira alrededor del eje z.",
+        "basis": "Funciones angulares",
+        "nuclearChargeHelp": "Una carga mayor atrae más al electrón; el orbital se encoge como uno sobre Z.",
+        "zoom": "Zoom",
+        "plane": "Plano de corte",
+        "offsetHelp": "Mueve el corte a lo largo del eje perpendicular a él.",
+        "coloring": "Coloración del corte",
+        "complexBasis": "Armónicos esféricos complejos Y l m",
+        "realBasis": "Orbitales reales como p x y d x y",
+        "nuclearCharge": "Carga nuclear Z"
+      }
     },
     "superposition": {
       "screenSummary": {
@@ -53,6 +114,6 @@
     "title": "Simulación",
     "phaseColormap": "Colores de fase",
     "phaseColormapHsv": "Rueda de tonos (HSV)",
-    "phaseColormapTwilight": "Crepúsculo (perceptualmente uniforme)"
+    "phaseColormapUniform": "Uniforme (luminosidad constante)"
   }
 }

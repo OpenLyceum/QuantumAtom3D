@@ -74,12 +74,26 @@ reference implementation: a browser spec compares GPU and CPU pixels.
 - The Monte Carlo sampler: inverse-CDF sampling for eigenstates, Metropolis for superpositions, seeded.
 - Analytic node positions, found by bisection.
 
+## State of the Orbitals screen (M1)
+
+This milestone is 2D only:
+
+- **Cross-section** (`SliceHeatmapNode`). ψ is sampled at 128² on an xy, xz or yz plane, painted into
+  an offscreen canvas, and scaled up by a `CanvasNode`. In phase colouring, hue is arg ψ and brightness
+  is |ψ|/max. In density colouring, the inferno ramp shows |ψ|²/max. Dashed curves mark where the
+  nodal surfaces cut the plane; `SliceNodalCurves` computes them analytically.
+- **P(r) chart** (bamboo). It spans the same length as the cross-section, with ⟨r⟩ and the radial nodes
+  marked.
+- **Readouts.** All values are exact: E_n, ⟨r⟩, r_rms, the peak of P(r), and the node counts with cone
+  and plane angles.
+- **View scale.** It depends on n, l and the zoom level, never on Z. Scaling with Z is the lesson.
+
 ## Roadmap
 
 | Milestone | Scope |
 |---|---|
-| M0 | Scaffold, fleet onboarding, phase-colour preference |
-| M1 | Math core and tests; Orbitals screen in 2D (P(r), slice, readouts) |
+| M0 ✓ | Scaffold, fleet onboarding, phase-colour preference |
+| M1 ✓ | Math core and tests; Orbitals screen in 2D (P(r), slice, readouts) |
 | M2 | GPU engine, CPU renderer, camera; volume and phase rendering on Orbitals |
 | M3 | Dots, isosurface, nodal surfaces, cutting plane, P(r) ↔ 3D hover, presets |
 | M4 | Superposition screen |

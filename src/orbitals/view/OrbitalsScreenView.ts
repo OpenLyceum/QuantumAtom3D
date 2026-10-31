@@ -1,160 +1,143 @@
 /**
  * OrbitalsScreenView.ts
  *
- * The top-level view for the simulation screen.
+ * The Orbitals screen (M1: 2D only). From left to right:
  *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
+ *   - the cross-section heatmap of ψ, with its plane, offset, colouring and legend below
+ *   - the radial distribution P(r) on the same length scale, with the readouts below it
+ *   - the state picker: n, l, m, the basis, Z, zoom and nodes
  *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. QuantumAtom3DControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
+ * The 3D viewport replaces the left column in M2; the cross-section then moves
+ * into a tabbed panel.
  */
 
-import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import type { TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty } from "scenerystack/axon";
+import { optionize } from "scenerystack/phet-core";
+import { StringUtils } from "scenerystack/phetcommon";
+import { RichText } from "scenerystack/scenery";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
+import { formatLength } from "../../common/view/formatters.js";
+import { OrbitalReadoutPanel } from "../../common/view/OrbitalReadoutPanel.js";
+import { RadialDistributionChartNode } from "../../common/view/RadialDistributionChartNode.js";
+import { SliceHeatmapNode } from "../../common/view/SliceHeatmapNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
+import { type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import type { OrbitalsModel } from "../model/OrbitalsModel.js";
+import { OrbitalsControlPanel } from "./OrbitalsControlPanel.js";
 import { OrbitalsScreenSummaryContent } from "./OrbitalsScreenSummaryContent.js";
+import { SliceControlPanel } from "./SliceControlPanel.js";
 
-export type OrbitalsScreenViewOptions = ScreenViewOptions;
+/** Side of the square cross-section, in view pixels. */
+const SLICE_SIZE = 340;
+
+/** Size of the P(r) plot area. */
+const CHART_WIDTH = 290;
+const CHART_HEIGHT = 170;
+
+/** Gaps between the three columns and between stacked items. */
+const COLUMN_GAP = 30;
+const STACK_GAP = 12;
+
+/** Room above the slice and chart for their titles. */
+const TITLE_ROOM = 28;
+
+const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
+const SCALE_FONT = new PhetFont(12);
+
+type SelfOptions = {
+  /** The phase-wheel preference, shared by every screen. */
+  readonly phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
+};
+
+export type OrbitalsScreenViewOptions = SelfOptions & ScreenViewOptions;
 
 export class OrbitalsScreenView extends ScreenView {
-  public constructor(model: OrbitalsModel, providedOptions?: OrbitalsScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See OrbitalsScreenSummaryContent for the four content regions.
-    const options = optionize<OrbitalsScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
+  public constructor(model: OrbitalsModel, providedOptions: OrbitalsScreenViewOptions) {
+    const options = optionize<OrbitalsScreenViewOptions, SelfOptions, ScreenViewOptions>()(
       {
         screenSummaryContent: new OrbitalsScreenSummaryContent(model),
       },
       providedOptions,
     );
+    const { phaseColormapProperty } = options;
     super(options);
 
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: QuantumAtom3DColors.backgroundColorProperty,
-    });
-    this.addChild(backgroundRect);
+    const strings = StringManager.getInstance().getOrbitalStrings();
 
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().orbitalsStringProperty, {
-      font: "bold 36px sans-serif",
+    // ── Left column: cross-section ───────────────────────────────────────────
+    const heatmap = new SliceHeatmapNode(SLICE_SIZE, {
+      wavefunctionProperty: model.wavefunctionProperty,
+      summaryProperty: model.summaryProperty,
+      slicePlaneProperty: model.slicePlaneProperty,
+      sliceOffsetProperty: model.sliceOffsetProperty,
+      halfWidthProperty: model.viewHalfWidthProperty,
+      coloringProperty: model.sliceColoringProperty,
+      phaseColormapProperty,
+      nodesVisibleProperty: model.nodesVisibleProperty,
+      left: this.layoutBounds.minX + SCREEN_VIEW_MARGIN,
+      top: this.layoutBounds.minY + SCREEN_VIEW_MARGIN + TITLE_ROOM,
+    });
+    const sliceTitle = new RichText(strings.slice.titleStringProperty, {
+      font: TITLE_FONT,
       fill: QuantumAtom3DColors.textColorProperty,
-      center: this.layoutBounds.center,
     });
-    this.addChild(placeholderText);
+    sliceTitle.boundsProperty.link(() => {
+      sliceTitle.left = heatmap.left;
+      sliceTitle.bottom = heatmap.top - STACK_GAP / 2;
+    });
+    const scaleProperty = new DerivedProperty(
+      [model.viewHalfWidthProperty, strings.slice.scaleStringProperty],
+      (halfWidth, pattern) => StringUtils.fillIn(pattern, { value: formatLength(halfWidth) }),
+    );
+    const scaleLabel = new RichText(scaleProperty, { font: SCALE_FONT, fill: QuantumAtom3DColors.textColorProperty });
+    scaleLabel.boundsProperty.link(() => {
+      scaleLabel.right = heatmap.right;
+      scaleLabel.bottom = heatmap.top - STACK_GAP / 2;
+    });
 
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getOrbitalsA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.<control>StringProperty,
-    //   });
-    //   this.addChild(exampleButton);
+    const sliceControlPanel = new SliceControlPanel(model, phaseColormapProperty);
+    sliceControlPanel.left = heatmap.left;
+    sliceControlPanel.top = heatmap.bottom + STACK_GAP;
 
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
+    // ── Middle column: P(r) and readouts ─────────────────────────────────────
+    const chart = new RadialDistributionChartNode(CHART_WIDTH, CHART_HEIGHT, {
+      summaryProperty: model.summaryProperty,
+      maxRadiusProperty: model.viewHalfWidthProperty,
+      left: heatmap.right + COLUMN_GAP,
+      top: heatmap.top,
+    });
+    const readoutPanel = new OrbitalReadoutPanel(model.summaryProperty);
+    readoutPanel.left = chart.left;
+    readoutPanel.top = chart.bottom + 2 * STACK_GAP;
+
+    // ── Right column: state picker ───────────────────────────────────────────
+    const controlPanel = new OrbitalsControlPanel(model);
+    controlPanel.right = this.layoutBounds.maxX - SCREEN_VIEW_MARGIN;
+    controlPanel.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
+
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
-        this.reset();
       },
       right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
       bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
+
+    this.addChild(sliceTitle);
+    this.addChild(scaleLabel);
+    this.addChild(heatmap);
+    this.addChild(sliceControlPanel);
+    this.addChild(chart);
+    this.addChild(readoutPanel);
+    this.addChild(controlPanel);
     this.addChild(resetAllButton);
 
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
-    this.addChild(
-      new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
-      }),
-    );
+    this.pdomPlayAreaNode.pdomOrder = [heatmap, chart, readoutPanel];
+    this.pdomControlAreaNode.pdomOrder = [controlPanel, sliceControlPanel, resetAllButton];
   }
-
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
-  }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeOrbitalsScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in OrbitalsScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeOrbitalsScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeOrbitalsScreenView();
-  //   super.dispose();
-  // }
 }

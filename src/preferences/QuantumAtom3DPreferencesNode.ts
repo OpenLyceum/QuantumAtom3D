@@ -45,9 +45,9 @@ export class QuantumAtom3DPreferencesNode extends VBox {
           options: { accessibleName: prefStrings.phaseColormapHsvStringProperty },
         },
         {
-          value: "twilight",
-          createNode: () => createItemText(prefStrings.phaseColormapTwilightStringProperty),
-          options: { accessibleName: prefStrings.phaseColormapTwilightStringProperty },
+          value: "uniform",
+          createNode: () => createItemText(prefStrings.phaseColormapUniformStringProperty),
+          options: { accessibleName: prefStrings.phaseColormapUniformStringProperty },
         },
       ],
       {
