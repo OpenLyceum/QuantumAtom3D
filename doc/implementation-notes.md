@@ -1,135 +1,104 @@
-# Implementation Notes - SceneryStack Template
+# Implementation Notes - Quantum Atom 3D
 
-Developer-facing notes on the **SceneryStackTemplate** scaffold. **Replace and expand this file when
-forking** to describe your sim's real architecture (see Stern Gerlach or Light Propagation for
-target quality). Until then, this documents what the template provides out of the box.
+Developer-facing notes. The physics is in [model.md](./model.md).
 
 ## Architecture Overview
 
-SceneryStackTemplate is the fleet-canonical starting point for new SceneryStack sims (one or N screens).
-It demonstrates Model–View separation, color profiles, localization, reset behavior, accessibility
-reference wiring, and reusable common components — **without** domain physics.
+Five screens. Each screen has its own model, built from shared classes in `src/common/model/`.
 
 ```
-main.ts
-  └─ SimScreen             (Screen<SimModel, SimScreenView>)
-       ├─ SimModel          state + logic  (src/sim-screen/model/)  ← stub: add physics here
-       └─ SimScreenView     visuals        (src/sim-screen/view/)
-            ├─ SimScreenSummaryContent     (PDOM overview — reference a11y pattern)
-            └─ SimKeyboardHelpContent      (keyboard help dialog)
+main.ts                  awaits initializeGpuContext() once (M2), then sim.start()
+  ├─ OrbitalsScreen        eigenstate viewer: dots / volume / isosurface, P(r), slice, nodes
+  ├─ SuperpositionScreen   up to 6 terms with complex coefficients, time evolution (TimeModel)
+  ├─ AngularMomentumScreen vector model (L, S, J), 2D projection, no GPU
+  ├─ ZeemanScreen          level diagram, selection rules, spectrum, no GPU
+  └─ OscillatorScreen      isotropic oscillator, degeneracy ladder, Cartesian ↔ spherical
 
-src/common/
-  ├─ SimPanel.ts           pre-themed panel (uses SimColors)
-  ├─ SimButtonOptions.ts   flat button / combo-box option bundles
-  └─ TimeModel.ts          composable play/pause + elapsed time
-
-src/preferences/
-  ├─ SimPreferencesModel   sim-specific pref state
-  ├─ SimPreferencesNode    pref UI in Preferences → Simulation
-  └─ simQueryParameters    QueryStringMachine declarations
+src/common/model/        pure TypeScript physics; never imports scenery
+  math/                  special functions, Y_lm, quadrature
+  hydrogen/ oscillator/  radial functions, energies, closed-form expectations
+  orbital/               BasisTerm, Wavefunction, RadialLookupTable, sampler, nodes, grid
+  angular/               vector model, Zeeman levels, selection rules
+src/common/gpu/          WebGPU device, WGSL shaders, GPU and CPU orbital renderers
+src/common/view/         OrbitCamera, OrbitalViewportNode (the Scenery/GPU boundary), charts
 ```
 
-Data flows Model → View through AXON `Property` objects (`.link()` / `.lazyLink()`). The view never
-integrates physics; the model never imports scenery.
+Data flows from model to view through AXON Properties. Models implement `step(dt)` and `reset()`.
 
-## Forking checklist
+## Rendering (WebGPU with a CPU reference backend)
 
-### Automated rename + scaffold (recommended)
+This follows HeatTransfer's GPU architecture (`HeatTransfer/src/common/field/gpu/`):
 
-```sh
-npm run rename -- --id my-sim --name "My Simulation"
-npm run scaffold-screens -- --screens Intro,Lab   # or omit --screens for one screen
-npm run check
-```
+- **One device for the whole sim.** `initializeGpuContext()` runs in `main.ts` before `sim.start()`,
+  while the splash screen is up. It compiles and checks every shader there. Any failure (no adapter, a
+  shader error, a presentation problem) demotes the whole sim to the CPU renderer. After that point
+  everything is synchronous, so screen model factories stay synchronous.
+- **The Scenery boundary is one `Image`.** It wraps the canvas that the renderer draws into (see
+  HeatTransfer `FieldNode.ts`). Pointer and keyboard input attach to that node.
+- **Bind-group layouts are explicit.** Never use `layout: "auto"`. Uniform byte sizes are
+  hand-computed constants placed beside each WGSL struct, and a unit test checks them.
 
-Or from the workspace: `Baton/scripts/create-sim.sh --repo MySim --name "My Simulation"`.
+**ψ is evaluated in the shader, not uploaded as a grid.** Every state on the 3D screens is a list of up
+to 8 terms c_k R_k(r) Y_{l_k m_k}(θ, φ):
 
-`scripts/rename-sim.ts` updates sim-level identifiers (package id, Colors, Preferences).
-`scripts/scaffold-screens.ts` emits fleet-named screen folders and wires main/strings/icons.
+- **Radial part.** R comes from a storage-buffer lookup table, with one row per (n, l) for hydrogen and
+  per (n_r, l) for the oscillator. Rows are tabulated on a √ρ axis and linearly interpolated in WGSL.
+  Z is a scale uniform, so the table never changes with Z.
+- **Angular part.** P_l^m is evaluated by recurrence in WGSL (l ≤ 4).
+- **Time evolution.** Per-term phases e^{−iE_k t} are computed in float64 on the CPU, wrapped mod 2π,
+  and uploaded as cos/sin uniforms. Time evolution therefore costs no extra CPU or upload work.
+- **Built from terms.** Real orbitals, hybrids and Cartesian oscillator states are all term lists of
+  spherical states, so the shader has a single code path.
 
-### Manual steps (after rename/scaffold or if skipping the scripts)
+**Render passes:**
 
-1. **`doc/model.md`** — educator physics (equations, ranges, simplifications).
-2. **`doc/implementation-notes.md`** — this file, rewritten for your architecture.
-3. **Screen model(s)** — real Properties, `step(dt)`, `reset()`; compose `TimeModel` if animated.
-4. **Screen view(s)** — play area + controls; wire `ResetAllButton` to `model.reset()`.
-5. **`*Colors.ts`** — sim palette (default + projector profiles).
-6. **Locale JSON** — title, strings, `a11y` keys; register locales in `init.ts`.
-7. **`public/icons/icon.svg`** → `npm run icons`; align theme color in `index.html` / vite config.
-8. **`tests/setup.ts`** — `init({ name: … })` must match `package.json` name after rename.
-9. **`AGENTS.md`** — sim-specific file map and pitfalls for AI assistants.
+- **One fullscreen fragment pass.** It ray-marches emission and absorption (phase hue or |ψ|²). It finds
+  the isosurface as the first crossing of level c. It intersects nodal surfaces analytically (spheres,
+  cones, planes). It also draws the cutting plane and the highlighted shell.
+- **Dots.** An instanced billboard pipeline draws the dots, depth-tested against the depth written by the
+  first pass.
+- **Scenery overlays.** Axes, labels and drag handles are Scenery nodes projected with the same
+  `OrbitCamera`.
+- **On demand.** A frame is rendered only when the state or camera changed, or when time is running.
+  Resolution scales with measured frame time.
 
-## Common components (keep when forking)
+**CPU backend.** It is used when WebGPU is missing, a shader fails, or `?forceCpu` is set. It is the same
+pipeline in TypeScript, calling the same `Wavefunction.evaluate`: a low-resolution ray-march that refines
+progressively and is time-sliced across frames, plus dots drawn in a `CanvasNode`. It is also the
+reference implementation: a browser spec compares GPU and CPU pixels.
 
-### SimPanel
+**Other CPU-side work:**
 
-Every control panel should use `SimPanel` so projector-mode switching is automatic:
+- A 64³ density grid, used only to turn an enclosed-probability fraction into an iso level.
+- The 128² slice heatmap.
+- The Monte Carlo sampler: inverse-CDF sampling for eigenstates, Metropolis for superpositions, seeded.
+- Analytic node positions, found by bisection.
 
-```typescript
-import { SimPanel } from "../../common/SimPanel.js";
-const panel = new SimPanel(content);
-const panelWide = new SimPanel(content, { xMargin: 20 });
-```
+## Roadmap
 
-### TimeModel
-
-Compose into your screen model for animation (do not subclass `TimeModel`):
-
-```typescript
-export class MyModel implements TModel {
-  public readonly timer = new TimeModel();  // pass true to auto-play on startup
-
-  public step(dt: number): void {
-    this.timer.step(dt);
-    // physics uses this.timer.timeProperty.value
-  }
-  public reset(): void { this.timer.reset(); /* restore initial state */ }
-}
-```
-
-Wire `TimeControlNode` to `model.timer.isPlayingProperty` in the view.
-
-### SimButtonOptions
-
-Spread flat button options into every push/round button and `TimeControlNode` (see `AGENTS.md`).
-Use `SIM_COMBO_BOX_OPTIONS` + `LIGHT_SURFACE_TEXT_FILL` for light control surfaces on dark panels.
-
-## Accessibility (reference implementation)
-
-The template is the **canonical OpenLyceum a11y reference**:
-
-- PDOM `accessibleName` on interactive nodes (prefer live `StringProperty`s).
-- `SimScreenSummaryContent` with a live `currentDetailsContent` `DerivedProperty` over model state.
-- Explicit `pdomOrder` + `SimKeyboardHelpContent`.
-- Strings under `a11y` in locale JSON → `StringManager.getA11yStrings()`.
-
-Full checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenLyceum/Baton/blob/main/ACCESSIBILITY.md).
-
-## Testing (fleet layout — keep when forking)
-
-| Path | Purpose |
+| Milestone | Scope |
 |---|---|
-| `vitest.config.ts` | `happy-dom`; `setupFiles: ["./tests/setup.ts"]`; `execArgv: ["--expose-gc"]` |
-| `tests/setup.ts` | Canvas/AudioContext mocks + `init()` before SceneryStack imports |
-| `tests/TimeModel.test.ts` | **Replace** with real model/physics tests mirroring `src/` |
-| `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression |
-| `tests/fuzz/fuzz.spec.ts` | Optional Playwright smoke via `?fuzz` |
+| M0 | Scaffold, fleet onboarding, phase-colour preference |
+| M1 | Math core and tests; Orbitals screen in 2D (P(r), slice, readouts) |
+| M2 | GPU engine, CPU renderer, camera; volume and phase rendering on Orbitals |
+| M3 | Dots, isosurface, nodal surfaces, cutting plane, P(r) ↔ 3D hover, presets |
+| M4 | Superposition screen |
+| M5 | Angular Momentum screen |
+| M6 | Zeeman screen |
+| M7 | 3D Oscillator screen |
+| M8 | Accessibility descriptions, es/fr review, thumbnails, release |
 
-Run `npm test`. Expand `memory-leak.test.ts` when adding runtime-created nodes or Property links.
+## Accessibility
 
-## Multi-screen simulations
+- **Screen summaries.** Each screen has a `*ScreenSummaryContent` whose `currentDetailsContent` will be a
+  live `DerivedProperty`, for example "3d_z² orbital of He⁺, mean radius 3.5 a0, two conical nodes at
+  54.7° from the z-axis".
+- **3D viewport.** It is focusable: the arrow keys orbit the camera and +/− zoom.
+- **Pointer-only gestures.** Each one, such as dragging the cutting plane, also has a slider.
 
-Default is single-screen. To add screens, see **`doc/multi-screen.md`**: per-screen folders mirroring
-`src/sim-screen/`, `StringManager` screen-name getters, optional shared root model, a shared
-`src/common/{SimName}ScreenIcons.ts` module (`create{Screen}Icon()` factories wired as
-`homeScreenIcon` / `navigationBarIcon`), and register all screens in `main.ts`.
+## Testing
 
-## PWA
-
-After `npm run build`, the sim is installable offline via Workbox (`dist/manifest.webmanifest`).
-
-## Known template stubs (remove when forking)
-
-- `SimModel.step()` / `reset()` — empty placeholders until you add physics.
-- Placeholder play-area content in `SimScreenView` — replace with real UI.
-- `tests/TimeModel.test.ts` — sample only; add tests for your model under `tests/`.
+- **Vitest (happy-dom).** It covers the model and the CPU renderer. WebGPU is unavailable there.
+- **Shader changes.** Verify them in a browser against the CPU backend. Run the specs in
+  `tests/browser/` with Chrome flags `--enable-unsafe-webgpu --enable-features=Vulkan`. Run with
+  `--disable-features=WebGPU,WebGPUService` to exercise the fallback.

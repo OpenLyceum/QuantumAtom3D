@@ -10,6 +10,10 @@
  */
 
 import { TimeModel } from "../src/common/TimeModel.js";
+import { SuperpositionModel } from "../src/superposition/model/SuperpositionModel.js";
 import { describeDisposalLeaks } from "./helpers/memoryLeak.js";
 
-describeDisposalLeaks([{ name: "TimeModel", create: () => new TimeModel(), idempotentDispose: true }]);
+describeDisposalLeaks([
+  { name: "TimeModel", create: () => new TimeModel(), idempotentDispose: true },
+  { name: "SuperpositionModel", create: () => new SuperpositionModel(), idempotentDispose: true },
+]);

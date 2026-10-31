@@ -21,24 +21,47 @@ import "./brand.js";
 
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
+import { AngularMomentumScreen } from "./angular-momentum/AngularMomentumScreen.js";
 import { StringManager } from "./i18n/StringManager.js";
-import { SimPreferencesModel } from "./preferences/SimPreferencesModel.js";
-import { SimPreferencesNode } from "./preferences/SimPreferencesNode.js";
-import SimColors from "./SimColors.js";
-import { SimScreen } from "./sim-screen/SimScreen.js";
+import { OrbitalsScreen } from "./orbitals/OrbitalsScreen.js";
+import { OscillatorScreen } from "./oscillator/OscillatorScreen.js";
+import { QuantumAtom3DPreferencesModel } from "./preferences/QuantumAtom3DPreferencesModel.js";
+import { QuantumAtom3DPreferencesNode } from "./preferences/QuantumAtom3DPreferencesNode.js";
+import QuantumAtom3DColors from "./QuantumAtom3DColors.js";
+import { SuperpositionScreen } from "./superposition/SuperpositionScreen.js";
+import { ZeemanScreen } from "./zeeman/ZeemanScreen.js";
 
 onReadyToLaunch(() => {
   const stringManager = StringManager.getInstance();
 
-  // Simulation-specific preferences; initial values come from simQueryParameters.
-  const simPreferences = new SimPreferencesModel(Tandem.ROOT.createTandem("preferences"));
+  // Simulation-specific preferences; initial values come from quantumAtom3DQueryParameters.
+  const simPreferences = new QuantumAtom3DPreferencesModel(Tandem.ROOT.createTandem("preferences"));
 
   const screens = [
-    new SimScreen({
-      // The screen name Property updates automatically when the locale changes
-      name: stringManager.getScreenNames().simStringProperty,
-      tandem: Tandem.ROOT.createTandem("simScreen"),
-      backgroundColorProperty: SimColors.backgroundColorProperty,
+    new OrbitalsScreen({
+      name: stringManager.getScreenNames().orbitalsStringProperty,
+      tandem: Tandem.ROOT.createTandem("orbitalsScreen"),
+      backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
+    }),
+    new SuperpositionScreen({
+      name: stringManager.getScreenNames().superpositionStringProperty,
+      tandem: Tandem.ROOT.createTandem("superpositionScreen"),
+      backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
+    }),
+    new AngularMomentumScreen({
+      name: stringManager.getScreenNames().angularMomentumStringProperty,
+      tandem: Tandem.ROOT.createTandem("angularMomentumScreen"),
+      backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
+    }),
+    new ZeemanScreen({
+      name: stringManager.getScreenNames().zeemanStringProperty,
+      tandem: Tandem.ROOT.createTandem("zeemanScreen"),
+      backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
+    }),
+    new OscillatorScreen({
+      name: stringManager.getScreenNames().oscillatorStringProperty,
+      tandem: Tandem.ROOT.createTandem("oscillatorScreen"),
+      backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
     }),
   ];
 
@@ -53,7 +76,7 @@ onReadyToLaunch(() => {
       simulationOptions: {
         customPreferences: [
           {
-            createContent: (tandem: Tandem) => new SimPreferencesNode(simPreferences, tandem),
+            createContent: (tandem: Tandem) => new QuantumAtom3DPreferencesNode(simPreferences, tandem),
           },
         ],
       },

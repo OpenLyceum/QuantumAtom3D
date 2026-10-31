@@ -1,18 +1,28 @@
-# SceneryStack Template
+# Quantum Atom 3D
 
 [![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 
-A reusable SceneryStack simulation template for one or N screens, built with
-[SceneryStack](https://scenerystack.org/), Vite 8, TypeScript 7, and Biome 2.
+An interactive 3D hydrogenic atom for upper-year quantum mechanics, built with
+[SceneryStack](https://scenerystack.org/). It shows orbitals and probability density with
+complex-phase colouring, radial distributions, superpositions that evolve in time, the
+angular-momentum vector model, Zeeman splitting with selection rules, and the degeneracy of the
+isotropic 3D oscillator.
+
+**Status:** in development. The screens are being built in milestones; see
+[`doc/implementation-notes.md`](doc/implementation-notes.md).
 
 ## Features
 
-- SceneryStack scaffold with model/view separation (`rename` + `scaffold-screens` for one or N screens)
-- English, Spanish, and French localization via `StringManager`
-- Default and projector color profiles
-- Progressive Web App (installable, offline-capable)
-- Git hooks for Biome pre-commit checks
-- Shared GitHub Actions CI via `OpenLyceum/Baton`
+- **Orbitals:** ψ_nlm for n ≤ 5, in the complex or real basis, with Z = 1–6 (H, He⁺, Li²⁺, …).
+  Rendered as dot clouds, volumes or 90/95 % isosurfaces, with phase colours, nodal surfaces, a
+  draggable cutting plane, and a P(r) chart linked to the 3D view.
+- **Superposition:** mix eigenstates with complex coefficients and watch the charge cloud slosh at the
+  Bohr frequency. Presets include sp/sp²/sp³ hybrids.
+- **Angular Momentum:** the vector model for L, and L + S → J.
+- **Zeeman:** normal and anomalous splitting, Δm selection rules, and π/σ± polarization.
+- **3D Oscillator:** (N+1)(N+2)/2 degeneracy, Cartesian ↔ spherical basis, comparison with hydrogen.
+- WebGPU rendering with a CPU fallback.
+- English, Spanish and French. Default and projector colour profiles. Installable as a PWA.
 
 ## Quick Start
 
@@ -39,8 +49,6 @@ npm start        # dev server → http://localhost:5173
 | `npm run format` | Auto-format all files |
 | `npm run fix` | Lint + auto-fix |
 | `npm run icons` | Regenerate PNG icons from `public/icons/icon.svg` |
-| `npm run rename` | Sim-level fork/rename (`--id`, `--name`) |
-| `npm run scaffold-screens` | Emit N fleet-named screen packages from `sim-screen/` (`--shared-model` optional) |
 | `npm run release` | `check && lint && build && test`, then version patch + push tags |
 | `npm run clean` | Remove `dist/` |
 

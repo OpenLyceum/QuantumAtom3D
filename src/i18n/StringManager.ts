@@ -50,25 +50,24 @@ const stringProperties = LocalizedString.getNestedStringProperties({
  * Keep this in sync with the `a11y` key in `strings_en.json` — a locale key
  * rename that is not mirrored here fails at the getter return (not silently).
  */
-export type SimA11yStrings = {
+export type QuantumAtom3DA11yStrings = {
   readonly screenSummary: {
     readonly playAreaStringProperty: ReadOnlyProperty<string>;
     readonly controlAreaStringProperty: ReadOnlyProperty<string>;
     readonly interactionHintStringProperty: ReadOnlyProperty<string>;
   };
   readonly currentDetailsStringProperty: ReadOnlyProperty<string>;
-  readonly controls: {
-    readonly exampleControlStringProperty: ReadOnlyProperty<string>;
-  };
 };
 
 /**
  * Explicit Preferences → Simulation labels from {@link StringManager.getPreferences}.
- * Same sync rule as {@link SimA11yStrings}.
+ * Same sync rule as {@link QuantumAtom3DA11yStrings}.
  */
-export type SimPreferenceStrings = {
+export type QuantumAtom3DPreferenceStrings = {
   readonly titleStringProperty: ReadOnlyProperty<string>;
-  readonly exampleToggleStringProperty: ReadOnlyProperty<string>;
+  readonly phaseColormapStringProperty: ReadOnlyProperty<string>;
+  readonly phaseColormapHsvStringProperty: ReadOnlyProperty<string>;
+  readonly phaseColormapTwilightStringProperty: ReadOnlyProperty<string>;
 };
 
 /**
@@ -103,34 +102,50 @@ export class StringManager {
    * Each property updates automatically when the locale changes.
    */
   public getScreenNames(): {
-    readonly simStringProperty: ReadOnlyProperty<string>;
+    readonly orbitalsStringProperty: ReadOnlyProperty<string>;
+    readonly superpositionStringProperty: ReadOnlyProperty<string>;
+    readonly angularMomentumStringProperty: ReadOnlyProperty<string>;
+    readonly zeemanStringProperty: ReadOnlyProperty<string>;
+    readonly oscillatorStringProperty: ReadOnlyProperty<string>;
   } {
     return {
-      simStringProperty: stringProperties.screens.simStringProperty,
+      orbitalsStringProperty: stringProperties.screens.orbitalsStringProperty,
+      superpositionStringProperty: stringProperties.screens.superpositionStringProperty,
+      angularMomentumStringProperty: stringProperties.screens.angularMomentumStringProperty,
+      zeemanStringProperty: stringProperties.screens.zeemanStringProperty,
+      oscillatorStringProperty: stringProperties.screens.oscillatorStringProperty,
     };
   }
 
-  /**
-   * Accessibility (Interactive Description) StringProperties.
-   *
-   * Returns the reactive `a11y` string tree used by the parallel DOM:
-   *   - `screenSummary.*` — play-area / control-area overview and an interaction
-   *     hint, read by `SimScreenSummaryContent`.
-   *   - `currentDetails` — a paragraph describing the simulation's current state.
-   *     In a real sim, derive a live version from model Properties (see
-   *     LunarLander's ScreenSummaryContent for the canonical pattern).
-   *
-   * Add `accessibleName` / `accessibleHelpText` strings for individual controls
-   * to the `a11y` group too, then read them through this same nested tree.
-   */
-  public getA11yStrings(): SimA11yStrings {
-    return stringProperties.a11y;
+  /** Accessibility strings for the Orbitals screen. */
+  public getOrbitalsA11yStrings() {
+    return stringProperties.a11y.orbitals;
+  }
+
+  /** Accessibility strings for the Superposition screen. */
+  public getSuperpositionA11yStrings() {
+    return stringProperties.a11y.superposition;
+  }
+
+  /** Accessibility strings for the Angular Momentum screen. */
+  public getAngularMomentumA11yStrings() {
+    return stringProperties.a11y.angularMomentum;
+  }
+
+  /** Accessibility strings for the Zeeman screen. */
+  public getZeemanA11yStrings() {
+    return stringProperties.a11y.zeeman;
+  }
+
+  /** Accessibility strings for the 3D Oscillator screen. */
+  public getOscillatorA11yStrings() {
+    return stringProperties.a11y.oscillator;
   }
 
   /**
    * Simulation-specific preference labels shown in Preferences → Simulation.
    */
-  public getPreferences(): SimPreferenceStrings {
+  public getPreferences() {
     return stringProperties.preferences;
   }
 }
