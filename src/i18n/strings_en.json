@@ -19,7 +19,7 @@
     "realState": "{{n}}{{letter}}<sub>{{subscript}}</sub>",
     "nuclearCharge": "Nuclear charge Z",
     "zoom": "Zoom",
-    "showNodes": "Show nodes",
+    "showNodes": "Slice nodes",
     "readouts": {
       "title": "Properties",
       "energy": "E",
@@ -49,14 +49,28 @@
       "phaseLegend": "brightness ∝ |ψ|",
       "densityLegend": "0 → max",
       "scale": "±{{value}} a<sub>0</sub>"
+    },
+    "volume": {
+      "title": "3D orbital",
+      "help": "Drag or use the arrow keys to rotate. Plus and minus zoom. Azimuth and elevation sliders also rotate the view.",
+      "orbitHelp": "Rotate the focused 3D view",
+      "zoomHelp": "Zoom the focused 3D view",
+      "yaw": "Azimuth",
+      "pitch": "Elevation",
+      "gpu": "WebGPU rendering",
+      "cpu": "CPU rendering · refines while idle",
+      "radialTab": "Radial probability",
+      "sliceTab": "Cross-section",
+      "orbitDescription": "Rotate the focused 3D view with the Left, Right, Up and Down arrow keys.",
+      "zoomDescription": "Zoom the focused 3D view with the plus or minus key."
     }
   },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "The play area shows a cross-section through the electron's probability cloud, coloured by the phase of the wavefunction or by its density, and a graph of the radial probability distribution P(r).",
+        "playArea": "The play area shows a rotatable 3D volume of the electron probability cloud, coloured by phase or density. Choose radial probability and properties, or a cross-section through the cloud.",
         "controlArea": "The control area has spinners for the quantum numbers n, l and m, a choice between complex and real angular functions, sliders for the nuclear charge, the zoom and the cross-section offset, and a Reset All button.",
-        "interactionHint": "Change n, l and m to see how the orbital's size, shape and nodes change."
+        "interactionHint": "Change n, l and m to see how the orbital's size, shape and nodes change. Drag or use the arrow keys to rotate. Plus and minus zoom. Azimuth and elevation sliders also rotate the view."
       },
       "currentDetails": "{{state}} of {{ion}}. Energy {{energy}} electronvolts. Mean radius {{radius}} Bohr radii. {{radialNodes}} radial nodes and {{angularNodes}} angular nodes.",
       "controls": {
@@ -71,7 +85,7 @@
         "zoom": "Zoom",
         "plane": "Cross-section plane",
         "offsetHelp": "Moves the cross-section along the axis perpendicular to it.",
-        "coloring": "Cross-section colouring",
+        "coloring": "Orbital colouring",
         "complexBasis": "Complex spherical harmonics Y l m",
         "realBasis": "Real orbitals such as p x and d x y",
         "nuclearCharge": "Nuclear charge Z"

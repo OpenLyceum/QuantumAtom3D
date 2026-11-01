@@ -34,8 +34,8 @@ identifier cannot start with a digit. Its title remains "3D Oscillator".
 | States | `src/common/model/orbital/` — `OrbitalTerm.ts`, `OrbitalCatalog.ts` (real orbitals as term lists), `Wavefunction.ts` (CPU evaluator), `NodalSurfaces.ts`, `SliceSampler.ts`, `SliceNodalCurves.ts`, `OrbitalSummary.ts`, `QuantumNumbersModel.ts` |
 | Shared views | `src/common/view/` — `SliceHeatmapNode.ts`, `RadialDistributionChartNode.ts`, `QuantumNumberControl.ts`, `OrbitalReadoutPanel.ts`, `ColormapLegendNode.ts`, `Colormaps.ts`, `formatters.ts` |
 | Planned | `src/common/model/oscillator/` (M7), `angular/` (M5–M6) |
-| GPU engine (planned M2) | `src/common/gpu/` — `GpuContext.ts`, WGSL in `shaders/`, `WebGpuOrbitalRenderer.ts`, `CpuOrbitalRenderer.ts` |
-| Scenery/GPU boundary (planned M2) | `src/common/view/OrbitalViewportNode.ts` (one `Image` around the engine canvas) |
+| GPU engine | `src/common/gpu/` — `GpuContext.ts`, WGSL in `shaders/`, `WebGpuOrbitalRenderer.ts`, `CpuOrbitalRenderer.ts` |
+| Scenery/GPU boundary | `src/common/view/OrbitalViewportNode.ts` (one `Image` around the engine canvas) |
 | Clock | `src/common/TimeModel.ts`, composed by `SuperpositionModel` |
 | Screens | `src/<screen>/` — `*Screen.ts`, `model/`, `view/`; icons in `src/common/QuantumAtom3DScreenIcons.ts` |
 | i18n | `src/i18n/StringManager.ts`, `strings_{en,es,fr}.json` |
@@ -72,8 +72,6 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
   colours computed from ψ (the phase wheels and the inferno density ramp). They must not follow the
   colour profile, or the legend would stop matching the heatmap. Theme chrome around them still comes
   from `QuantumAtom3DColors.ts`.
-
-When the GPU engine lands (M2), add these two:
 
 - `src/common/gpu/`: GPU-only state, as in FluidDynamics.
 - `src/common/gpu/webgpu-globals.d.ts`: an ambient declaration of the WebGPU flag namespaces. It is
@@ -124,6 +122,9 @@ only under root `tests/`, mirroring `src/`.
   under test. Landé g_J and oscillator degeneracy come with M6 and M7.
 - **WebGPU.** It is unavailable under Vitest, so test the CPU renderer there. Compare GPU and CPU in
   `tests/browser/` with Chrome flags `--enable-unsafe-webgpu --enable-features=Vulkan`.
+  `QUANTUM_CHROME` optionally supplies a Chrome executable; `QUANTUM_REQUIRE_GPU=1` makes unavailable
+  GPU presentation fail instead of skip. Run against a freshly started Vite server: importing a
+  module without an HMR timestamp after editing source creates a second module instance.
 
 ## Commands
 
