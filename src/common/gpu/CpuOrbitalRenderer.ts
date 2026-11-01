@@ -17,6 +17,7 @@ import type { CameraFrame } from "../view/OrbitCamera.js";
 import { OrbitalRayMarcher } from "./OrbitalRayMarcher.js";
 import type { OrbitalRenderer } from "./OrbitalRenderer.js";
 import type { OrbitalScene } from "./OrbitalScene.js";
+import { paintPointCloud } from "./PointCloudPainter.js";
 
 /** Square resolutions rendered in turn, coarse to fine. */
 export const CPU_RESOLUTIONS = [32, 64, 128, 256] as const;
@@ -41,6 +42,7 @@ export class CpuOrbitalRenderer implements OrbitalRenderer {
   private level = 0;
   private row = 0;
   private imageData: ImageData | null = null;
+  private pointsDirty = true;
 
   public constructor() {
     const finest = CPU_RESOLUTIONS[CPU_RESOLUTIONS.length - 1] ?? 1;
@@ -69,6 +71,7 @@ export class CpuOrbitalRenderer implements OrbitalRenderer {
   }
 
   private restart(): void {
+    this.pointsDirty = true;
     this.marcher =
       this.scene && this.frame && this.colorLuts ? new OrbitalRayMarcher(this.scene, this.frame, this.colorLuts) : null;
     this.level = 0;
@@ -77,6 +80,14 @@ export class CpuOrbitalRenderer implements OrbitalRenderer {
   }
 
   public render(): boolean {
+    if (this.scene?.mode === "dots" && this.frame && this.colorLuts) {
+      if (!this.pointsDirty) {
+        return false;
+      }
+      paintPointCloud(this.displayContext, this.canvas.width, this.scene, this.frame, this.colorLuts);
+      this.pointsDirty = false;
+      return true;
+    }
     const resolution = CPU_RESOLUTIONS[this.level];
     if (!(this.marcher && resolution)) {
       return false;

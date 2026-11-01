@@ -33,7 +33,9 @@
       "nodeCount": "{{count}}",
       "conesValue": "conos θ = {{angles}}",
       "planesValue": "planos φ = {{angles}}",
-      "polarPlaneValue": "plano xy (θ = 90°)"
+      "polarPlaneValue": "plano xy (θ = 90°)",
+      "meanSquareRadius": "⟨r²⟩",
+      "squareLengthValue": "{{value}} a<sub>0</sub>²"
     },
     "radialChart": {
       "title": "P(r) = r²|R<sub>nl</sub>|²",
@@ -48,7 +50,9 @@
       "density": "Densidad |ψ|²",
       "phaseLegend": "brillo ∝ |ψ|",
       "densityLegend": "0 → máx",
-      "scale": "±{{value}} a<sub>0</sub>"
+      "scale": "±{{value}} a<sub>0</sub>",
+      "showPlane": "Mostrar plano de corte en 3D",
+      "planeHelp": "Arrastra el control azul en la vista 3D o usa el deslizador de desplazamiento para mover el plano de corte."
     },
     "volume": {
       "title": "Orbital 3D",
@@ -62,14 +66,29 @@
       "radialTab": "Probabilidad radial",
       "sliceTab": "Sección transversal",
       "orbitDescription": "Gire la vista 3D seleccionada con las flechas izquierda, derecha, arriba y abajo.",
-      "zoomDescription": "Amplíe la vista 3D seleccionada con las teclas más o menos."
+      "zoomDescription": "Amplíe la vista 3D seleccionada con las teclas más o menos.",
+      "volume": "Volumen",
+      "dots": "Puntos",
+      "isosurface": "Isosuperficie",
+      "probe": "Radio explorado",
+      "probeHelp": "Mueve el cursor radial y resalta la esfera correspondiente en la vista 3D. Cero oculta la esfera.",
+      "nodes": "Nodos 3D"
+    },
+    "presets": {
+      "title": "Estados predefinidos",
+      "ground": "1s",
+      "radial": "2s",
+      "polar": "2p<sub>z</sub>",
+      "cones": "3d<sub>z²</sub>",
+      "positive": "2p, m = +1",
+      "negative": "2p, m = −1"
     }
   },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "El área de exploración muestra una nube de probabilidad electrónica en 3D, coloreada por fase o densidad. Elija la probabilidad radial y las propiedades, o una sección de la nube.",
-        "controlArea": "El área de control tiene selectores para los números cuánticos n, l y m, una elección entre funciones angulares complejas y reales, deslizadores para la carga nuclear, el zoom y el desplazamiento del corte, y un botón Restablecer todo.",
+        "playArea": "Explora el orbital como volumen, puntos de probabilidad o una isosuperficie del 90 % o 95 %. La gráfica radial comparte un cursor con la vista 3D. La sección muestra el plano de corte seleccionado.",
+        "controlArea": "Elige números cuánticos, base real o compleja, carga, modo de representación y estados predefinidos. Activa los nodos 3D o de la sección. Los deslizadores de cámara, radio y desplazamiento del plano permiten el control por teclado.",
         "interactionHint": "Cambia n, l y m para ver cómo cambian el tamaño, la forma y los nodos del orbital. Arrastre o use las flechas para girar. Más y menos ajustan el zoom. Los controles de acimut y elevación también giran la vista."
       },
       "currentDetails": "{{state}} de {{ion}}. Energía {{energy}} electronvoltios. Radio medio {{radius}} radios de Bohr. {{radialNodes}} nodos radiales y {{angularNodes}} nodos angulares.",

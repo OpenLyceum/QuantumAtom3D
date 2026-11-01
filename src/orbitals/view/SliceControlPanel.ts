@@ -9,9 +9,12 @@
 import type { TReadOnlyProperty } from "scenerystack/axon";
 import { HBox, RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
-import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
+import { AquaRadioButtonGroup, Checkbox, HSlider } from "scenerystack/sun";
 import { SLICE_PLANE_VALUES, type SlicePlane } from "../../common/model/orbital/SliceSampler.js";
-import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
+import {
+  QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
+  QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+} from "../../common/QuantumAtom3DControlOptions.js";
 import { QuantumAtom3DPanel } from "../../common/QuantumAtom3DPanel.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
@@ -61,6 +64,11 @@ export class SliceControlPanel extends QuantumAtom3DPanel {
       spacing: ROW_SPACING,
       align: "left",
       children: [
+        new Checkbox(model.cuttingPlaneVisibleProperty, label(strings.showPlaneStringProperty), {
+          ...QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
+          accessibleName: strings.showPlaneStringProperty,
+          accessibleHelpText: strings.planeHelpStringProperty,
+        }),
         new HBox({ spacing: ITEM_SPACING, children: [label(strings.planeStringProperty), planeRadioButtons] }),
         new HBox({ spacing: ITEM_SPACING, children: [label(strings.offsetStringProperty), offsetSlider] }),
       ],

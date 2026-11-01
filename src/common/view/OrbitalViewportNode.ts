@@ -2,15 +2,20 @@
 import { Multilink, StringUnionProperty, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
 import { Bounds2, type Vector2 } from "scenerystack/dot";
 import type { OneKeyStroke } from "scenerystack/scenery";
-import { DragListener, Image, KeyboardListener, Line, Node, Rectangle, Text } from "scenerystack/scenery";
+import { Circle, DragListener, Image, KeyboardListener, Line, Node, Rectangle, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { OrbitalsModel } from "../../orbitals/model/OrbitalsModel.js";
+import quantumAtom3DQueryParameters from "../../preferences/quantumAtom3DQueryParameters.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import { createOrbitalRenderer } from "../gpu/createOrbitalRenderer.js";
 import type { OrbitalRenderer } from "../gpu/OrbitalRenderer.js";
+import { hydrogenEnclosingRadius } from "../model/hydrogen/HydrogenRadial.js";
+import { buildDensityGrid, type DensityGrid, enclosedProbabilityLevel } from "../model/orbital/EnclosedProbability.js";
 import { peakDensity } from "../model/orbital/PeakDensity.js";
+import { sampleEigenstate } from "../model/orbital/ProbabilitySampler.js";
+import { DOT_COUNT } from "../model/orbital/RenderMode.js";
 import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
 import { OrbitCamera, projectToScreen, type Vec3 } from "./OrbitCamera.js";
 
@@ -49,6 +54,27 @@ export class OrbitalViewportNode extends Node {
     });
     this.image = new Image(this.engine.canvas, { scale: size / this.engine.canvas.width, pickable: false });
     this.addChild(this.image);
+    // The orthographic silhouette of a sphere is a circle for every camera orientation.
+    const probeShell = new Circle(1, {
+      centerX: size / 2,
+      centerY: size / 2,
+      stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+      lineDash: [4, 3],
+      pickable: false,
+    });
+    this.addChild(probeShell);
+    const planeHandle = new Circle(7, {
+      fill: QuantumAtom3DColors.accentColorProperty,
+      stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+      pickable: false,
+    });
+    this.addChild(planeHandle);
+    const planeNormal = (): Vec3 =>
+      model.slicePlaneProperty.value === "xy"
+        ? [0, 0, 1]
+        : model.slicePlaneProperty.value === "xz"
+          ? [0, 1, 0]
+          : [1, 0, 0];
     this.addChild(
       new Rectangle(0, 0, size, size, {
         stroke: QuantumAtom3DColors.sliceFrameColorProperty,
@@ -73,13 +99,43 @@ export class OrbitalViewportNode extends Node {
     // Cache normalization across camera, colour and zoom changes. Compute it once per state.
     let lastWavefunction = model.wavefunctionProperty.value;
     let peak = peakDensity(lastWavefunction);
+    let grid: DensityGrid | null = null;
+    const isoLevels = new Map<number, number>();
+    let points: Float32Array | undefined;
     this.updateScene = () => {
       const wavefunction = model.wavefunctionProperty.value;
       if (wavefunction !== lastWavefunction) {
         lastWavefunction = wavefunction;
         peak = peakDensity(wavefunction);
+        grid = null;
+        isoLevels.clear();
+        points = undefined;
+      }
+      const { n, l, m, basis, nuclearCharge } = model.summaryProperty.value;
+      const mode = model.renderModeProperty.value;
+      if (mode === "dots" && !points) {
+        points = sampleEigenstate(n, l, m, basis, nuclearCharge, DOT_COUNT, quantumAtom3DQueryParameters.seed);
+      }
+      if (mode === "isosurface" && !grid) {
+        grid = buildDensityGrid(wavefunction, hydrogenEnclosingRadius(n, l, nuclearCharge, 0.9999));
+      }
+      const fraction = model.enclosedFractionProperty.value;
+      if (mode === "isosurface" && grid && !isoLevels.has(fraction)) {
+        isoLevels.set(fraction, enclosedProbabilityLevel(grid, fraction));
       }
       this.engine.setScene({
+        ...(model.nodes3DVisibleProperty.value && { nodes: model.summaryProperty.value.nodes }),
+        ...(model.cuttingPlaneVisibleProperty.value && {
+          cuttingPlane: { normal: planeNormal(), offset: model.sliceOffsetProperty.value },
+        }),
+        overlayColor: [
+          QuantumAtom3DColors.sliceNodeOverlayColorProperty.value.red / 255,
+          QuantumAtom3DColors.sliceNodeOverlayColorProperty.value.green / 255,
+          QuantumAtom3DColors.sliceNodeOverlayColorProperty.value.blue / 255,
+        ],
+        mode,
+        ...(points && { points }),
+        isoLevel: isoLevels.get(fraction) ?? 0,
         terms: wavefunction.terms,
         nuclearCharge: wavefunction.nuclearCharge,
         inversePeakAmplitude: peak > 0 ? 1 / Math.sqrt(peak) : 0,
@@ -90,7 +146,44 @@ export class OrbitalViewportNode extends Node {
     };
     this.links = [
       Multilink.multilink(
-        [model.wavefunctionProperty, model.viewHalfWidthProperty, model.sliceColoringProperty, phaseColormapProperty],
+        [
+          model.cuttingPlaneVisibleProperty,
+          model.slicePlaneProperty,
+          model.sliceOffsetFractionProperty,
+          this.camera.yawProperty,
+          this.camera.pitchProperty,
+        ],
+        (visible) => {
+          planeHandle.visible = visible;
+          const normal = planeNormal();
+          const point: Vec3 = [
+            normal[0] * model.sliceOffsetFractionProperty.value,
+            normal[1] * model.sliceOffsetFractionProperty.value,
+            normal[2] * model.sliceOffsetFractionProperty.value,
+          ];
+          const [x, y] = projectToScreen(this.camera.frame, point);
+          planeHandle.centerX = size / 2 + (x * size) / 2;
+          planeHandle.centerY = size / 2 - (y * size) / 2;
+        },
+      ),
+      Multilink.multilink([model.probeFractionProperty], (fraction) => {
+        probeShell.radius = Math.max(0.01, (fraction * size) / 2);
+        probeShell.visible = fraction > 0;
+      }),
+      Multilink.multilink(
+        [
+          model.wavefunctionProperty,
+          model.viewHalfWidthProperty,
+          model.sliceColoringProperty,
+          phaseColormapProperty,
+          model.renderModeProperty,
+          model.enclosedFractionProperty,
+          model.nodes3DVisibleProperty,
+          model.cuttingPlaneVisibleProperty,
+          model.slicePlaneProperty,
+          model.sliceOffsetProperty,
+          QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+        ],
         () => {
           this.sceneDirty = true;
         },
@@ -108,19 +201,32 @@ export class OrbitalViewportNode extends Node {
       }),
     ];
     let previous: Vector2 | null = null;
+    let draggingPlane = false;
     this.dragListener = new DragListener({
       start: (event) => {
         previous = this.globalToLocalPoint(event.pointer.point);
+        draggingPlane = planeHandle.visible && previous.distance(planeHandle.center) < 14;
       },
       drag: (event) => {
         const point = this.globalToLocalPoint(event.pointer.point);
         if (previous) {
-          this.camera.orbit(-(point.x - previous.x) * DRAG_ANGLE, (point.y - previous.y) * DRAG_ANGLE);
+          if (draggingPlane) {
+            const [nx, ny] = projectToScreen(this.camera.frame, planeNormal());
+            const norm = nx * nx + ny * ny;
+            const delta =
+              norm > 0.01 ? ((point.x - previous.x) * nx - (point.y - previous.y) * ny) / norm : previous.y - point.y;
+            model.sliceOffsetFractionProperty.value = model.sliceOffsetFractionProperty.range.constrainValue(
+              model.sliceOffsetFractionProperty.value + (2 * delta) / size,
+            );
+          } else {
+            this.camera.orbit(-(point.x - previous.x) * DRAG_ANGLE, (point.y - previous.y) * DRAG_ANGLE);
+          }
         }
         previous = point;
       },
       end: () => {
         previous = null;
+        draggingPlane = false;
       },
     });
     this.keyboardListener = new KeyboardListener({
@@ -147,6 +253,18 @@ export class OrbitalViewportNode extends Node {
     });
     this.addInputListener(this.dragListener);
     this.addInputListener(this.keyboardListener);
+    this.addInputListener({
+      move: (event) => {
+        if (!previous) {
+          const point = this.globalToLocalPoint(event.pointer.point);
+          // The ray's closest approach to the nucleus, divided by view half-width.
+          model.probeFractionProperty.value = Math.min(
+            1,
+            Math.hypot((2 * point.x) / size - 1, 1 - (2 * point.y) / size),
+          );
+        }
+      },
+    });
   }
 
   /** Coalesce synchronous property changes, then spend a bounded amount of CPU work per frame. */

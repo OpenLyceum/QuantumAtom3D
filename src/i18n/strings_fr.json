@@ -33,7 +33,9 @@
       "nodeCount": "{{count}}",
       "conesValue": "cônes θ = {{angles}}",
       "planesValue": "plans φ = {{angles}}",
-      "polarPlaneValue": "plan xy (θ = 90°)"
+      "polarPlaneValue": "plan xy (θ = 90°)",
+      "meanSquareRadius": "⟨r²⟩",
+      "squareLengthValue": "{{value}} a<sub>0</sub>²"
     },
     "radialChart": {
       "title": "P(r) = r²|R<sub>nl</sub>|²",
@@ -48,7 +50,9 @@
       "density": "Densité |ψ|²",
       "phaseLegend": "luminosité ∝ |ψ|",
       "densityLegend": "0 → max",
-      "scale": "±{{value}} a<sub>0</sub>"
+      "scale": "±{{value}} a<sub>0</sub>",
+      "showPlane": "Afficher le plan de coupe en 3D",
+      "planeHelp": "Faites glisser la poignée bleue dans la vue 3D ou utilisez le curseur de décalage pour déplacer le plan de coupe."
     },
     "volume": {
       "title": "Orbitale 3D",
@@ -62,14 +66,29 @@
       "radialTab": "Probabilité radiale",
       "sliceTab": "Coupe",
       "orbitDescription": "Tournez la vue 3D sélectionnée avec les flèches gauche, droite, haut et bas.",
-      "zoomDescription": "Zoomez la vue 3D sélectionnée avec les touches plus ou moins."
+      "zoomDescription": "Zoomez la vue 3D sélectionnée avec les touches plus ou moins.",
+      "volume": "Volume",
+      "dots": "Points",
+      "isosurface": "Isosurface",
+      "probe": "Rayon sondé",
+      "probeHelp": "Déplacez le curseur radial et affichez la sphère correspondante dans la vue 3D. Zéro masque la sphère.",
+      "nodes": "Nœuds 3D"
+    },
+    "presets": {
+      "title": "États prédéfinis",
+      "ground": "1s",
+      "radial": "2s",
+      "polar": "2p<sub>z</sub>",
+      "cones": "3d<sub>z²</sub>",
+      "positive": "2p, m = +1",
+      "negative": "2p, m = −1"
     }
   },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "La zone d’exploration montre le nuage de probabilité électronique en 3D, coloré selon la phase ou la densité. Choisissez la probabilité radiale et les propriétés, ou une coupe du nuage.",
-        "controlArea": "La zone de contrôle comprend des sélecteurs pour les nombres quantiques n, l et m, un choix entre fonctions angulaires complexes et réelles, des curseurs pour la charge nucléaire, le zoom et le décalage de la coupe, et un bouton Tout réinitialiser.",
+        "playArea": "Explorez l’orbitale en volume, en points de probabilité ou par une isosurface à 90 % ou 95 %. Le graphique radial partage une sonde avec la vue 3D. La coupe montre le plan sélectionné.",
+        "controlArea": "Choisissez les nombres quantiques, la base réelle ou complexe, la charge, le rendu et les états prédéfinis. Activez les nœuds 3D ou ceux de la coupe. Les curseurs de caméra, de rayon et de décalage du plan permettent le contrôle au clavier.",
         "interactionHint": "Changez n, l et m pour voir comment la taille, la forme et les nœuds de l'orbitale changent. Glissez ou utilisez les flèches pour tourner. Plus et moins règlent le zoom. Les curseurs d’azimut et d’élévation tournent aussi la vue."
       },
       "currentDetails": "{{state}} de {{ion}}. Énergie {{energy}} électronvolts. Rayon moyen {{radius}} rayons de Bohr. {{radialNodes}} nœuds radiaux et {{angularNodes}} nœuds angulaires.",

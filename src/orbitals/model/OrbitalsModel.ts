@@ -44,6 +44,14 @@ export const SLICE_COLORING_VALUES = ["phase", "density"] as const;
 export type SliceColoring = (typeof SLICE_COLORING_VALUES)[number];
 
 export class OrbitalsModel implements TModel {
+  public readonly nodes3DVisibleProperty = new BooleanProperty(false);
+  public readonly cuttingPlaneVisibleProperty = new BooleanProperty(false);
+  /** Radial probe shared by the chart, viewport and keyboard slider. */
+  public readonly probeFractionProperty = new NumberProperty(0, { range: new Range(0, 1) });
+  public readonly renderModeProperty = new StringUnionProperty<"volume" | "dots" | "isosurface">("volume", {
+    validValues: ["volume", "dots", "isosurface"],
+  });
+  public readonly enclosedFractionProperty = new NumberProperty(0.9, { validValues: [0.9, 0.95] });
   public readonly quantumNumbers: QuantumNumbersModel;
   public readonly nuclearChargeProperty: NumberProperty;
   public readonly basisProperty: StringUnionProperty<OrbitalBasis>;
@@ -130,6 +138,11 @@ export class OrbitalsModel implements TModel {
   }
 
   public reset(): void {
+    this.nodes3DVisibleProperty.reset();
+    this.cuttingPlaneVisibleProperty.reset();
+    this.probeFractionProperty.reset();
+    this.renderModeProperty.reset();
+    this.enclosedFractionProperty.reset();
     this.quantumNumbers.reset();
     this.nuclearChargeProperty.reset();
     this.basisProperty.reset();
@@ -145,6 +158,11 @@ export class OrbitalsModel implements TModel {
   }
 
   public dispose(): void {
+    this.nodes3DVisibleProperty.dispose();
+    this.cuttingPlaneVisibleProperty.dispose();
+    this.probeFractionProperty.dispose();
+    this.renderModeProperty.dispose();
+    this.enclosedFractionProperty.dispose();
     this.sliceOffsetProperty.dispose();
     this.viewHalfWidthProperty.dispose();
     this.summaryProperty.dispose();
