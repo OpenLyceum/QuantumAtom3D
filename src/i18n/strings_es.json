@@ -136,11 +136,11 @@
     },
     "oscillator": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "La vista 3D muestra estados del oscilador en coordenadas reducidas. La matriz compara las bases cartesiana y esférica. Filas cartesianas y columnas esféricas.",
+        "controlArea": "Elige N, la base mostrada y un estado de cada base. Los selectores de fila y columna eligen un coeficiente. Gira, amplía o cambia la representación.",
+        "interactionHint": "La intensidad del color representa la magnitud al cuadrado. El coeficiente complejo se lee por separado. Ambas bases describen la misma capa degenerada."
       },
-      "currentDetails": "La simulación está en su estado inicial."
+      "currentDetails": "N={{N}}; E={{energy}} ℏω; d={{count}}; {{basis}}. (nₓ,nᵧ,n_z)=({{cart}}); (nᵣ,l,m)=({{sphere}}); ⟨cart|sph⟩={{re}} + ({{im}})i."
     }
   },
   "preferences": {
@@ -204,5 +204,16 @@
     "period": "Período de Larmor",
     "off": "B = 0: sin precesión de Larmor",
     "note": "Solo posiciones; se omiten intensidades y desplazamientos de Lamb e hiperfinos. Velocidad de precesión ilustrativa."
+  },
+  "oscillator": {
+    "units": "Longitudes: √(ℏ/mω); energías: ℏω",
+    "shell": "Capa N",
+    "cartesian": "Cartesiana",
+    "spherical": "Esférica",
+    "cartState": "Estado cartesiano (nₓ,nᵧ,n_z)",
+    "sphereState": "Estado esférico (nᵣ,l,m)",
+    "overlap": "|⟨cartesiano|esférico⟩|²: intensidad del color 0 → 1",
+    "comparison": "Degeneración oscilador / hidrógeno",
+    "note": "Columnas: (nᵣ,l,m); filas: (nₓ,nᵧ,n_z). Oscilador SU(3), hidrógeno SO(4). Isosuperficie: aproximadamente 90 %."
   }
 }

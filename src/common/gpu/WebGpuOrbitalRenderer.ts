@@ -22,7 +22,7 @@ import { requestCanvasContext, type WebGpuContext } from "./WebGpuSupport.js";
 /** One table serves every renderer: it depends on nothing but n and l. */
 let sharedRadialTable: RadialLookupTable | null = null;
 function getRadialTable(): RadialLookupTable {
-  sharedRadialTable ??= new RadialLookupTable();
+  sharedRadialTable ??= new RadialLookupTable(undefined, true);
   return sharedRadialTable;
 }
 

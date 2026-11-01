@@ -136,11 +136,11 @@
     },
     "oscillator": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La vue 3D montre les états de l’oscillateur en coordonnées réduites. La matrice compare les bases cartésienne et sphérique. Lignes cartésiennes, colonnes sphériques.",
+        "controlArea": "Choisissez N, la base affichée et un état de chaque base. Les sélecteurs de ligne et de colonne choisissent un coefficient. Tournez, zoomez ou changez le rendu.",
+        "interactionHint": "La couleur représente le module au carré. Le coefficient complexe est lu séparément. Les deux bases décrivent la même couche dégénérée."
       },
-      "currentDetails": "La simulation est dans son état initial."
+      "currentDetails": "N={{N}}; E={{energy}} ℏω; d={{count}}; {{basis}}. (nₓ,nᵧ,n_z)=({{cart}}); (nᵣ,l,m)=({{sphere}}); ⟨cart|sph⟩={{re}} + ({{im}})i."
     }
   },
   "preferences": {
@@ -204,5 +204,16 @@
     "period": "Période de Larmor",
     "off": "B = 0 : aucune précession de Larmor",
     "note": "Positions seules ; intensités, déplacements de Lamb et hyperfins omis. Vitesse de précession illustrative."
+  },
+  "oscillator": {
+    "units": "Longueurs : √(ℏ/mω) ; énergies : ℏω",
+    "shell": "Couche N",
+    "cartesian": "Cartésienne",
+    "spherical": "Sphérique",
+    "cartState": "État cartésien (nₓ,nᵧ,n_z)",
+    "sphereState": "État sphérique (nᵣ,l,m)",
+    "overlap": "|⟨cartésien|sphérique⟩|² : intensité de couleur 0 → 1",
+    "comparison": "Dégénérescence oscillateur / hydrogène",
+    "note": "Colonnes : (nᵣ,l,m) ; lignes : (nₓ,nᵧ,n_z). Oscillateur SU(3), hydrogène SO(4). Isosurface : environ 90 %."
   }
 }

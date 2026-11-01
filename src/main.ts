@@ -64,6 +64,7 @@ onReadyToLaunch(async () => {
       backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
     }),
     new OscillatorScreen({
+      preferences: simPreferences,
       name: stringManager.getScreenNames().oscillatorStringProperty,
       tandem: Tandem.ROOT.createTandem("oscillatorScreen"),
       backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,

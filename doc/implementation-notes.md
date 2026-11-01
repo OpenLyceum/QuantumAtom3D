@@ -39,7 +39,7 @@ This follows HeatTransfer's GPU architecture (`HeatTransfer/src/common/field/gpu
   hand-computed constants placed beside each WGSL struct, and a unit test checks them.
 
 **ψ is evaluated in the shader, not uploaded as a grid.** Every state on the 3D screens is a list of up
-to 8 terms c_k R_k(r) Y_{l_k m_k}(θ, φ):
+to 16 terms c_k R_k(r) Y_{l_k m_k}(θ, φ):
 
 - **Radial part.** R comes from a storage-buffer lookup table, with one row per (n, l) for hydrogen and
   per (n_r, l) for the oscillator. Rows are tabulated on a √ρ axis and linearly interpolated in WGSL.
@@ -201,8 +201,8 @@ refreshed at most four times per second during playback. Grid construction is sy
 
 M4 validation includes analytic dipole amplitude/period, breathing, norm conservation, hybrid
 orthonormality, coherent-sampler moments, disposal checks, CPU/GPU pixel comparisons and browser
-mixing/playback/reset tests. An intermittent hybrid-isosurface screenshot discrepancy remains under
-investigation; repeated identical renderer calls were stable. Keep the M4 PR in draft until resolved.
+mixing/playback/reset tests. The earlier apparent hybrid-isosurface discrepancy was an error in visual inspection: direct PNG
+pixel comparisons show identical cloud images across profiles. Displayed-image checks are retained.
 
 ## Angular Momentum (M5)
 
@@ -215,7 +215,7 @@ ladder. The polar plot updates for the selected orbital or spin-traced coupled s
 Unit tests cover vector lengths, closure, projection, uncertainty bounds and spin weights for
 all allowed l<=4 states. The shared memory harness checks model and diagram/plot disposal.
 Browser tests cover clamps, half-integer controls, playback, reset, keyboard help, pointer fuzz
-and keyboard fuzz. The earlier M4 isosurface screenshot discrepancy remains unresolved.
+and keyboard fuzz. The earlier M4 screenshot concern was resolved by direct PNG pixel comparison.
 
 ## Zeeman (M6)
 
@@ -235,3 +235,34 @@ are rejected and an empty intermediate spectrum is safely skipped. Tests cover t
 field-unit accessibility, weak-field scaling, polarization filtering, playback and reset.
 Unit physics tests include Landé factors, Dirac limits, normal triplets, the ten anomalous
 Lyman-alpha positions, wavelength shifts and field caps. No GPU is needed.
+
+## 3D Oscillator (M7)
+
+The screen implements shells N=0–4 in Cartesian and complex spherical bases. The Cartesian
+basis uses normalized physicists' Hermite polynomials; the spherical basis uses normalized
+r^l L_nr^(l+1/2)(r²) exp(-r²/2) Y_lm. All coordinates are reduced oscillator lengths and
+energies are in hbar omega. Spherical terms store n_r in the shared term.n field.
+
+The overlap matrix is computed by five-point Gauss-Hermite quadrature on each axis. It is
+exact up to floating-point error for the degree-at-most-eight overlap polynomials. The
+matrix display encodes squared magnitude; the selected Cartesian row and spherical column
+report the full complex <Cartesian|spherical> coefficient. Tests verify every shell's unitarity
+and compare expanded Cartesian states against independent direct Hermite evaluation.
+
+Rendering shares the existing analytic angular shader and radial storage table. Nine oscillator
+radial rows follow the 15 hydrogenic rows. The uniform block now has 16 term slots (720 bytes):
+Cartesian (4,0,0) requires nine terms, exceeding the original eight-slot plan. Hydrogen remains
+the default Wavefunction family. Oscillator CPU and GPU paths use the same term expansions.
+
+The oscillator offers volume and approximately 90% isosurface modes, a phase/density legend,
+orbit and zoom controls. Isosurfaces use a 64³ grid in a fixed reduced-coordinate box. Peak
+normalization is a coarse 3D visualization estimate. The degeneracy comparison excludes spin
+and pairs oscillator shell N with hydrogen principal number n=N+1 to show their growth.
+
+### Display validation
+
+A visual inspection initially suggested missing phase-coloured lobes. Direct pixel checks of the
+saved PNGs showed identical M4 cloud RGB pixels and identical M7 cyan-lobe coverage across
+French/default and Spanish/projector captures. The apparent discrepancy was an inspection error.
+Experimental canvas-copy changes were removed. Browser tests now compare displayed phase-colour
+coverage with the renderer bitmap, capturing the display before reading renderer pixels.

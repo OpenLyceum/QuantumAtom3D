@@ -59,11 +59,11 @@ export function peakDensity(wavefunction: Wavefunction): number {
   if (!first) {
     return 0;
   }
-  if (rest.every((term) => term.n === first.n && term.l === first.l)) {
+  if (wavefunction.family === "hydrogen" && rest.every((term) => term.n === first.n && term.l === first.l)) {
     return radialPeak(first.n, first.l, wavefunction.nuclearCharge) * angularPeak(wavefunction);
   }
   const maxN = Math.max(...wavefunction.terms.map((term) => term.n));
-  const half = hydrogenRadialCutoff(maxN, wavefunction.nuclearCharge) / 2;
+  const half = wavefunction.family === "oscillator" ? 5.5 : hydrogenRadialCutoff(maxN, wavefunction.nuclearCharge) / 2;
   const sample: ComplexSample = { re: 0, im: 0 };
   let peak = 0;
   for (let i = 0; i < GRID_SAMPLES; i++) {

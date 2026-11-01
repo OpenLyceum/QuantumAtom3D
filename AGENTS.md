@@ -46,10 +46,14 @@ identifier cannot start with a digit. Its title remains "3D Oscillator".
 - **Units.** Hartree atomic units in every model (lengths in a0, energies in E_h, times in ħ/E_h).
   Conversions to pm, eV, fs and nm belong in one place, `common/model/AtomicUnits.ts`. Never scale
   inline.
-- **States are term lists.** Each 3D state is a list of up to 8 terms: a coefficient, quantum numbers
+- **States are term lists.** Each 3D state is a list of up to 16 terms: a coefficient, quantum numbers
   and a basis kind. Real orbitals, hybrids and Cartesian oscillator states are all term lists of
   spherical states. The CPU's `Wavefunction.evaluate` and the WGSL field chunk have to agree term for
   term.
+- **Oscillator units.** Oscillator models use reduced length sqrt(hbar/m omega) and energy hbar omega.
+  `Wavefunction.family` selects hydrogenic or oscillator radial functions; oscillator `term.n` means n_r.
+  The oscillator radial rows follow the 15 hydrogenic rows in the shared GPU table. Sixteen term slots
+  are required because Cartesian (4,0,0) has nine nonzero spherical coefficients.
 - **No shared model.** Each screen model composes the common classes; there is no `SharedModel`.
 
 ## Accessibility
@@ -62,7 +66,7 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
 - Keep the 3D viewport keyboard-operable: arrows orbit and +/− zoom.
 - The cutting-plane handle shares its offset with the slice slider; radial hover shares a probe slider.
 - Node overlays are analytic ray events; maintain CPU/WGSL parity when changing their intersections.
-- `Params` occupies 464 bytes. The dot pass composites foreground surfaces per fragment.
+- `Params` occupies 720 bytes. The dot pass composites foreground surfaces per fragment.
 - Give every pointer gesture in 3D a slider equivalent.
 - Orbitals' keyboard help covers its spinners, sliders, radio buttons and checkbox. The other four
   are still scaffold stubs; fill each one in when its screen gains interactions.

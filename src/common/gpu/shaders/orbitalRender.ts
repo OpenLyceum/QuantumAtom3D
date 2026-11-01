@@ -24,7 +24,7 @@ export const ORBITAL_RENDER_SHADER = /* wgsl */ `
 const LUT_SIZE: i32 = 256;
 const PI: f32 = 3.14159265358979;
 const OPAQUE_ENOUGH: f32 = 0.99;
-const MAX_TERMS: i32 = 8;
+const MAX_TERMS: i32 = 16;
 
 struct Term {
   coefficient: vec4<f32>, // re, im, angular prefactor, unused

@@ -28,7 +28,7 @@ export class OrbitalRayMarcher {
     this.scene = scene;
     this.frame = frame;
     this.colorLuts = colorLuts;
-    this.wavefunction = new Wavefunction(scene.terms, scene.nuclearCharge);
+    this.wavefunction = new Wavefunction(scene.terms, scene.nuclearCharge, scene.family);
   }
 
   /** Writes the colour (0–1 RGB over black) of pixel (px, py) of a resolution × resolution image into `out`. */

@@ -48,7 +48,7 @@ export function paintPointCloud(
   context.fillStyle = "rgb(0,0,0)";
   context.fillRect(0, 0, resolution, resolution);
   const points = scene.points ?? new Float32Array();
-  const wavefunction = new Wavefunction(scene.terms, scene.nuclearCharge);
+  const wavefunction = new Wavefunction(scene.terms, scene.nuclearCharge, scene.family);
   paintSurfaceBackground(context, resolution, scene, frame, luts, wavefunction);
   const sample = { re: 0, im: 0 };
   const depth = (i: number) =>

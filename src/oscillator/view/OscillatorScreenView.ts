@@ -1,160 +1,231 @@
-/**
- * OscillatorScreenView.ts
- *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. QuantumAtom3DControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
- */
-
-import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import type { Range } from "scenerystack/dot";
+import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
+import { AquaRadioButtonGroup, HSlider, NumberSpinner } from "scenerystack/sun";
+import {
+  cartesianExpansion,
+  cartesianStates,
+  oscillatorDegeneracy,
+  oscillatorEnergy,
+  sphericalStates,
+} from "../../common/model/oscillator/OscillatorStates.js";
+import {
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+} from "../../common/QuantumAtom3DButtonOptions.js";
+import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
+import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
+import { BasisOverlapNode } from "./BasisOverlapNode.js";
 import { OscillatorScreenSummaryContent } from "./OscillatorScreenSummaryContent.js";
-
-export type OscillatorScreenViewOptions = ScreenViewOptions;
-
+import { OscillatorViewportNode } from "./OscillatorViewportNode.js";
+export type OscillatorScreenViewOptions = ScreenViewOptions & {
+  phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
+};
 export class OscillatorScreenView extends ScreenView {
-  public constructor(model: OscillatorModel, providedOptions?: OscillatorScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See OscillatorScreenSummaryContent for the four content regions.
-    const options = optionize<OscillatorScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new OscillatorScreenSummaryContent(model),
-      },
-      providedOptions,
+  public readonly viewport: OscillatorViewportNode;
+  public constructor(model: OscillatorModel, options: OscillatorScreenViewOptions) {
+    super({ ...options, screenSummaryContent: new OscillatorScreenSummaryContent(model) });
+    const strings = StringManager.getInstance().getOscillatorStrings();
+    const orbital = StringManager.getInstance().getOrbitalStrings();
+    const text = (value: string | TReadOnlyProperty<string>, maxWidth = 500) =>
+      new RichText(value, { font: new PhetFont(13), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const spinner = (
+      property: typeof model.shellProperty,
+      range: TReadOnlyProperty<Range>,
+      name: TReadOnlyProperty<string>,
+      offset = 0,
+    ) =>
+      new NumberSpinner(property, range, {
+        arrowsPosition: "leftRight",
+        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
+        numberDisplayOptions: {
+          textOptions: { font: new PhetFont(14) },
+          numberFormatter: (value) => `${value + offset}`,
+          minBackgroundWidth: 35,
+        },
+        accessibleName: name,
+      });
+    this.viewport = new OscillatorViewportNode(320, model, options.phaseColormapProperty);
+    const viewport = this.viewport;
+    viewport.left = this.layoutBounds.minX + 25;
+    viewport.top = this.layoutBounds.minY + 50;
+    const title = text(strings.unitsStringProperty, 340);
+    title.left = viewport.left;
+    title.bottom = viewport.top - 10;
+    const cameraRows = (
+      [
+        [orbital.volume.yawStringProperty, viewport.camera.yawProperty],
+        [orbital.volume.pitchStringProperty, viewport.camera.pitchProperty],
+        [orbital.zoomStringProperty, model.zoomProperty],
+      ] as const
+    ).map(
+      ([name, property]) =>
+        new HBox({
+          spacing: 12,
+          children: [
+            text(name, 100),
+            new HSlider(property, property.range, {
+              ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+              accessibleName: name,
+              keyboardStep: property === model.zoomProperty ? 1 : Math.PI / 36,
+              shiftKeyboardStep: property === model.zoomProperty ? 1 : Math.PI / 180,
+              pageKeyboardStep: property === model.zoomProperty ? 1 : Math.PI / 6,
+              ...(property === model.zoomProperty && { constrainValue: (value: number) => Math.round(value) }),
+            }),
+          ],
+        }),
     );
-    super(options);
-
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: QuantumAtom3DColors.backgroundColorProperty,
+    const modes = new AquaRadioButtonGroup(
+      model.modeProperty,
+      (["volume", "isosurface"] as const).map((value) => ({
+        value,
+        createNode: () => text(orbital.volume[`${value}StringProperty`]),
+        options: { accessibleName: orbital.volume[`${value}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 15, radioButtonOptions: { radius: 6 } },
+    );
+    const below = new VBox({
+      align: "left",
+      spacing: 10,
+      children: [
+        modes,
+        new OrbitalColorControl({ sliceColoringProperty: model.coloringProperty }, options.phaseColormapProperty),
+        ...cameraRows,
+      ],
+      left: viewport.left,
+      top: viewport.bottom + 10,
     });
-    this.addChild(backgroundRect);
-
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().oscillatorStringProperty, {
-      font: "bold 36px sans-serif",
-      fill: QuantumAtom3DColors.textColorProperty,
-      center: this.layoutBounds.center,
+    const right = this.layoutBounds.minX + 435;
+    const bases = new AquaRadioButtonGroup(
+      model.basisProperty,
+      (["cartesian", "spherical"] as const).map((value) => ({
+        value,
+        createNode: () => text(strings[`${value}StringProperty`]),
+        options: { accessibleName: strings[`${value}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 20, radioButtonOptions: { radius: 7 } },
+    );
+    const cartLabel = new DerivedProperty(
+      [model.shellProperty, model.cartesianIndexProperty],
+      (N, index) => `(${(cartesianStates(N)[index] ?? cartesianStates(N)[0])?.join(",")})`,
+    );
+    const sphereLabel = new DerivedProperty([model.shellProperty, model.sphericalIndexProperty], (N, index) => {
+      const s = sphericalStates(N)[index] ?? sphericalStates(N)[0];
+      return s ? `(${s.nr},${s.l},${s.m})` : "";
     });
-    this.addChild(placeholderText);
-
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getOscillatorA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.<control>StringProperty,
-    //   });
-    //   this.addChild(exampleButton);
-
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
-    const resetAllButton = new ResetAllButton({
+    const controls = new VBox({
+      align: "left",
+      spacing: 10,
+      children: [
+        new HBox({
+          spacing: 15,
+          children: [
+            text(strings.shellStringProperty),
+            spinner(model.shellProperty, model.shellProperty.rangeProperty, strings.shellStringProperty),
+          ],
+        }),
+        bases,
+        new HBox({
+          spacing: 12,
+          children: [
+            text(strings.cartStateStringProperty),
+            spinner(model.cartesianIndexProperty, model.indexRangeProperty, strings.cartStateStringProperty, 1),
+            text(cartLabel),
+          ],
+        }),
+        new HBox({
+          spacing: 12,
+          children: [
+            text(strings.sphereStateStringProperty),
+            spinner(model.sphericalIndexProperty, model.indexRangeProperty, strings.sphereStateStringProperty, 1),
+            text(sphereLabel),
+          ],
+        }),
+      ],
+      left: right,
+      top: this.layoutBounds.minY + 20,
+    });
+    const energy = text(
+      new DerivedProperty(
+        [model.shellProperty],
+        (N) =>
+          `E = ${oscillatorEnergy(N)} ℏω; d<sub>N</sub> = ${oscillatorDegeneracy(N)}; l = ${[...new Set(sphericalStates(N).map((s) => s.l))].join(", ")}`,
+      ),
+    );
+    energy.left = right;
+    energy.top = this.layoutBounds.minY + 165;
+    const matrixTitle = text(strings.overlapStringProperty);
+    matrixTitle.left = right;
+    matrixTitle.top = this.layoutBounds.minY + 195;
+    const coefficient = new DerivedProperty(
+      [model.shellProperty, model.cartesianIndexProperty, model.sphericalIndexProperty],
+      (N, row, column) => {
+        const c = cartesianStates(N)[row];
+        const s = sphericalStates(N)[column];
+        const t =
+          c && s
+            ? cartesianExpansion(c).find((entry) => entry.n === s.nr && entry.l === s.l && entry.m === s.m)
+            : undefined;
+        return `⟨${c?.join(",") ?? ""}|${s ? `${s.nr},${s.l},${s.m}` : ""}⟩ = ${(t?.re ?? 0).toFixed(4)} ${-(t?.im ?? 0) < 0 ? "−" : "+"} ${Math.abs(t?.im ?? 0).toFixed(4)}i`;
+      },
+    );
+    const coefficientLabel = text(coefficient);
+    coefficientLabel.left = right;
+    coefficientLabel.top = this.layoutBounds.minY + 220;
+    const overlap = new BasisOverlapNode(model);
+    overlap.left = right;
+    overlap.top = this.layoutBounds.minY + 250;
+    const ladder = text(
+      new DerivedProperty(
+        [model.shellProperty, strings.comparisonStringProperty],
+        (N, caption) =>
+          `${caption}<br>${Array.from({ length: 5 }, (_, shell) => `${shell === N ? "▶ " : ""}N=${shell}: ${oscillatorDegeneracy(shell)} / n=${shell + 1}: ${(shell + 1) ** 2}`).join("<br>")}`,
+      ),
+      500,
+    );
+    ladder.left = right + 390;
+    ladder.top = this.layoutBounds.minY + 275;
+    ladder.maxWidth = 140;
+    ladder.lineWrap = 140;
+    const note = text(strings.noteStringProperty, 920);
+    note.left = viewport.left;
+    note.bottom = this.layoutBounds.maxY - 15;
+    const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
-        this.reset();
+        viewport.reset();
       },
-      right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
-      bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
+      right: this.layoutBounds.maxX - 18,
+      bottom: this.layoutBounds.maxY - 18,
     });
-    this.addChild(resetAllButton);
-
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
     this.addChild(
       new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
+        children: [
+          viewport,
+          title,
+          below,
+          controls,
+          energy,
+          matrixTitle,
+          coefficientLabel,
+          overlap,
+          ladder,
+          note,
+          reset,
         ],
       }),
     );
+    this.pdomPlayAreaNode.pdomOrder = [viewport];
+    this.pdomControlAreaNode.pdomOrder = [controls, below, reset];
   }
-
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
   public override step(_dt: number): void {
-    // TODO: implement animation updates here
+    this.viewport.step();
   }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeOscillatorScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in OscillatorScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeOscillatorScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeOscillatorScreenView();
-  //   super.dispose();
-  // }
 }

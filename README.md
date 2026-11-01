@@ -8,8 +8,7 @@ complex-phase colouring, radial distributions, superpositions that evolve in tim
 angular-momentum vector model, Zeeman splitting with selection rules, and the degeneracy of the
 isotropic 3D oscillator.
 
-**Status:** Orbitals, Superposition, Angular Momentum and Zeeman screens are implemented. A Superposition
-isosurface visual check remains open. The 3D Oscillator screen remains planned; see
+**Status:** Orbitals, Superposition, Angular Momentum, Zeeman and 3D Oscillator screens are implemented. Further polish remains planned; see
 [`doc/implementation-notes.md`](doc/implementation-notes.md).
 
 ## Features
@@ -18,13 +17,14 @@ isosurface visual check remains open. The 3D Oscillator screen remains planned; 
   Volume rendering with phase or density colours, pointer/keyboard orbit and zoom, camera sliders,
   probability dots, 90%/95% isosurfaces, analytic 3D nodes, a draggable cutting plane and linked
   P(r) probing. Includes stationary-state presets and expectation-value readouts.
-- **Superposition (M4 in validation):** mix up to six eigenstates, evolve their relative phases,
+- **Superposition:** mix up to six eigenstates, evolve their relative phases,
   track mean radius and mean z, and explore dipole, breathing, rotation and sp/sp²/sp³ presets.
 - **Angular Momentum:** orbital precession cones, projections and uncertainties; L + S → J
   coupling, half-integer projections and a spin-traced angular-density plot.
 - **Zeeman:** normal/anomalous splitting, Dirac fine structure, weak-field limits, selection rules,
   polarization filtering, spectral positions and schematic Larmor precession.
-- **3D Oscillator (planned):** (N+1)(N+2)/2 degeneracy, Cartesian ↔ spherical basis, comparison with hydrogen.
+- **3D Oscillator:** shells N=0–4, Cartesian/spherical states and their overlap matrix,
+  degeneracy comparison with hydrogen, and 3D volume/isosurface rendering.
 - WebGPU rendering with a progressive CPU fallback, including recovery after device loss. Use
   `?forceCpu=true` to select the CPU renderer explicitly; `?seed=173` reproduces the dot samples.
 - English, Spanish and French. Default and projector colour profiles. Installable as a PWA.

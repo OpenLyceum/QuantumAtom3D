@@ -13,6 +13,7 @@
 
 import { MAX_N } from "../../../QuantumAtom3DConstants.js";
 import { hydrogenRadial, hydrogenRadialCutoff } from "../hydrogen/HydrogenRadial.js";
+import { OSCILLATOR_RADIAL_STATES, oscillatorRadial } from "../oscillator/OscillatorStates.js";
 
 /** Samples per row. */
 export const RADIAL_TABLE_SAMPLES = 1024;
@@ -32,8 +33,9 @@ export class RadialLookupTable {
   /** r_max of each row, in a0 (Z = 1). */
   public readonly rowMaxRadius: Float32Array;
 
-  public constructor(maxN = MAX_N) {
-    this.rowCount = radialRowIndex(maxN + 1, 0);
+  public constructor(maxN = MAX_N, includeOscillator = false) {
+    const hydrogenRows = radialRowIndex(maxN + 1, 0);
+    this.rowCount = hydrogenRows + (includeOscillator ? OSCILLATOR_RADIAL_STATES.length : 0);
     this.values = new Float32Array(this.rowCount * RADIAL_TABLE_SAMPLES);
     this.rowMaxRadius = new Float32Array(this.rowCount);
     for (let n = 1; n <= maxN; n++) {
@@ -46,6 +48,16 @@ export class RadialLookupTable {
           this.values[row * RADIAL_TABLE_SAMPLES + i] = hydrogenRadial(n, l, 1, s * s * maxRadius);
         }
       }
+    }
+    if (includeOscillator) {
+      OSCILLATOR_RADIAL_STATES.forEach((state, index) => {
+        const row = hydrogenRows + index;
+        this.rowMaxRadius[row] = 9;
+        for (let i = 0; i < RADIAL_TABLE_SAMPLES; i++) {
+          const s = i / (RADIAL_TABLE_SAMPLES - 1);
+          this.values[row * RADIAL_TABLE_SAMPLES + i] = oscillatorRadial(state.nr, state.l, 9 * s * s);
+        }
+      });
     }
   }
 

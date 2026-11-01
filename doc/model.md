@@ -161,3 +161,17 @@ animated precession uses an illustrative speed. All tesla/eV/nm/fs conversion st
 
 References: [NIST Zeeman compendium](https://www.nist.gov/pml/atomic-spectroscopy-compendium-basic-ideas-notation-data-and-formulas/atomic-spectroscopy-zeeman),
 [MIT hydrogen fine-structure notes](https://ocw.mit.edu/courses/8-06-quantum-physics-iii-spring-2018/439fc15f7ed10dd76c69dc3f7fea600e_MIT8_06S18ch2.pdf).
+
+## Isotropic 3D Oscillator
+
+Reduced coordinates use a_osc=sqrt(hbar/(m omega)); E/(hbar omega)=N+3/2.
+Cartesian states have N=nx+ny+nz. Spherical states have N=2nr+l, with l=N,N-2,...
+and m=-l,...,l. Each shell has (N+1)(N+2)/2 states, excluding spin. This differs from
+hydrogen's n² degeneracy. The additional degeneracies reflect oscillator SU(3) and Coulomb
+SO(4) dynamical symmetries.
+
+The radial normalization is sqrt(2 nr!/Gamma(nr+l+3/2)). Overlap columns and rows are
+orthonormal; the two bases span the same shell. The displayed matrix entry is
+<Cartesian|spherical>; a Cartesian expansion uses its complex conjugate.
+
+Reference: [University of Virginia isotropic oscillator notes](https://galileo.phys.virginia.edu/classes/252/SHO/SHO.html).
