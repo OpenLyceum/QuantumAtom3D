@@ -124,6 +124,9 @@ export class StringManager {
   public getSuperpositionStrings() {
     return stringProperties.superposition;
   }
+  public getAngularStrings() {
+    return stringProperties.angular;
+  }
 
   /** Accessibility strings for the Orbitals screen. */
   public getOrbitalsA11yStrings() {

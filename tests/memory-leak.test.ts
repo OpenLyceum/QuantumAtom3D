@@ -10,6 +10,9 @@
  */
 
 import { Property } from "scenerystack/axon";
+import { AngularMomentumModel } from "../src/angular-momentum/model/AngularMomentumModel.js";
+import { AngularDensityNode } from "../src/angular-momentum/view/AngularDensityNode.js";
+import { AngularMomentumDiagramNode } from "../src/angular-momentum/view/AngularMomentumDiagramNode.js";
 import { CpuOrbitalRenderer } from "../src/common/gpu/CpuOrbitalRenderer.js";
 import { QuantumNumbersModel } from "../src/common/model/orbital/QuantumNumbersModel.js";
 import { TimeModel } from "../src/common/TimeModel.js";
@@ -26,8 +29,12 @@ import { describeDisposalLeaks } from "./helpers/memoryLeak.js";
 const viewportModel = new OrbitalsModel();
 const colormap = new Property<PhaseColormap>("hsv");
 const superpositionModel = new SuperpositionModel();
+const angularModel = new AngularMomentumModel();
 
 describeDisposalLeaks([
+  { name: "AngularMomentumModel", create: () => new AngularMomentumModel() },
+  { name: "AngularMomentumDiagramNode", create: () => new AngularMomentumDiagramNode(angularModel) },
+  { name: "AngularDensityNode", create: () => new AngularDensityNode(angularModel) },
   { name: "OrbitCamera", create: () => new OrbitCamera() },
   { name: "CpuOrbitalRenderer", create: () => new CpuOrbitalRenderer(), idempotentDispose: true },
   { name: "OrbitalViewportNode", create: () => new OrbitalViewportNode(340, viewportModel, colormap) },

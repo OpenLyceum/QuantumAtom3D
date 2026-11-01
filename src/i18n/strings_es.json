@@ -120,11 +120,11 @@
     },
     "angularMomentum": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El diagrama muestra vectores de momento angular, conos de precesión y proyecciones permitidas. La gráfica polar muestra densidad angular.",
+        "controlArea": "Elige l y m, o activa el espín y elige j y su proyección. Reproduce la precesión o ajusta su fase con el deslizador.",
+        "interactionHint": "Los vectores ilustran el modelo vectorial cuántico. La velocidad es ilustrativa."
       },
-      "currentDetails": "La simulación está en su estado inicial."
+      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}."
     },
     "zeeman": {
       "screenSummary": {
@@ -173,5 +173,18 @@
       "sp2": "sp²",
       "sp3": "sp³"
     }
+  },
+  "angular": {
+    "title": "Momento angular cuántico",
+    "l": "Número cuántico orbital l",
+    "m": "Número cuántico magnético m",
+    "spin": "Incluir espín (s = ½)",
+    "mj": "Proyección total mⱼ",
+    "phase": "Fase de precesión",
+    "density": "Densidad de probabilidad angular",
+    "densityHelp": "El radio muestra densidad por ángulo sólido, normalizada al máximo. Se toma la traza sobre el espín.",
+    "note": "Modelo vectorial cuántico esquemático; velocidad ilustrativa. Estos vectores no son trayectorias electrónicas.",
+    "upper": "j = l + ½",
+    "lower": "j = |l − ½|"
   }
 }

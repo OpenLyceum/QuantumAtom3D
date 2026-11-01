@@ -120,11 +120,11 @@
     },
     "angularMomentum": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The diagram shows angular-momentum vectors, precession cones and allowed projections. The polar plot shows angular probability density.",
+        "controlArea": "Choose l and m, or include spin and choose j and its projection. Play or step the schematic precession, or adjust its phase with the slider.",
+        "interactionHint": "The vectors are a quantum vector-model illustration. Precession speed is illustrative."
       },
-      "currentDetails": "The simulation is in its initial state."
+      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}."
     },
     "zeeman": {
       "screenSummary": {
@@ -173,5 +173,18 @@
       "sp2": "sp²",
       "sp3": "sp³"
     }
+  },
+  "angular": {
+    "title": "Quantum angular momentum",
+    "l": "Orbital quantum number l",
+    "m": "Magnetic quantum number m",
+    "spin": "Include spin (s = ½)",
+    "mj": "Total projection mⱼ",
+    "phase": "Precession phase",
+    "density": "Angular probability density",
+    "densityHelp": "Radius shows density per solid angle, normalized to its peak. Spin mode traces over spin.",
+    "note": "Schematic quantum vector model; animation speed is illustrative. These vectors are not electron trajectories.",
+    "upper": "j = l + ½",
+    "lower": "j = |l − ½|"
   }
 }
