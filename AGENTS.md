@@ -33,13 +33,13 @@ identifier cannot start with a digit. Its title remains "3D Oscillator".
 | Hydrogen | `src/common/model/hydrogen/` — `HydrogenRadial.ts` (R_nl, nodes, peak, enclosing radius), `HydrogenExpectations.ts` (E_n, ⟨r⟩, ⟨r²⟩), `HydrogenicIons.ts` |
 | States | `src/common/model/orbital/` — `OrbitalTerm.ts`, `OrbitalCatalog.ts` (real orbitals as term lists), `Wavefunction.ts` (CPU evaluator), `NodalSurfaces.ts`, `SliceSampler.ts`, `SliceNodalCurves.ts`, `OrbitalSummary.ts`, `QuantumNumbersModel.ts` |
 | Shared views | `src/common/view/` — `SliceHeatmapNode.ts`, `RadialDistributionChartNode.ts`, `QuantumNumberControl.ts`, `OrbitalReadoutPanel.ts`, `ColormapLegendNode.ts`, `Colormaps.ts`, `formatters.ts` |
-| Planned | `src/common/model/oscillator/` (M7), `angular/` (M5–M6) |
+| Oscillator / angular | `src/common/model/oscillator/`, `angular/` |
 | GPU engine | `src/common/gpu/` — `GpuContext.ts`, WGSL in `shaders/`, `WebGpuOrbitalRenderer.ts`, `CpuOrbitalRenderer.ts` |
 | Scenery/GPU boundary | `src/common/view/OrbitalViewportNode.ts` (one `Image` around the engine canvas) |
 | Clock | `src/common/TimeModel.ts`, composed by `SuperpositionModel` |
 | Screens | `src/<screen>/` — `*Screen.ts`, `model/`, `view/`; icons in `src/common/QuantumAtom3DScreenIcons.ts` |
 | i18n | `src/i18n/StringManager.ts`, `strings_{en,es,fr}.json` |
-| Preferences / query params | `src/preferences/` — phase colour wheel (`hsv` / `uniform`) |
+| Preferences / query params | `src/preferences/` — phase wheel, render quality, length units, formula visibility and orbital permalinks |
 
 ## Model
 
@@ -68,8 +68,8 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
 - Node overlays are analytic ray events; maintain CPU/WGSL parity when changing their intersections.
 - `Params` occupies 720 bytes. The dot pass composites foreground surfaces per fragment.
 - Give every pointer gesture in 3D a slider equivalent.
-- Orbitals' keyboard help covers its spinners, sliders, radio buttons and checkbox. The other four
-  are still scaffold stubs; fill each one in when its screen gains interactions.
+- All five screens provide live summaries and keyboard help. Summary subclasses own and dispose their
+  derived text through `DisposableScreenSummaryContent`, which also releases the framework text nodes.
 - The n, l, m spinners are exposed to assistive technology as sliders (`role="slider"`), which is
   how scenery's `NumberSpinner` works. Browser tests should query them by that role.
 
@@ -126,7 +126,7 @@ only under root `tests/`, mirroring `src/`.
 | `tests/fuzz/fuzz.spec.ts` | Template-owned Playwright fuzz smoke |
 
 - **Physics tests.** Check against closed forms or independent quadrature, never against the code
-  under test. Landé g_J and oscillator degeneracy come with M6 and M7.
+  under test. Landé g_J and oscillator degeneracy have independent physics checks.
 - **WebGPU.** It is unavailable under Vitest, so test the CPU renderer there. Compare GPU and CPU in
   `tests/browser/` with Chrome flags `--enable-unsafe-webgpu --enable-features=Vulkan`.
   `QUANTUM_CHROME` optionally supplies a Chrome executable; `QUANTUM_REQUIRE_GPU=1` makes unavailable
@@ -155,6 +155,20 @@ npm run lint && npm run check && npm run build && npm test
 
 `src/init.ts` reads `version` from `package.json`, so the patch bump shows up in the About dialog
 without a second edit.
+
+## Display preferences
+
+- Pass the shared preferences instance through screen options. Reset All restores launch-time state,
+  including orbital permalinks, but retains preferences chosen in the dialog.
+- `n`, `l`, `m`, `Z`, `basis` configure Orbitals. Validate each value in the query schema and clamp
+  dependent l/m before constructing the constrained model. `seed` reproduces probability dots.
+- Length conversion is display-only; squared lengths require the square of the conversion factor.
+  The radial plot retains atomic-unit coordinates and regenerates its tick cache when the unit changes.
+- `quality=low|medium|high|auto`: GPU sizes 128/256/512 with a stable 512 display canvas; CPU maximum
+  refinement 64/128/256 (auto uses the CPU frame budget). Automatic GPU quality uses completed queue
+  latency and hysteresis, never idle-frame spacing. Direct reference renderer tests retain fixed sizes.
+- `showFormulas` controls the explanatory wavefunction equation in Orbitals' Y_lm tab. Mathematical
+  symbols in controls and physical readouts remain visible.
 
 ## Development notes
 

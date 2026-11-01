@@ -3,6 +3,7 @@ import { buildDensityGrid, enclosedProbabilityLevel } from "../../common/model/o
 import { peakDensity } from "../../common/model/orbital/PeakDensity.js";
 import type { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
 import { InteractiveOrbitalCanvas } from "../../common/view/InteractiveOrbitalCanvas.js";
+import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
 export class OscillatorViewportNode extends InteractiveOrbitalCanvas {
@@ -12,8 +13,13 @@ export class OscillatorViewportNode extends InteractiveOrbitalCanvas {
   private style = "";
   private inversePeak = 0;
   private isoLevel = 0;
-  public constructor(size: number, model: OscillatorModel, palette: TReadOnlyProperty<PhaseColormap>) {
-    super(size, model.zoomProperty);
+  public constructor(
+    size: number,
+    model: OscillatorModel,
+    palette: TReadOnlyProperty<PhaseColormap>,
+    quality?: TReadOnlyProperty<RenderQuality>,
+  ) {
+    super(size, model.zoomProperty, quality);
     this.model = model;
     this.palette = palette;
   }

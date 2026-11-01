@@ -13,21 +13,28 @@ import { Property } from "scenerystack/axon";
 import { AngularMomentumModel } from "../src/angular-momentum/model/AngularMomentumModel.js";
 import { AngularDensityNode } from "../src/angular-momentum/view/AngularDensityNode.js";
 import { AngularMomentumDiagramNode } from "../src/angular-momentum/view/AngularMomentumDiagramNode.js";
+import { AngularMomentumScreenSummaryContent } from "../src/angular-momentum/view/AngularMomentumScreenSummaryContent.js";
 import { CpuOrbitalRenderer } from "../src/common/gpu/CpuOrbitalRenderer.js";
 import { QuantumNumbersModel } from "../src/common/model/orbital/QuantumNumbersModel.js";
 import { TimeModel } from "../src/common/TimeModel.js";
+import { OrbitalAngularDetailNode } from "../src/common/view/OrbitalAngularDetailNode.js";
 import { OrbitalViewportNode } from "../src/common/view/OrbitalViewportNode.js";
 import { OrbitCamera } from "../src/common/view/OrbitCamera.js";
 import { OrbitalsModel } from "../src/orbitals/model/OrbitalsModel.js";
+import { OrbitalsScreenSummaryContent } from "../src/orbitals/view/OrbitalsScreenSummaryContent.js";
 import { OscillatorModel } from "../src/oscillator/model/OscillatorModel.js";
 import { BasisOverlapNode } from "../src/oscillator/view/BasisOverlapNode.js";
+import { OscillatorScreenSummaryContent } from "../src/oscillator/view/OscillatorScreenSummaryContent.js";
 import { OscillatorViewportNode } from "../src/oscillator/view/OscillatorViewportNode.js";
+import { QuantumAtom3DPreferencesModel } from "../src/preferences/QuantumAtom3DPreferencesModel.js";
 import type { PhaseColormap } from "../src/QuantumAtom3DConstants.js";
 import { CoefficientRow, SuperpositionModel } from "../src/superposition/model/SuperpositionModel.js";
 import { ExpectationTimeSeriesNode } from "../src/superposition/view/ExpectationTimeSeriesNode.js";
+import { SuperpositionScreenSummaryContent } from "../src/superposition/view/SuperpositionScreenSummaryContent.js";
 import { SuperpositionViewportNode } from "../src/superposition/view/SuperpositionViewportNode.js";
 import { ZeemanModel } from "../src/zeeman/model/ZeemanModel.js";
 import { ZeemanDiagramNode } from "../src/zeeman/view/ZeemanDiagramNode.js";
+import { ZeemanScreenSummaryContent } from "../src/zeeman/view/ZeemanScreenSummaryContent.js";
 import { ZeemanSpectrumNode } from "../src/zeeman/view/ZeemanSpectrumNode.js";
 import { describeDisposalLeaks } from "./helpers/memoryLeak.js";
 
@@ -40,6 +47,16 @@ const zeemanModel = new ZeemanModel();
 const oscillatorModel = new OscillatorModel();
 
 describeDisposalLeaks([
+  { name: "OscillatorScreenSummaryContent", create: () => new OscillatorScreenSummaryContent(oscillatorModel) },
+  { name: "ZeemanScreenSummaryContent", create: () => new ZeemanScreenSummaryContent(zeemanModel) },
+  { name: "AngularMomentumScreenSummaryContent", create: () => new AngularMomentumScreenSummaryContent(angularModel) },
+  {
+    name: "SuperpositionScreenSummaryContent",
+    create: () => new SuperpositionScreenSummaryContent(superpositionModel),
+  },
+  { name: "OrbitalsScreenSummaryContent", create: () => new OrbitalsScreenSummaryContent(viewportModel) },
+  { name: "OrbitalAngularDetailNode", create: () => new OrbitalAngularDetailNode(viewportModel) },
+  { name: "QuantumAtom3DPreferencesModel", create: () => new QuantumAtom3DPreferencesModel() },
   { name: "OscillatorModel", create: () => new OscillatorModel() },
   { name: "OscillatorViewportNode", create: () => new OscillatorViewportNode(320, oscillatorModel, colormap) },
   { name: "BasisOverlapNode", create: () => new BasisOverlapNode(oscillatorModel) },

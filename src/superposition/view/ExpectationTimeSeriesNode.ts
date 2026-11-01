@@ -1,16 +1,26 @@
-import { Multilink, type UnknownMultilink } from "scenerystack/axon";
+import { DerivedProperty, Multilink, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
 import { ChartRectangle, ChartTransform, LinePlot } from "scenerystack/bamboo";
 import { Range, Vector2 } from "scenerystack/dot";
+import { StringUtils } from "scenerystack/phetcommon";
 import { Circle, HBox, Line, Node, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { atomicTimeToFs } from "../../common/model/AtomicUnits.js";
+import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
+import { formatLength, lengthUnitSymbol } from "../../common/view/formatters.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
 
 export class ExpectationTimeSeriesNode extends Node {
+  private readonly labels: TReadOnlyProperty<string>[];
   private readonly link: UnknownMultilink;
-  public constructor(width: number, height: number, model: SuperpositionModel) {
+  public constructor(
+    width: number,
+    height: number,
+    model: SuperpositionModel,
+    unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY,
+  ) {
     const strings = StringManager.getInstance().getSuperpositionStrings();
     const chart = new ChartTransform({
       viewWidth: width,
@@ -20,14 +30,20 @@ export class ExpectationTimeSeriesNode extends Node {
     });
     const rPlot = new LinePlot(chart, [], { stroke: QuantumAtom3DColors.radialCurveColorProperty, lineWidth: 2 });
     const zPlot = new LinePlot(chart, [], { stroke: QuantumAtom3DColors.meanRadiusColorProperty, lineWidth: 2 });
+    const labels = [strings.meanRadiusStringProperty, strings.meanZStringProperty].map(
+      (pattern) =>
+        new DerivedProperty([pattern, unitProperty], (p, unit) =>
+          StringUtils.fillIn(p, { unit: lengthUnitSymbol(unit) }),
+        ),
+    );
     const title = new HBox({
       spacing: 20,
       children: [
-        new Text(strings.meanRadiusStringProperty, {
+        new Text(labels[0] ?? "", {
           font: new PhetFont(13),
           fill: QuantumAtom3DColors.radialCurveColorProperty,
         }),
-        new Text(strings.meanZStringProperty, {
+        new Text(labels[1] ?? "", {
           font: new PhetFont(13),
           fill: QuantumAtom3DColors.meanRadiusColorProperty,
         }),
@@ -61,6 +77,7 @@ export class ExpectationTimeSeriesNode extends Node {
         timeLabel,
       ],
     });
+    this.labels = labels;
     let previousTime = -1;
     let lastTerms = model.termsProperty.value;
     let lastCharge = model.nuclearChargeProperty.value;
@@ -72,6 +89,7 @@ export class ExpectationTimeSeriesNode extends Node {
         model.termsProperty,
         model.nuclearChargeProperty,
         strings.timeAxisStringProperty,
+        unitProperty,
       ],
       (time, values, terms, charge, axis) => {
         if (time < previousTime || terms !== lastTerms || charge !== lastCharge) {
@@ -93,7 +111,7 @@ export class ExpectationTimeSeriesNode extends Node {
         [-max, 0, max].forEach((value, index) => {
           const label = yLabels[index];
           if (label) {
-            label.string = value.toFixed(1);
+            label.string = formatLength(value, unitProperty.value);
             label.right = -4;
             label.centerY = chart.modelToViewY(value);
           }
@@ -108,6 +126,12 @@ export class ExpectationTimeSeriesNode extends Node {
   }
   public override dispose(): void {
     this.link.dispose();
+    for (const child of this.children.slice()) {
+      child.disposeSubtree();
+    }
+    for (const label of this.labels) {
+      label.dispose();
+    }
     super.dispose();
   }
 }

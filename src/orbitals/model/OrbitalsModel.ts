@@ -26,10 +26,8 @@ import { computeOrbitalSummary, type OrbitalSummary } from "../../common/model/o
 import { QuantumNumbersModel } from "../../common/model/orbital/QuantumNumbersModel.js";
 import { SLICE_PLANE_VALUES, type SlicePlane } from "../../common/model/orbital/SliceSampler.js";
 import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
+import query from "../../preferences/quantumAtom3DQueryParameters.js";
 import {
-  INITIAL_L,
-  INITIAL_M,
-  INITIAL_N,
   MAX_N,
   MAX_NUCLEAR_CHARGE,
   MAX_ZOOM_LEVEL,
@@ -81,17 +79,17 @@ export class OrbitalsModel implements TModel {
   public constructor(tandem?: Tandem) {
     this.quantumNumbers = new QuantumNumbersModel({
       maxN: MAX_N,
-      initialN: INITIAL_N,
-      initialL: INITIAL_L,
-      initialM: INITIAL_M,
+      initialN: query.n,
+      initialL: Math.min(query.l, query.n - 1),
+      initialM: Math.max(-Math.min(query.l, query.n - 1), Math.min(query.m, query.l, query.n - 1)) || 0,
       ...(tandem && { tandem: tandem.createTandem("quantumNumbers") }),
     });
-    this.nuclearChargeProperty = new NumberProperty(MIN_NUCLEAR_CHARGE, {
+    this.nuclearChargeProperty = new NumberProperty(query.Z, {
       range: new Range(MIN_NUCLEAR_CHARGE, MAX_NUCLEAR_CHARGE),
       numberType: "Integer",
       ...(tandem && { tandem: tandem.createTandem("nuclearChargeProperty") }),
     });
-    this.basisProperty = new StringUnionProperty<OrbitalBasis>("complex", {
+    this.basisProperty = new StringUnionProperty<OrbitalBasis>(query.basis === "real" ? "real" : "complex", {
       validValues: ORBITAL_BASIS_VALUES,
       ...(tandem && { tandem: tandem.createTandem("basisProperty") }),
     });

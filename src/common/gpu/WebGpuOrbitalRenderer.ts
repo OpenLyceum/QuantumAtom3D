@@ -37,13 +37,13 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
   private readonly pipeline: GPURenderPipeline;
   private readonly pointPipeline: GPURenderPipeline;
   private readonly pointBuffer: GPUBuffer;
-  private readonly depthTexture: GPUTexture;
+  private depthTexture: GPUTexture;
   private readonly bindGroup: GPUBindGroup;
   private readonly paramsBuffer: GPUBuffer;
   private readonly colorLutBuffer: GPUBuffer;
   private readonly ownedBuffers: GPUBuffer[];
   private readonly paramsData = new ArrayBuffer(PARAMS_BYTES);
-  private readonly resolution: number;
+  private resolution: number;
 
   private scene: OrbitalScene | null = null;
   private frame: CameraFrame | null = null;
@@ -162,6 +162,22 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
 
   public setCamera(frame: CameraFrame): void {
     this.frame = frame;
+    this.dirty = true;
+  }
+
+  public setResolution(resolution: number): void {
+    if (resolution === this.resolution) {
+      return;
+    }
+    this.resolution = resolution;
+    this.gpuCanvas.width = this.canvas.width = resolution;
+    this.gpuCanvas.height = this.canvas.height = resolution;
+    this.depthTexture.destroy();
+    this.depthTexture = this.device.createTexture({
+      size: [resolution, resolution],
+      format: "depth24plus",
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
     this.dirty = true;
   }
 

@@ -6,7 +6,7 @@
  * corresponding query parameter in quantumAtom3DQueryParameters.
  */
 
-import { StringUnionProperty } from "scenerystack/axon";
+import { BooleanProperty, StringUnionProperty } from "scenerystack/axon";
 import type { Tandem } from "scenerystack/tandem";
 import { DEFAULT_PHASE_COLORMAP, PHASE_COLORMAP_VALUES, type PhaseColormap } from "../QuantumAtom3DConstants.js";
 import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
@@ -21,7 +21,18 @@ import quantumAtom3DQueryParameters from "./quantumAtom3DQueryParameters.js";
 const isPhaseColormap = (value: string): value is PhaseColormap =>
   PHASE_COLORMAP_VALUES.some((candidate) => candidate === value);
 
+export type LengthUnit = "a0" | "pm";
+export type RenderQuality = "auto" | "low" | "medium" | "high";
 export class QuantumAtom3DPreferencesModel {
+  public readonly lengthUnitProperty = new StringUnionProperty<LengthUnit>(
+    quantumAtom3DQueryParameters.lengthUnit === "pm" ? "pm" : "a0",
+    { validValues: ["a0", "pm"] },
+  );
+  public readonly qualityProperty = new StringUnionProperty<RenderQuality>(
+    quantumAtom3DQueryParameters.quality as RenderQuality,
+    { validValues: ["auto", "low", "medium", "high"] },
+  );
+  public readonly showFormulasProperty = new BooleanProperty(quantumAtom3DQueryParameters.showFormulas);
   /** Colour wheel for the phase of ψ; initial value from the `phaseColormap` query parameter. */
   public readonly phaseColormapProperty: StringUnionProperty<PhaseColormap>;
 
@@ -37,6 +48,15 @@ export class QuantumAtom3DPreferencesModel {
 
   public reset(): void {
     this.phaseColormapProperty.reset();
+    this.lengthUnitProperty.reset();
+    this.qualityProperty.reset();
+    this.showFormulasProperty.reset();
+  }
+  public dispose(): void {
+    this.phaseColormapProperty.dispose();
+    this.lengthUnitProperty.dispose();
+    this.qualityProperty.dispose();
+    this.showFormulasProperty.dispose();
   }
 }
 

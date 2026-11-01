@@ -7,7 +7,7 @@
  *
  * Registered in the screens array in src/main.ts. Its home-screen and navigation-bar
  * icons come from createOscillatorIcon() in src/common/QuantumAtom3DScreenIcons.ts
- * (see doc/multi-screen.md).
+ * Icons use the shared profile colours.
  */
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";
@@ -32,6 +32,7 @@ export class OscillatorScreen extends Screen<OscillatorModel, OscillatorScreenVi
       (model) =>
         new OscillatorScreenView(model, {
           phaseColormapProperty: options.preferences.phaseColormapProperty,
+          preferences: options.preferences,
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<OscillatorScreenOptions, EmptySelfOptions, ScreenOptions>()(

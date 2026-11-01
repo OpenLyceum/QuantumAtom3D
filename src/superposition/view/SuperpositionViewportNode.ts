@@ -6,6 +6,7 @@ import type { OrbitalTerm } from "../../common/model/orbital/OrbitalTerm.js";
 import { peakDensity } from "../../common/model/orbital/PeakDensity.js";
 import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
 import { InteractiveOrbitalCanvas } from "../../common/view/InteractiveOrbitalCanvas.js";
+import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import quantumAtom3DQueryParameters from "../../preferences/quantumAtom3DQueryParameters.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
@@ -24,8 +25,13 @@ export class SuperpositionViewportNode extends InteractiveOrbitalCanvas {
   private isoLevel = 0;
   private lastGridTime = -Infinity;
   private lastSceneTime = -Infinity;
-  public constructor(size: number, model: SuperpositionModel, palette: TReadOnlyProperty<PhaseColormap>) {
-    super(size, model.zoomProperty);
+  public constructor(
+    size: number,
+    model: SuperpositionModel,
+    palette: TReadOnlyProperty<PhaseColormap>,
+    quality?: TReadOnlyProperty<RenderQuality>,
+  ) {
+    super(size, model.zoomProperty, quality);
     this.model = model;
     this.palette = palette;
   }

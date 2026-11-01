@@ -61,7 +61,7 @@ to 16 terms c_k R_k(r) Y_{l_k m_k}(θ, φ):
 - **Scenery overlays.** Axes, labels and drag handles are Scenery nodes projected with the same
   `OrbitCamera`.
 - **On demand.** A frame is rendered only when the state or camera changed, or when time is running.
-  Adaptive resolution remains planned.
+  Automatic GPU quality adapts resolution using completed GPU queue latency; fixed quality overrides it.
 
 **CPU backend.** It is used when WebGPU is missing, a shader fails, or `?forceCpu` is set. It is the same
 pipeline in TypeScript, calling the same `Wavefunction.evaluate`: a low-resolution ray-march that refines
@@ -109,8 +109,9 @@ readouts and the cross-section with its plane/offset controls. The right column 
   nucleus. A keyboard slider selects the same radius. A dashed circle is the projected silhouette
   of that spherical shell. Zero hides the probe. This guide does not occlude orbital data.
 - **Presets.** 1s, 2s, 2p_z, 3d_z² and complex 2p with m=±1. Charge and display settings are retained.
-- **Remaining scope.** Hybrid presets depend on the M4 superposition model. The Y_lm detail tab
-  will reuse the M5 angular plot. Adaptive GPU resolution and quality preferences remain pending.
+- **Angular detail.** The Y_lm tab plots a polar section of the selected complex or real angular
+  density, with an accessible azimuth slider. Radius is normalized to the selected section’s peak.
+  The full hybrid presets are on Superposition. Quality preferences apply to all three 3D screens.
 
 The M1 tools remain available:
 
@@ -132,15 +133,15 @@ The M1 tools remain available:
 | M1 ✓ | Math core and tests; Orbitals screen in 2D (P(r), slice, readouts) |
 | M2 ✓ | GPU engine, CPU renderer, camera; volume and phase rendering on Orbitals |
 | M3 ✓ | Dots, isosurface, nodal surfaces, cutting plane, P(r) ↔ 3D hover, stationary presets |
-| M4 | Superposition screen |
-| M5 | Angular Momentum screen |
-| M6 | Zeeman screen |
-| M7 | 3D Oscillator screen |
-| M8 | Accessibility descriptions, es/fr review, thumbnails, release |
+| M4 ✓ | Superposition screen |
+| M5 ✓ | Angular Momentum screen |
+| M6 ✓ | Zeeman screen |
+| M7 ✓ | 3D Oscillator screen |
+| M8 ✓ | Display preferences, permalinks, angular tab, icons, live descriptions and locale/profile checks |
 
 ## Accessibility
 
-- **Screen summaries.** Each screen has a `*ScreenSummaryContent` whose `currentDetailsContent` will be a
+- **Screen summaries.** Each screen has a `*ScreenSummaryContent` whose `currentDetailsContent` is a
   live `DerivedProperty`, for example "3d_z² orbital of He⁺, mean radius 3.5 a0, two conical nodes at
   54.7° from the z-axis".
 - **3D viewport.** It is focusable: the arrow keys orbit the camera and +/− zoom.
@@ -266,3 +267,33 @@ saved PNGs showed identical M4 cloud RGB pixels and identical M7 cyan-lobe cover
 French/default and Spanish/projector captures. The apparent discrepancy was an inspection error.
 Experimental canvas-copy changes were removed. Browser tests now compare displayed phase-colour
 coverage with the renderer bitmap, capturing the display before reading renderer pixels.
+
+## Display and accessibility polish (M8)
+
+All five screen summaries update with model state. Orbitals names the ion, energy, radius,
+node counts and node angles; Angular Momentum includes vector magnitudes and the uncoupled
+uncertainty product; Zeeman includes wavelength bounds and the selected upper sublevel.
+Each summary disposes its derived text and the framework's combined voicing strings. Browser
+checks exercise named focusable controls, keyboard help, and live descriptions in en/fr/es
+with projector mode. Screen icons are distinct programmatic motifs in profile colours.
+
+Length preferences affect orbital readouts, radial ticks, view scale, probes, superposition
+readouts, graph labels and accessible descriptions. Physical model values and history stay
+in atomic units. Oscillator coordinates retain their reduced units. The explanatory equation
+in the Y_lm tab has its own formula-visibility preference.
+
+Low/medium/high quality chooses GPU dimensions 128/256/512. A stable display canvas avoids
+changing viewport bounds. Automatic quality starts at 512 and steps down after six consecutive
+completed frames above 40 ms, or up after 48 frames below 18 ms. Idle gaps are excluded.
+Resizing replaces the depth attachment but retains pipelines and storage buffers. CPU quality
+caps progressive refinement at 64/128/256; auto retains the 12 ms per-frame scheduling budget.
+This is a workload mitigation, not a verified 30 fps guarantee on mobile hardware.
+
+URL parameters n/l/m/Z/basis configure the initial Orbitals state. Individual invalid values
+are rejected by QueryStringMachine; valid but inconsistent l/m values are clamped. Reset All
+returns to the launch state, retaining dialog preferences. quality/lengthUnit/showFormulas
+seed their corresponding preferences. No persistence beyond the session is added.
+
+Release tagging and real low-end/mobile performance measurements remain separate follow-up
+work. Isosurface grid construction remains synchronous, and the superposition phase control
+is a keyboard-accessible slider rather than the dial sketched in the original plan.

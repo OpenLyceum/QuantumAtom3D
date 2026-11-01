@@ -1,9 +1,11 @@
-import { DerivedProperty } from "scenerystack/axon";
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
-import { ScreenSummaryContent } from "scenerystack/sim";
+import { angularMagnitude, orbitalUncertaintyProduct } from "../../common/model/angular/VectorModel.js";
+import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
-export class AngularMomentumScreenSummaryContent extends ScreenSummaryContent {
+export class AngularMomentumScreenSummaryContent extends DisposableScreenSummaryContent {
+  private readonly details: TReadOnlyProperty<string>;
   public constructor(model: AngularMomentumModel) {
     const strings = StringManager.getInstance().getAngularMomentumA11yStrings();
     const details = new DerivedProperty(
@@ -15,7 +17,17 @@ export class AngularMomentumScreenSummaryContent extends ScreenSummaryContent {
         model.mjProperty,
         strings.currentDetailsStringProperty,
       ],
-      (l, m, spin, j, mj, pattern) => StringUtils.fillIn(pattern, { l, m, j: spin ? j : "—", mj: spin ? mj : "—" }),
+      (l, m, spin, j, mj, pattern) =>
+        StringUtils.fillIn(pattern, {
+          l,
+          m: spin ? "—" : m,
+          j: spin ? j : "—",
+          mj: spin ? mj : "—",
+          L: angularMagnitude(l).toFixed(3),
+          S: spin ? angularMagnitude(0.5).toFixed(3) : "—",
+          J: spin ? angularMagnitude(j).toFixed(3) : "—",
+          uncertainty: spin ? "—" : orbitalUncertaintyProduct(l, m).toFixed(3),
+        }),
     );
     super({
       playAreaContent: strings.screenSummary.playAreaStringProperty,
@@ -23,5 +35,10 @@ export class AngularMomentumScreenSummaryContent extends ScreenSummaryContent {
       interactionHintContent: strings.screenSummary.interactionHintStringProperty,
       currentDetailsContent: details,
     });
+    this.details = details;
+  }
+  public override dispose(): void {
+    super.dispose();
+    this.details.dispose();
   }
 }

@@ -5,11 +5,13 @@
  * validated device exists, the CPU reference otherwise.
  */
 
+import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import type { CameraFrame } from "../view/OrbitCamera.js";
 import { CpuOrbitalRenderer } from "./CpuOrbitalRenderer.js";
 import { demoteGpuContext, getGpuInitializationResult } from "./GpuContext.js";
 import type { OrbitalRenderer } from "./OrbitalRenderer.js";
 import type { OrbitalScene } from "./OrbitalScene.js";
+import { RenderQualityController } from "./RenderQualityController.js";
 import { WebGpuOrbitalRenderer } from "./WebGpuOrbitalRenderer.js";
 import type { WebGpuContext } from "./WebGpuSupport.js";
 
@@ -35,6 +37,9 @@ class RecoverableOrbitalRenderer implements OrbitalRenderer {
   private readonly display: CanvasRenderingContext2D;
   private readonly context: WebGpuContext;
   private renderer: OrbitalRenderer;
+  private readonly quality = new RenderQualityController();
+  private measuring = false;
+  private disposed = false;
   private scene: OrbitalScene | null = null;
   private frame: CameraFrame | null = null;
 
@@ -52,6 +57,10 @@ class RecoverableOrbitalRenderer implements OrbitalRenderer {
   public get backend() {
     return this.renderer.backend;
   }
+  public setQuality(quality: RenderQuality): void {
+    this.quality.setQuality(quality);
+    this.renderer.setQuality?.(quality);
+  }
   public setScene(scene: OrbitalScene): void {
     this.scene = scene;
   }
@@ -63,6 +72,7 @@ class RecoverableOrbitalRenderer implements OrbitalRenderer {
     demoteGpuContext(this.context);
     this.renderer.dispose();
     this.renderer = new CpuOrbitalRenderer();
+    this.renderer.setQuality?.(this.quality.quality);
     this.scene ??= this.lastScene;
     this.frame ??= this.lastFrame;
   }
@@ -84,8 +94,26 @@ class RecoverableOrbitalRenderer implements OrbitalRenderer {
         this.lastFrame = this.frame;
         this.frame = null;
       }
+      if (this.renderer instanceof WebGpuOrbitalRenderer) {
+        this.renderer.setResolution(this.quality.resolution);
+      }
+      const started = performance.now();
       if (!this.renderer.render()) {
         return false;
+      }
+      if (this.backend === "gpu" && this.quality.quality === "auto" && !this.measuring) {
+        this.measuring = true;
+        this.context.device.queue.onSubmittedWorkDone().then(
+          () => {
+            if (!this.disposed) {
+              this.quality.observe(performance.now() - started);
+            }
+            this.measuring = false;
+          },
+          () => {
+            this.measuring = false;
+          },
+        );
       }
       this.display.drawImage(this.renderer.canvas, 0, 0, this.canvas.width, this.canvas.height);
       return true;
@@ -98,6 +126,7 @@ class RecoverableOrbitalRenderer implements OrbitalRenderer {
     }
   }
   public dispose(): void {
+    this.disposed = true;
     this.renderer.dispose();
     this.canvas.width = 0;
     this.canvas.height = 0;

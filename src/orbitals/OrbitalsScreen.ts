@@ -7,7 +7,7 @@
  *
  * Registered in the screens array in src/main.ts. Its home-screen and navigation-bar
  * icons come from createOrbitalsIcon() in src/common/QuantumAtom3DScreenIcons.ts
- * (see doc/multi-screen.md).
+ * Icons use the shared profile colours.
  */
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";
@@ -38,6 +38,7 @@ export class OrbitalsScreen extends Screen<OrbitalsModel, OrbitalsScreenView> {
       (model) =>
         new OrbitalsScreenView(model, {
           phaseColormapProperty: preferences.phaseColormapProperty,
+          preferences,
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<ScreenOptions & { tandem: Tandem }, EmptySelfOptions, ScreenOptions>()(

@@ -18,6 +18,7 @@ import {
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
+import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
@@ -25,6 +26,7 @@ import { BasisOverlapNode } from "./BasisOverlapNode.js";
 import { OscillatorScreenSummaryContent } from "./OscillatorScreenSummaryContent.js";
 import { OscillatorViewportNode } from "./OscillatorViewportNode.js";
 export type OscillatorScreenViewOptions = ScreenViewOptions & {
+  preferences?: QuantumAtom3DPreferencesModel;
   phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
 };
 export class OscillatorScreenView extends ScreenView {
@@ -51,7 +53,12 @@ export class OscillatorScreenView extends ScreenView {
         },
         accessibleName: name,
       });
-    this.viewport = new OscillatorViewportNode(320, model, options.phaseColormapProperty);
+    this.viewport = new OscillatorViewportNode(
+      320,
+      model,
+      options.phaseColormapProperty,
+      options.preferences?.qualityProperty,
+    );
     const viewport = this.viewport;
     viewport.left = this.layoutBounds.minX + 25;
     viewport.top = this.layoutBounds.minY + 50;

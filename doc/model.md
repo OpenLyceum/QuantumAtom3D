@@ -5,7 +5,7 @@ educator. It is the companion to [implementation-notes.md](./implementation-note
 developers.
 
 > **Status.** The sim is being built in milestones (see implementation-notes §"Roadmap"). This file
-> describes the target model for all five screens; each section notes the screen that uses it.
+> describes the implemented model for all five screens; each section notes the screen that uses it.
 
 ## Overview
 
@@ -17,8 +17,8 @@ spherical harmonic. Students see the three-dimensional probability density |ψ|�
 the quantum numbers n, l, m.
 
 The later screens add time and fields. A superposition of states with different energies is no longer
-stationary: its charge cloud oscillates at the Bohr frequency ΔE/h, which is the classical picture of
-the emitted light. The vector model shows angular momentum as a vector of fixed length precessing on a
+stationary: interference can oscillate at the Bohr frequency ΔE/h. This closed-system model does
+not simulate spontaneous emission or radiation damping. The vector model shows angular momentum as a vector of fixed length precessing on a
 cone, and a magnetic field splits each level into Zeeman components whose allowed transitions obey
 dipole selection rules. The oscillator screen shows why the oscillator's degeneracy is (N+1)(N+2)/2 while
 hydrogen's is n², and how the Cartesian and spherical bases span the same degenerate subspaces.
@@ -36,7 +36,7 @@ The model works in Hartree atomic units (ħ = mₑ = e = 4πε₀ = 1) and conve
 | Distance from nucleus | r | a0 (52.918 pm) | a0 or pm | 0 – ~60 a0/Z |
 | Energy | E | E_h (27.2114 eV) | eV | −13.6 Z² eV and up |
 | Time | t | ħ/E_h (24.189 as) | fs | 0 – ∞ |
-| Magnetic field | B | T | T | 0 – a few T |
+| Magnetic field | B | atomic field unit | T | mode- and Z-dependent cap |
 | Oscillator energy, length | E, r | ħω, √(ħ/mω) | same | N = 0 – 4 |
 
 ## Governing equations
@@ -175,3 +175,16 @@ orthonormal; the two bases span the same shell. The displayed matrix entry is
 <Cartesian|spherical>; a Cartesian expansion uses its complex conjugate.
 
 Reference: [University of Virginia isotropic oscillator notes](https://galileo.phys.virginia.edu/classes/252/SHO/SHO.html).
+
+## Angular sections and display units
+
+The Orbitals Y_lm detail tab plots angular density at a selected azimuth phi. Its left
+half-plane uses phi+pi, so real orbitals preserve their orientation and nodal sections.
+The plotted radius is density normalized to the peak in that section, not an electron
+trajectory or the sin(theta)-weighted polar probability distribution. A section that is
+identically nodal collapses to the origin. Complex |Y_lm|² is azimuth-independent.
+
+Changing from a0 to pm changes only display values: r is multiplied by the Bohr radius
+in pm, and <r²> by its square. The radial chart's density values remain in atomic units;
+its horizontal tick labels use the selected length unit. Oscillator lengths keep their
+separate sqrt(hbar/(m omega)) convention.

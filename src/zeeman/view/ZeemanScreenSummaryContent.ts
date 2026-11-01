@@ -1,21 +1,38 @@
-import { DerivedProperty } from "scenerystack/axon";
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
-import { ScreenSummaryContent } from "scenerystack/sim";
-import { atomicFieldToTesla } from "../../common/model/AtomicUnits.js";
+import { atomicFieldToTesla, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
 import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
+import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
-export class ZeemanScreenSummaryContent extends ScreenSummaryContent {
+export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
+  private readonly details: TReadOnlyProperty<string>;
   public constructor(model: ZeemanModel) {
     const s = StringManager.getInstance().getZeemanA11yStrings();
     const details = new DerivedProperty(
-      [model.fieldProperty, model.capProperty, model.transitionsProperty, s.currentDetailsStringProperty],
-      (field, cap, transitions, pattern) =>
-        StringUtils.fillIn(pattern, {
+      [
+        model.fieldProperty,
+        model.capProperty,
+        model.transitionsProperty,
+        s.currentDetailsStringProperty,
+        model.upperLevelsProperty,
+        model.selectedIndexProperty,
+        model.modeProperty,
+      ],
+      (field, cap, transitions, pattern, levels, index, mode) => {
+        const selected = levels[index];
+        const wavelengths = transitions.map((t) => wavelengthNmForEnergy(t.photonEnergy));
+        return StringUtils.fillIn(pattern, {
           field: atomicFieldToTesla(field).toPrecision(4),
           cap: atomicFieldToTesla(cap).toPrecision(4),
           count: distinctPhotonEnergies(transitions).length,
-        }),
+          minimum: wavelengths.length > 0 ? Math.min(...wavelengths).toFixed(6) : "—",
+          maximum: wavelengths.length > 0 ? Math.max(...wavelengths).toFixed(6) : "—",
+          state: selected
+            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${selected.g.toFixed(4)}` : ""}`
+            : "—",
+        });
+      },
     );
     super({
       playAreaContent: s.screenSummary.playAreaStringProperty,
@@ -23,5 +40,10 @@ export class ZeemanScreenSummaryContent extends ScreenSummaryContent {
       interactionHintContent: s.screenSummary.interactionHintStringProperty,
       currentDetailsContent: details,
     });
+    this.details = details;
+  }
+  public override dispose(): void {
+    super.dispose();
+    this.details.dispose();
   }
 }

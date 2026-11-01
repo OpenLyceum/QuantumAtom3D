@@ -14,6 +14,35 @@ import { DEFAULT_PHASE_COLORMAP, PHASE_COLORMAP_VALUES } from "../QuantumAtom3DC
 import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
 
 const quantumAtom3DQueryParameters = QueryStringMachine.getAll({
+  /** Initial orbital state. Dependent quantum numbers are clamped to valid ranges. */
+  n: {
+    type: "number",
+    defaultValue: 2,
+    isValidValue: (v: number) => Number.isInteger(v) && v >= 1 && v <= 5,
+    public: true,
+  },
+  l: {
+    type: "number",
+    defaultValue: 1,
+    isValidValue: (v: number) => Number.isInteger(v) && v >= 0 && v <= 4,
+    public: true,
+  },
+  m: {
+    type: "number",
+    defaultValue: 0,
+    isValidValue: (v: number) => Number.isInteger(v) && Math.abs(v) <= 4,
+    public: true,
+  },
+  Z: {
+    type: "number",
+    defaultValue: 1,
+    isValidValue: (v: number) => Number.isInteger(v) && v >= 1 && v <= 6,
+    public: true,
+  },
+  basis: { type: "string", defaultValue: "complex", validValues: ["complex", "real"], public: true },
+  quality: { type: "string", defaultValue: "auto", validValues: ["auto", "low", "medium", "high"], public: true },
+  lengthUnit: { type: "string", defaultValue: "a0", validValues: ["a0", "pm"], public: true },
+  showFormulas: { type: "boolean", defaultValue: true, public: true },
   /** Reproducible probability samples, independent of other simulation randomness. */
   seed: {
     type: "number",

@@ -1,5 +1,5 @@
 /** Shared canvas/camera boundary for time-dependent orbital screens. Scene construction stays outside. */
-import { Multilink, type NumberProperty, type UnknownMultilink } from "scenerystack/axon";
+import { Multilink, type NumberProperty, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
 import { Bounds2, type Vector2 } from "scenerystack/dot";
 import {
   DragListener,
@@ -13,6 +13,7 @@ import {
 } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { createOrbitalRenderer } from "../gpu/createOrbitalRenderer.js";
 import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
@@ -25,7 +26,8 @@ export class InteractiveOrbitalCanvas extends Node {
   private readonly cameraLink: UnknownMultilink;
   private readonly drag: DragListener;
   private readonly keys: KeyboardListener<readonly OneKeyStroke[]>;
-  public constructor(size: number, zoom: NumberProperty) {
+  private readonly quality: TReadOnlyProperty<RenderQuality> | undefined;
+  public constructor(size: number, zoom: NumberProperty, quality?: TReadOnlyProperty<RenderQuality>) {
     const strings = StringManager.getInstance().getOrbitalStrings().volume;
     super({
       tagName: "div",
@@ -38,6 +40,7 @@ export class InteractiveOrbitalCanvas extends Node {
       mouseArea: new Bounds2(0, 0, size, size),
       touchArea: new Bounds2(0, 0, size, size),
     });
+    this.quality = quality;
     this.canvasImage = new Image(this.engine.canvas, { scale: size / this.engine.canvas.width, pickable: false });
     this.children = [
       this.canvasImage,
@@ -104,6 +107,9 @@ export class InteractiveOrbitalCanvas extends Node {
     this.addInputListener(this.keys);
   }
   public step(): void {
+    if (this.quality) {
+      this.engine.setQuality?.(this.quality.value);
+    }
     if (this.engine.render()) {
       this.canvasImage.invalidateImage();
     }

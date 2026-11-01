@@ -29,17 +29,17 @@
       "radialNodes": "Nodos radiales",
       "angularNodes": "Nodos angulares",
       "energyValue": "{{value}} eV",
-      "lengthValue": "{{value}} a<sub>0</sub>",
+      "lengthValue": "{{value}} {{unit}}",
       "nodeCount": "{{count}}",
       "conesValue": "conos θ = {{angles}}",
       "planesValue": "planos φ = {{angles}}",
       "polarPlaneValue": "plano xy (θ = 90°)",
       "meanSquareRadius": "⟨r²⟩",
-      "squareLengthValue": "{{value}} a<sub>0</sub>²"
+      "squareLengthValue": "{{value}} {{unit}}²"
     },
     "radialChart": {
       "title": "P(r) = r²|R<sub>nl</sub>|²",
-      "xAxis": "r (a<sub>0</sub>)"
+      "xAxis": "r ({{unit}})"
     },
     "slice": {
       "title": "Corte",
@@ -50,7 +50,7 @@
       "density": "Densidad |ψ|²",
       "phaseLegend": "brillo ∝ |ψ|",
       "densityLegend": "0 → máx",
-      "scale": "±{{value}} a<sub>0</sub>",
+      "scale": "±{{value}} {{unit}}",
       "showPlane": "Mostrar plano de corte en 3D",
       "planeHelp": "Arrastra el control azul en la vista 3D o usa el deslizador de desplazamiento para mover el plano de corte."
     },
@@ -72,7 +72,8 @@
       "isosurface": "Isosuperficie",
       "probe": "Radio explorado",
       "probeHelp": "Mueve el cursor radial y resalta la esfera correspondiente en la vista 3D. Cero oculta la esfera.",
-      "nodes": "Nodos 3D"
+      "nodes": "Nodos 3D",
+      "angularTab": "Yₗₘ"
     },
     "presets": {
       "title": "Estados predefinidos",
@@ -82,6 +83,11 @@
       "cones": "3d<sub>z²</sub>",
       "positive": "2p, m = +1",
       "negative": "2p, m = −1"
+    },
+    "angularDetail": {
+      "title": "Densidad de probabilidad angular",
+      "description": "Sección polar en φ = {{phi}}°. El radio muestra la densidad angular normalizada a su máximo. Densidad por ángulo sólido, sin el factor de integración sin θ.",
+      "phi": "Sección angular φ"
     }
   },
   "a11y": {
@@ -91,7 +97,7 @@
         "controlArea": "Elige números cuánticos, base real o compleja, carga, modo de representación y estados predefinidos. Activa los nodos 3D o de la sección. Los deslizadores de cámara, radio y desplazamiento del plano permiten el control por teclado.",
         "interactionHint": "Cambia n, l y m para ver cómo cambian el tamaño, la forma y los nodos del orbital. Arrastre o use las flechas para girar. Más y menos ajustan el zoom. Los controles de acimut y elevación también giran la vista."
       },
-      "currentDetails": "{{state}} de {{ion}}. Energía {{energy}} electronvoltios. Radio medio {{radius}} radios de Bohr. {{radialNodes}} nodos radiales y {{angularNodes}} nodos angulares.",
+      "currentDetails": "{{state}} de {{ion}}. Energía {{energy}} electronvoltios. Radio medio {{radius}} {{unit}}. {{radialNodes}} nodos radiales y {{angularNodes}} nodos angulares. {{nodeDetails}}",
       "controls": {
         "principal": "Número cuántico principal n",
         "principalHelp": "De 1 a 5. Fija la energía y el tamaño global del orbital.",
@@ -116,7 +122,7 @@
         "controlArea": "Mezcla hasta seis estados hidrogenoides mediante números cuánticos, magnitudes y fases. Elige un estado predefinido, representación, carga y velocidad.",
         "interactionHint": "Reproduce, pausa o avanza paso a paso. Las flechas giran la vista 3D enfocada; más y menos ajustan el zoom. Los deslizadores permiten el control por teclado."
       },
-      "currentDetails": "{{count}} estados distintos ocupados. Tiempo {{time}} femtosegundos. Posición z media {{z}} radios de Bohr y radio medio {{r}} radios de Bohr."
+      "currentDetails": "{{count}} estados distintos ocupados. Tiempo {{time}} femtosegundos. Posición z media {{z}} {{unit}} y radio medio {{r}} {{unit}}."
     },
     "angularMomentum": {
       "screenSummary": {
@@ -124,7 +130,7 @@
         "controlArea": "Elige l y m, o activa el espín y elige j y su proyección. Reproduce la precesión o ajusta su fase con el deslizador.",
         "interactionHint": "Los vectores ilustran el modelo vectorial cuántico. La velocidad es ilustrativa."
       },
-      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}."
+      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}. Magnitudes en ℏ: L={{L}}, S={{S}}, J={{J}}. Producto orbital ΔLₓ ΔLᵧ / ℏ²={{uncertainty}}; un guion indica que no se aplica."
     },
     "zeeman": {
       "screenSummary": {
@@ -132,7 +138,7 @@
         "controlArea": "Elige modo, serie, carga, campo, dirección y nivel superior. Reproduce la precesión de Larmor esquemática.",
         "interactionHint": "A lo largo del campo solo se ven componentes sigma. El modo anómalo limita el campo al régimen débil indicado."
       },
-      "currentDetails": "Campo {{field}} teslas, límite {{cap}} teslas. {{count}} posiciones espectrales distintas."
+      "currentDetails": "Campo {{field}} teslas, límite {{cap}} teslas. {{count}} posiciones espectrales distintas. Intervalo de longitudes de onda de {{minimum}} a {{maximum}} nm. Estado superior seleccionado: {{state}}."
     },
     "oscillator": {
       "screenSummary": {
@@ -147,7 +153,16 @@
     "title": "Simulación",
     "phaseColormap": "Colores de fase",
     "phaseColormapHsv": "Rueda de tonos (HSV)",
-    "phaseColormapUniform": "Uniforme (luminosidad constante)"
+    "phaseColormapUniform": "Uniforme (luminosidad constante)",
+    "lengthUnit": "Unidad de longitud",
+    "a0": "Radios de Bohr (a₀)",
+    "pm": "Picómetros (pm)",
+    "quality": "Calidad de imagen",
+    "auto": "Automática",
+    "low": "Baja",
+    "medium": "Media",
+    "high": "Alta",
+    "showFormulas": "Mostrar la fórmula de onda (Orbitales → Yₗₘ)"
   },
   "superposition": {
     "time": "Tiempo",
@@ -162,8 +177,8 @@
     "allowed": "Transición dipolar permitida",
     "forbidden": "Transición dipolar prohibida",
     "normalization": "El estado combinado se normaliza automáticamente. Los puntos son muestras de probabilidad, no trayectorias.",
-    "meanRadius": "⟨r⟩ (a₀)",
-    "meanZ": "⟨z⟩ (a₀)",
+    "meanRadius": "⟨r⟩ ({{unit}})",
+    "meanZ": "⟨z⟩ ({{unit}})",
     "timeAxis": "Tiempo (fs)",
     "presets": {
       "dipole": "Dipolo",
