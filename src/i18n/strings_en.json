@@ -29,17 +29,17 @@
       "radialNodes": "Radial nodes",
       "angularNodes": "Angular nodes",
       "energyValue": "{{value}} eV",
-      "lengthValue": "{{value}} a<sub>0</sub>",
+      "lengthValue": "{{value}} {{unit}}",
       "nodeCount": "{{count}}",
       "conesValue": "cones θ = {{angles}}",
       "planesValue": "planes φ = {{angles}}",
       "polarPlaneValue": "xy-plane (θ = 90°)",
       "meanSquareRadius": "⟨r²⟩",
-      "squareLengthValue": "{{value}} a<sub>0</sub>²"
+      "squareLengthValue": "{{value}} {{unit}}²"
     },
     "radialChart": {
       "title": "P(r) = r²|R<sub>nl</sub>|²",
-      "xAxis": "r (a<sub>0</sub>)"
+      "xAxis": "r ({{unit}})"
     },
     "slice": {
       "title": "Cross-section",
@@ -50,7 +50,7 @@
       "density": "Density |ψ|²",
       "phaseLegend": "brightness ∝ |ψ|",
       "densityLegend": "0 → max",
-      "scale": "±{{value}} a<sub>0</sub>",
+      "scale": "±{{value}} {{unit}}",
       "showPlane": "Show cutting plane in 3D",
       "planeHelp": "Drag the blue handle in the 3D view, or use the offset slider to move the cutting plane."
     },
@@ -72,7 +72,8 @@
       "isosurface": "Isosurface",
       "probe": "Probe radius",
       "probeHelp": "Move the radial cursor and highlight the corresponding spherical shell in the 3D view. Zero hides the shell.",
-      "nodes": "3D nodes"
+      "nodes": "3D nodes",
+      "angularTab": "Yₗₘ"
     },
     "presets": {
       "title": "State presets",
@@ -82,6 +83,11 @@
       "cones": "3d<sub>z²</sub>",
       "positive": "2p, m = +1",
       "negative": "2p, m = −1"
+    },
+    "angularDetail": {
+      "title": "Angular probability density",
+      "description": "Polar section at φ = {{phi}}°. Radius shows angular density, normalized to its peak. This is density per solid angle, without the sin θ integration weight.",
+      "phi": "Angular section φ"
     }
   },
   "a11y": {
@@ -91,7 +97,7 @@
         "controlArea": "Choose quantum numbers, real or complex angular functions, charge, rendering mode and stationary-state presets. Toggle 3D or slice nodes. Camera sliders, the radial probe slider and the plane offset slider provide keyboard control.",
         "interactionHint": "Change n, l and m to see how the orbital's size, shape and nodes change. Drag or use the arrow keys to rotate. Plus and minus zoom. Azimuth and elevation sliders also rotate the view."
       },
-      "currentDetails": "{{state}} of {{ion}}. Energy {{energy}} electronvolts. Mean radius {{radius}} Bohr radii. {{radialNodes}} radial nodes and {{angularNodes}} angular nodes.",
+      "currentDetails": "{{state}} of {{ion}}. Energy {{energy}} electronvolts. Mean radius {{radius}} {{unit}}. {{radialNodes}} radial nodes and {{angularNodes}} angular nodes. {{nodeDetails}}",
       "controls": {
         "principal": "Principal quantum number n",
         "principalHelp": "From 1 to 5. Sets the energy and the overall size of the orbital.",
@@ -116,7 +122,7 @@
         "controlArea": "Mix up to six hydrogenic states using quantum numbers, coefficient magnitudes and phases. Choose a preset, rendering mode, charge and playback speed.",
         "interactionHint": "Play, pause or step through time. Arrow keys rotate the focused 3D view; plus and minus zoom. Sliders provide keyboard equivalents."
       },
-      "currentDetails": "{{count}} distinct occupied states. Time {{time}} femtoseconds. Mean z {{z}} Bohr radii and mean radius {{r}} Bohr radii."
+      "currentDetails": "{{count}} distinct occupied states. Time {{time}} femtoseconds. Mean z {{z}} {{unit}} and mean radius {{r}} {{unit}}."
     },
     "angularMomentum": {
       "screenSummary": {
@@ -124,7 +130,7 @@
         "controlArea": "Choose l and m, or include spin and choose j and its projection. Play or step the schematic precession, or adjust its phase with the slider.",
         "interactionHint": "The vectors are a quantum vector-model illustration. Precession speed is illustrative."
       },
-      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}."
+      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}. Magnitudes in ℏ: L={{L}}, S={{S}}, J={{J}}. Orbital ΔLₓ ΔLᵧ / ℏ²={{uncertainty}}; a dash means not applicable."
     },
     "zeeman": {
       "screenSummary": {
@@ -132,7 +138,7 @@
         "controlArea": "Choose normal or anomalous splitting, spectral series, charge, magnetic field, viewing direction and upper level. Play or step the schematic Larmor precession.",
         "interactionHint": "Along the magnetic field, only sigma components are visible. The anomalous mode restricts the field to its labelled weak-field cap."
       },
-      "currentDetails": "Field {{field}} tesla, cap {{cap}} tesla. {{count}} distinct spectral positions."
+      "currentDetails": "Field {{field}} tesla, cap {{cap}} tesla. {{count}} distinct spectral positions. Wavelength range {{minimum}} to {{maximum}} nm. Selected upper state: {{state}}."
     },
     "oscillator": {
       "screenSummary": {
@@ -147,7 +153,16 @@
     "title": "Simulation",
     "phaseColormap": "Phase colours",
     "phaseColormapHsv": "Hue wheel (HSV)",
-    "phaseColormapUniform": "Uniform (constant lightness)"
+    "phaseColormapUniform": "Uniform (constant lightness)",
+    "lengthUnit": "Length unit",
+    "a0": "Bohr radii (a₀)",
+    "pm": "Picometres (pm)",
+    "quality": "Render quality",
+    "auto": "Automatic",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "showFormulas": "Show wavefunction formula (Orbitals → Yₗₘ)"
   },
   "superposition": {
     "time": "Time",
@@ -162,8 +177,8 @@
     "allowed": "Electric-dipole allowed",
     "forbidden": "Electric-dipole forbidden",
     "normalization": "The combined state is normalized automatically. Dots are probability samples, not trajectories.",
-    "meanRadius": "⟨r⟩ (a₀)",
-    "meanZ": "⟨z⟩ (a₀)",
+    "meanRadius": "⟨r⟩ ({{unit}})",
+    "meanZ": "⟨z⟩ ({{unit}})",
     "timeAxis": "Time (fs)",
     "presets": {
       "dipole": "Dipole",

@@ -7,16 +7,26 @@
  * the axis, where P(r) touches zero.
  */
 
-import { Multilink, type NumberProperty, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
+import {
+  DerivedProperty,
+  Multilink,
+  type NumberProperty,
+  type TReadOnlyProperty,
+  type UnknownMultilink,
+} from "scenerystack/axon";
 import { ChartRectangle, ChartTransform, GridLineSet, LinePlot, TickLabelSet, TickMarkSet } from "scenerystack/bamboo";
 import { Range, toFixed, Vector2 } from "scenerystack/dot";
 import { Orientation } from "scenerystack/phet-core";
+import { StringUtils } from "scenerystack/phetcommon";
 import { Circle, Line, Node, type NodeOptions, RichText, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { hydrogenRadialDistribution } from "../model/hydrogen/HydrogenRadial.js";
 import type { OrbitalSummary } from "../model/orbital/OrbitalSummary.js";
+import { DEFAULT_LENGTH_UNIT_PROPERTY } from "./DisplayDefaults.js";
+import { formatLength, lengthUnitSymbol } from "./formatters.js";
 
 /** Samples along r for the curve. */
 const CURVE_SAMPLES = 300;
@@ -49,17 +59,25 @@ function niceStep(span: number, target: number): number {
 }
 
 export type RadialDistributionChartNodeOptions = NodeOptions & {
+  readonly lengthUnitProperty?: TReadOnlyProperty<LengthUnit>;
   readonly summaryProperty: TReadOnlyProperty<OrbitalSummary>;
   readonly maxRadiusProperty: TReadOnlyProperty<number>;
   readonly probeFractionProperty?: NumberProperty;
 };
 
 export class RadialDistributionChartNode extends Node {
+  private readonly axisProperty: TReadOnlyProperty<string>;
   private readonly multilink: UnknownMultilink;
   private readonly probeLink: UnknownMultilink | undefined;
 
   public constructor(width: number, height: number, options: RadialDistributionChartNodeOptions) {
-    const { summaryProperty, maxRadiusProperty, probeFractionProperty, ...nodeOptions } = options;
+    const {
+      summaryProperty,
+      maxRadiusProperty,
+      probeFractionProperty,
+      lengthUnitProperty = DEFAULT_LENGTH_UNIT_PROPERTY,
+      ...nodeOptions
+    } = options;
     const strings = StringManager.getInstance().getOrbitalStrings().radialChart;
 
     const chartTransform = new ChartTransform({
@@ -84,7 +102,7 @@ export class RadialDistributionChartNode extends Node {
       edge: "min",
       extent: TICK_LABEL_SPACING,
       createLabel: (value: number) =>
-        new Text(toFixed(value, tickStep < 1 ? 1 : 0), {
+        new Text(lengthUnitProperty.value === "pm" ? formatLength(value, "pm") : toFixed(value, tickStep < 1 ? 1 : 0), {
           font: LABEL_FONT,
           fill: QuantumAtom3DColors.textColorProperty,
         }),
@@ -109,7 +127,10 @@ export class RadialDistributionChartNode extends Node {
       fill: QuantumAtom3DColors.textColorProperty,
       maxWidth: width,
     });
-    const xAxisLabel = new RichText(strings.xAxisStringProperty, {
+    const axisProperty = new DerivedProperty([strings.xAxisStringProperty, lengthUnitProperty], (pattern, unit) =>
+      StringUtils.fillIn(pattern, { unit: lengthUnitSymbol(unit) }),
+    );
+    const xAxisLabel = new RichText(axisProperty, {
       font: LABEL_FONT,
       fill: QuantumAtom3DColors.textColorProperty,
     });
@@ -150,50 +171,56 @@ export class RadialDistributionChartNode extends Node {
       xAxisLabel.top = height + AXIS_LABEL_OFFSET;
     });
 
-    this.multilink = Multilink.multilink([summaryProperty, maxRadiusProperty], (summary, maxRadius) => {
-      const { n, l, nuclearCharge } = summary;
-      const points: Vector2[] = [];
-      let peak = 0;
-      for (let i = 0; i <= CURVE_SAMPLES; i++) {
-        const r = (maxRadius * i) / CURVE_SAMPLES;
-        const value = hydrogenRadialDistribution(n, l, nuclearCharge, r);
-        peak = Math.max(peak, value);
-        points.push(new Vector2(r, value));
-      }
-      chartTransform.setModelXRange(new Range(0, maxRadius));
-      chartTransform.setModelYRange(new Range(0, peak > 0 ? peak * Y_HEADROOM : 1));
-      tickStep = niceStep(maxRadius, TARGET_TICKS);
-      gridLines.setSpacing(tickStep);
-      tickMarks.setSpacing(tickStep);
-      tickLabels.setSpacing(tickStep);
-      curve.setDataSet(points);
+    this.axisProperty = axisProperty;
+    this.multilink = Multilink.multilink(
+      [summaryProperty, maxRadiusProperty, lengthUnitProperty],
+      (summary, maxRadius) => {
+        const { n, l, nuclearCharge } = summary;
+        const points: Vector2[] = [];
+        let peak = 0;
+        for (let i = 0; i <= CURVE_SAMPLES; i++) {
+          const r = (maxRadius * i) / CURVE_SAMPLES;
+          const value = hydrogenRadialDistribution(n, l, nuclearCharge, r);
+          peak = Math.max(peak, value);
+          points.push(new Vector2(r, value));
+        }
+        chartTransform.setModelXRange(new Range(0, maxRadius));
+        chartTransform.setModelYRange(new Range(0, peak > 0 ? peak * Y_HEADROOM : 1));
+        tickStep = niceStep(maxRadius, TARGET_TICKS);
+        gridLines.setSpacing(tickStep);
+        tickMarks.setSpacing(tickStep);
+        tickLabels.setSpacing(tickStep);
+        tickLabels.invalidateTickLabelSet();
+        curve.setDataSet(points);
 
-      const meanVisible = summary.meanRadius < maxRadius;
-      const meanX = chartTransform.modelToViewX(summary.meanRadius);
-      meanLine.visible = meanVisible;
-      meanLabel.visible = meanVisible;
-      meanLine.setLine(meanX, 0, meanX, height);
-      meanLabel.left = meanX + TICK_LABEL_SPACING;
-      meanLabel.top = TICK_LABEL_SPACING;
+        const meanVisible = summary.meanRadius < maxRadius;
+        const meanX = chartTransform.modelToViewX(summary.meanRadius);
+        meanLine.visible = meanVisible;
+        meanLabel.visible = meanVisible;
+        meanLine.setLine(meanX, 0, meanX, height);
+        meanLabel.left = meanX + TICK_LABEL_SPACING;
+        meanLabel.top = TICK_LABEL_SPACING;
 
-      for (const dot of nodeDots.children) {
-        dot.dispose();
-      }
-      nodeDots.children = summary.nodes.radialNodeRadii
-        .filter((radius) => radius < maxRadius)
-        .map(
-          (radius) =>
-            new Circle(NODE_DOT_RADIUS, {
-              fill: QuantumAtom3DColors.nodeMarkerColorProperty,
-              center: new Vector2(chartTransform.modelToViewX(radius), height),
-            }),
-        );
-    });
+        for (const dot of nodeDots.children) {
+          dot.dispose();
+        }
+        nodeDots.children = summary.nodes.radialNodeRadii
+          .filter((radius) => radius < maxRadius)
+          .map(
+            (radius) =>
+              new Circle(NODE_DOT_RADIUS, {
+                fill: QuantumAtom3DColors.nodeMarkerColorProperty,
+                center: new Vector2(chartTransform.modelToViewX(radius), height),
+              }),
+          );
+      },
+    );
   }
 
   public override dispose(): void {
     this.probeLink?.dispose();
     this.multilink.dispose();
+    this.axisProperty.dispose();
     super.dispose();
   }
 }

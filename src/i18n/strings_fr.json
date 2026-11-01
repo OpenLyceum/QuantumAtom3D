@@ -29,17 +29,17 @@
       "radialNodes": "Nœuds radiaux",
       "angularNodes": "Nœuds angulaires",
       "energyValue": "{{value}} eV",
-      "lengthValue": "{{value}} a<sub>0</sub>",
+      "lengthValue": "{{value}} {{unit}}",
       "nodeCount": "{{count}}",
       "conesValue": "cônes θ = {{angles}}",
       "planesValue": "plans φ = {{angles}}",
       "polarPlaneValue": "plan xy (θ = 90°)",
       "meanSquareRadius": "⟨r²⟩",
-      "squareLengthValue": "{{value}} a<sub>0</sub>²"
+      "squareLengthValue": "{{value}} {{unit}}²"
     },
     "radialChart": {
       "title": "P(r) = r²|R<sub>nl</sub>|²",
-      "xAxis": "r (a<sub>0</sub>)"
+      "xAxis": "r ({{unit}})"
     },
     "slice": {
       "title": "Coupe",
@@ -50,7 +50,7 @@
       "density": "Densité |ψ|²",
       "phaseLegend": "luminosité ∝ |ψ|",
       "densityLegend": "0 → max",
-      "scale": "±{{value}} a<sub>0</sub>",
+      "scale": "±{{value}} {{unit}}",
       "showPlane": "Afficher le plan de coupe en 3D",
       "planeHelp": "Faites glisser la poignée bleue dans la vue 3D ou utilisez le curseur de décalage pour déplacer le plan de coupe."
     },
@@ -72,7 +72,8 @@
       "isosurface": "Isosurface",
       "probe": "Rayon sondé",
       "probeHelp": "Déplacez le curseur radial et affichez la sphère correspondante dans la vue 3D. Zéro masque la sphère.",
-      "nodes": "Nœuds 3D"
+      "nodes": "Nœuds 3D",
+      "angularTab": "Yₗₘ"
     },
     "presets": {
       "title": "États prédéfinis",
@@ -82,6 +83,11 @@
       "cones": "3d<sub>z²</sub>",
       "positive": "2p, m = +1",
       "negative": "2p, m = −1"
+    },
+    "angularDetail": {
+      "title": "Densité de probabilité angulaire",
+      "description": "Coupe polaire à φ = {{phi}}°. Le rayon montre la densité angulaire normalisée à son maximum. Densité par angle solide, sans le facteur d’intégration sin θ.",
+      "phi": "Coupe angulaire φ"
     }
   },
   "a11y": {
@@ -91,7 +97,7 @@
         "controlArea": "Choisissez les nombres quantiques, la base réelle ou complexe, la charge, le rendu et les états prédéfinis. Activez les nœuds 3D ou ceux de la coupe. Les curseurs de caméra, de rayon et de décalage du plan permettent le contrôle au clavier.",
         "interactionHint": "Changez n, l et m pour voir comment la taille, la forme et les nœuds de l'orbitale changent. Glissez ou utilisez les flèches pour tourner. Plus et moins règlent le zoom. Les curseurs d’azimut et d’élévation tournent aussi la vue."
       },
-      "currentDetails": "{{state}} de {{ion}}. Énergie {{energy}} électronvolts. Rayon moyen {{radius}} rayons de Bohr. {{radialNodes}} nœuds radiaux et {{angularNodes}} nœuds angulaires.",
+      "currentDetails": "{{state}} de {{ion}}. Énergie {{energy}} électronvolts. Rayon moyen {{radius}} {{unit}}. {{radialNodes}} nœuds radiaux et {{angularNodes}} nœuds angulaires. {{nodeDetails}}",
       "controls": {
         "principal": "Nombre quantique principal n",
         "principalHelp": "De 1 à 5. Fixe l'énergie et la taille globale de l'orbitale.",
@@ -116,7 +122,7 @@
         "controlArea": "Mélangez jusqu’à six états hydrogénoïdes avec leurs nombres quantiques, modules et phases. Choisissez un état prédéfini, le rendu, la charge et la vitesse.",
         "interactionHint": "Lancez, suspendez ou avancez pas à pas. Les flèches tournent la vue 3D sélectionnée ; plus et moins règlent le zoom. Les curseurs permettent aussi le contrôle au clavier."
       },
-      "currentDetails": "{{count}} états distincts occupés. Temps {{time}} femtosecondes. Position z moyenne {{z}} rayons de Bohr et rayon moyen {{r}} rayons de Bohr."
+      "currentDetails": "{{count}} états distincts occupés. Temps {{time}} femtosecondes. Position z moyenne {{z}} {{unit}} et rayon moyen {{r}} {{unit}}."
     },
     "angularMomentum": {
       "screenSummary": {
@@ -124,7 +130,7 @@
         "controlArea": "Choisissez l et m, ou activez le spin pour choisir j et sa projection. Animez la précession ou réglez sa phase avec le curseur.",
         "interactionHint": "Les vecteurs illustrent le modèle vectoriel quantique. La vitesse est illustrative."
       },
-      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}."
+      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}. Normes en ℏ : L={{L}}, S={{S}}, J={{J}}. Produit orbital ΔLₓ ΔLᵧ / ℏ²={{uncertainty}} ; un tiret indique sans objet."
     },
     "zeeman": {
       "screenSummary": {
@@ -132,7 +138,7 @@
         "controlArea": "Choisissez le mode, la série, la charge, le champ, la direction et le niveau supérieur. Animez la précession de Larmor schématique.",
         "interactionHint": "Selon le champ, seules les composantes sigma sont visibles. Le mode anomal limite le champ au régime faible indiqué."
       },
-      "currentDetails": "Champ {{field}} teslas, limite {{cap}} teslas. {{count}} positions spectrales distinctes."
+      "currentDetails": "Champ {{field}} teslas, limite {{cap}} teslas. {{count}} positions spectrales distinctes. Plage de longueurs d’onde de {{minimum}} à {{maximum}} nm. État supérieur sélectionné : {{state}}."
     },
     "oscillator": {
       "screenSummary": {
@@ -147,7 +153,16 @@
     "title": "Simulation",
     "phaseColormap": "Couleurs de phase",
     "phaseColormapHsv": "Roue des teintes (TSV)",
-    "phaseColormapUniform": "Uniforme (luminosité constante)"
+    "phaseColormapUniform": "Uniforme (luminosité constante)",
+    "lengthUnit": "Unité de longueur",
+    "a0": "Rayons de Bohr (a₀)",
+    "pm": "Picomètres (pm)",
+    "quality": "Qualité du rendu",
+    "auto": "Automatique",
+    "low": "Basse",
+    "medium": "Moyenne",
+    "high": "Haute",
+    "showFormulas": "Afficher la formule d’onde (Orbitales → Yₗₘ)"
   },
   "superposition": {
     "time": "Temps",
@@ -162,8 +177,8 @@
     "allowed": "Transition dipolaire permise",
     "forbidden": "Transition dipolaire interdite",
     "normalization": "L’état combiné est normalisé automatiquement. Les points sont des échantillons de probabilité, pas des trajectoires.",
-    "meanRadius": "⟨r⟩ (a₀)",
-    "meanZ": "⟨z⟩ (a₀)",
+    "meanRadius": "⟨r⟩ ({{unit}})",
+    "meanZ": "⟨z⟩ ({{unit}})",
     "timeAxis": "Temps (fs)",
     "presets": {
       "dipole": "Dipôle",

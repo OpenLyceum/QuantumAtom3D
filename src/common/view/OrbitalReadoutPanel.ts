@@ -11,10 +11,12 @@ import { StringUtils } from "scenerystack/phetcommon";
 import { GridBox, RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { OrbitalSummary } from "../model/orbital/OrbitalSummary.js";
 import { QuantumAtom3DPanel, type QuantumAtom3DPanelOptions } from "../QuantumAtom3DPanel.js";
-import { formatAngles, formatEnergyEv, formatLength } from "./formatters.js";
+import { DEFAULT_LENGTH_UNIT_PROPERTY } from "./DisplayDefaults.js";
+import { formatAngles, formatEnergyEv, formatLength, lengthUnitSymbol } from "./formatters.js";
 
 const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
 const READOUT_FONT = new PhetFont(13);
@@ -29,7 +31,11 @@ const EQUATORIAL_TOLERANCE = 1e-6;
 export class OrbitalReadoutPanel extends QuantumAtom3DPanel {
   private readonly disposables: { dispose(): void }[];
 
-  public constructor(summaryProperty: TReadOnlyProperty<OrbitalSummary>, options?: QuantumAtom3DPanelOptions) {
+  public constructor(
+    summaryProperty: TReadOnlyProperty<OrbitalSummary>,
+    options?: QuantumAtom3DPanelOptions,
+    unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY,
+  ) {
     const strings = StringManager.getInstance().getOrbitalStrings().readouts;
     const disposables: { dispose(): void }[] = [];
 
@@ -37,7 +43,9 @@ export class OrbitalReadoutPanel extends QuantumAtom3DPanel {
       dependency: TReadOnlyProperty<string>,
       compute: (summary: OrbitalSummary, pattern: string) => T,
     ): TReadOnlyProperty<T> => {
-      const property = new DerivedProperty([summaryProperty, dependency], compute);
+      const property = new DerivedProperty([summaryProperty, dependency, unitProperty], (summary, pattern) =>
+        compute(summary, pattern),
+      );
       disposables.push(property);
       return property;
     };
@@ -47,7 +55,10 @@ export class OrbitalReadoutPanel extends QuantumAtom3DPanel {
     );
     const lengthOf = (pick: (summary: OrbitalSummary) => number) =>
       derive(strings.lengthValueStringProperty, (summary, pattern) =>
-        StringUtils.fillIn(pattern, { value: formatLength(pick(summary)) }),
+        StringUtils.fillIn(pattern, {
+          value: formatLength(pick(summary), unitProperty.value),
+          unit: lengthUnitSymbol(unitProperty.value),
+        }),
       );
     const radialNodesProperty = derive(strings.nodeCountStringProperty, (summary, pattern) =>
       StringUtils.fillIn(pattern, { count: summary.nodes.radialNodeRadii.length }),
@@ -105,7 +116,10 @@ export class OrbitalReadoutPanel extends QuantumAtom3DPanel {
       [
         strings.meanSquareRadiusStringProperty,
         derive(strings.squareLengthValueStringProperty, (summary, pattern) =>
-          StringUtils.fillIn(pattern, { value: formatLength(summary.meanSquareRadius) }),
+          StringUtils.fillIn(pattern, {
+            value: formatLength(summary.meanSquareRadius, unitProperty.value, 2),
+            unit: lengthUnitSymbol(unitProperty.value),
+          }),
         ),
       ],
       [strings.rmsRadiusStringProperty, lengthOf((summary) => summary.rmsRadius)],

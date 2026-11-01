@@ -8,7 +8,7 @@ complex-phase colouring, radial distributions, superpositions that evolve in tim
 angular-momentum vector model, Zeeman splitting with selection rules, and the degeneracy of the
 isotropic 3D oscillator.
 
-**Status:** Orbitals, Superposition, Angular Momentum, Zeeman and 3D Oscillator screens are implemented. Further polish remains planned; see
+**Status:** Orbitals, Superposition, Angular Momentum, Zeeman and 3D Oscillator screens are implemented. The M8 display and accessibility polish is implemented; see
 [`doc/implementation-notes.md`](doc/implementation-notes.md).
 
 ## Features
@@ -16,7 +16,8 @@ isotropic 3D oscillator.
 - **Orbitals:** ψ_nlm for n ≤ 5, in the complex or real basis, with Z = 1–6 (H, He⁺, Li²⁺, …).
   Volume rendering with phase or density colours, pointer/keyboard orbit and zoom, camera sliders,
   probability dots, 90%/95% isosurfaces, analytic 3D nodes, a draggable cutting plane and linked
-  P(r) probing. Includes stationary-state presets and expectation-value readouts.
+  P(r) probing. Includes an angular-density section with selectable azimuth, stationary-state presets,
+  and expectation-value readouts in Bohr radii or picometres.
 - **Superposition:** mix up to six eigenstates, evolve their relative phases,
   track mean radius and mean z, and explore dipole, breathing, rotation and sp/sp²/sp³ presets.
 - **Angular Momentum:** orbital precession cones, projections and uncertainties; L + S → J
@@ -27,6 +28,9 @@ isotropic 3D oscillator.
   degeneracy comparison with hydrogen, and 3D volume/isosurface rendering.
 - WebGPU rendering with a progressive CPU fallback, including recovery after device loss. Use
   `?forceCpu=true` to select the CPU renderer explicitly; `?seed=173` reproduces the dot samples.
+- Preferences for phase colours, rendering quality, length units and the angular-tab formula.
+  Share an initial orbital with, for example, `?screens=1&n=3&l=2&m=0&Z=2&basis=real&lengthUnit=pm`.
+  Invalid dependent quantum numbers are clamped; Reset All returns to the URL's initial state.
 - English, Spanish and French. Default and projector colour profiles. Installable as a PWA.
 
 ## Quick Start

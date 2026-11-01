@@ -12,6 +12,7 @@
  *     within a few frames and sharpens while the view stays still.
  */
 
+import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import { createColorLuts } from "../view/Colormaps.js";
 import type { CameraFrame } from "../view/OrbitCamera.js";
 import { OrbitalRayMarcher } from "./OrbitalRayMarcher.js";
@@ -39,6 +40,7 @@ export class CpuOrbitalRenderer implements OrbitalRenderer {
   private frame: CameraFrame | null = null;
   private colorLuts: Float32Array | null = null;
   private marcher: OrbitalRayMarcher | null = null;
+  private maximumLevel = CPU_RESOLUTIONS.length - 1;
   private level = 0;
   private row = 0;
   private imageData: ImageData | null = null;
@@ -57,6 +59,13 @@ export class CpuOrbitalRenderer implements OrbitalRenderer {
     this.displayContext = displayContext;
   }
 
+  public setQuality(quality: RenderQuality): void {
+    const maximum = quality === "low" ? 1 : quality === "medium" ? 2 : 3;
+    if (this.maximumLevel !== maximum) {
+      this.maximumLevel = maximum;
+      this.restart();
+    }
+  }
   public setScene(scene: OrbitalScene): void {
     if (scene.phaseColormap !== this.scene?.phaseColormap) {
       this.colorLuts = createColorLuts(scene.phaseColormap);
@@ -88,7 +97,7 @@ export class CpuOrbitalRenderer implements OrbitalRenderer {
       this.pointsDirty = false;
       return true;
     }
-    const resolution = CPU_RESOLUTIONS[this.level];
+    const resolution = this.level <= this.maximumLevel ? CPU_RESOLUTIONS[this.level] : undefined;
     if (!(this.marcher && resolution)) {
       return false;
     }

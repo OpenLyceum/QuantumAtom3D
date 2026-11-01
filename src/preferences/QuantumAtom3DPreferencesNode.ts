@@ -8,7 +8,7 @@
 
 import { Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
-import { VerticalAquaRadioButtonGroup } from "scenerystack/sun";
+import { AquaRadioButtonGroup, Checkbox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
 import type { Tandem } from "scenerystack/tandem";
 import { StringManager } from "../i18n/StringManager.js";
 import QuantumAtom3DColors from "../QuantumAtom3DColors.js";
@@ -58,10 +58,42 @@ export class QuantumAtom3DPreferencesNode extends VBox {
       },
     );
 
+    const lengthButtons = new AquaRadioButtonGroup(
+      preferencesModel.lengthUnitProperty,
+      (["a0", "pm"] as const).map((value) => ({
+        value,
+        createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
+        options: { accessibleName: prefStrings[`${value}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 12, accessibleName: prefStrings.lengthUnitStringProperty },
+    );
+    const qualityButtons = new AquaRadioButtonGroup(
+      preferencesModel.qualityProperty,
+      (["auto", "low", "medium", "high"] as const).map((value) => ({
+        value,
+        createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
+        options: { accessibleName: prefStrings[`${value}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 12, accessibleName: prefStrings.qualityStringProperty },
+    );
+    const formulas = new Checkbox(
+      preferencesModel.showFormulasProperty,
+      createItemText(prefStrings.showFormulasStringProperty),
+      { accessibleName: prefStrings.showFormulasStringProperty },
+    );
     super({
       align: "left",
       spacing: 12,
-      children: [header, colormapLabel, colormapRadioButtons],
+      children: [
+        header,
+        colormapLabel,
+        colormapRadioButtons,
+        createItemText(prefStrings.lengthUnitStringProperty),
+        lengthButtons,
+        createItemText(prefStrings.qualityStringProperty),
+        qualityButtons,
+        formulas,
+      ],
     });
   }
 }

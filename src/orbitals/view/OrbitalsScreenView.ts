@@ -1,7 +1,6 @@
 /** Orbitals: 3D volume at left, radial/slice details in the middle, state controls at right. */
 import { DerivedProperty, StringUnionProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { Dimension2 } from "scenerystack/dot";
-import { optionize } from "scenerystack/phet-core";
 import { StringUtils } from "scenerystack/phetcommon";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
@@ -10,12 +9,15 @@ import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
 import { RENDER_MODES } from "../../common/model/orbital/RenderMode.js";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
-import { formatLength } from "../../common/view/formatters.js";
+import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
+import { formatLength, lengthUnitSymbol } from "../../common/view/formatters.js";
+import { OrbitalAngularDetailNode } from "../../common/view/OrbitalAngularDetailNode.js";
 import { OrbitalReadoutPanel } from "../../common/view/OrbitalReadoutPanel.js";
 import { OrbitalViewportNode } from "../../common/view/OrbitalViewportNode.js";
 import { RadialDistributionChartNode } from "../../common/view/RadialDistributionChartNode.js";
 import { SliceHeatmapNode } from "../../common/view/SliceHeatmapNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import type { OrbitalsModel } from "../model/OrbitalsModel.js";
@@ -32,21 +34,23 @@ const GAP = 12;
 const TITLE_ROOM = 30;
 const LABEL_FONT = new PhetFont(13);
 
-type SelfOptions = { readonly phaseColormapProperty: TReadOnlyProperty<PhaseColormap> };
+type SelfOptions = {
+  readonly preferences?: QuantumAtom3DPreferencesModel;
+  readonly phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
+};
 export type OrbitalsScreenViewOptions = SelfOptions & ScreenViewOptions;
 
 export class OrbitalsScreenView extends ScreenView {
   public readonly viewport: OrbitalViewportNode;
 
   public constructor(model: OrbitalsModel, providedOptions: OrbitalsScreenViewOptions) {
-    const options = optionize<OrbitalsScreenViewOptions, SelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new OrbitalsScreenSummaryContent(model),
-      },
-      providedOptions,
-    );
+    const options = {
+      screenSummaryContent: new OrbitalsScreenSummaryContent(model, providedOptions.preferences?.lengthUnitProperty),
+      ...providedOptions,
+    };
     super(options);
     const { phaseColormapProperty } = options;
+    const unitProperty = options.preferences?.lengthUnitProperty ?? DEFAULT_LENGTH_UNIT_PROPERTY;
     const strings = StringManager.getInstance().getOrbitalStrings();
     const label = (text: TReadOnlyProperty<string>, maxWidth = 150) =>
       new RichText(text, {
@@ -55,7 +59,12 @@ export class OrbitalsScreenView extends ScreenView {
         maxWidth,
       });
 
-    this.viewport = new OrbitalViewportNode(VIEW_SIZE, model, phaseColormapProperty);
+    this.viewport = new OrbitalViewportNode(
+      VIEW_SIZE,
+      model,
+      phaseColormapProperty,
+      options.preferences?.qualityProperty,
+    );
     const viewport = this.viewport;
     viewport.left = this.layoutBounds.minX + SCREEN_VIEW_MARGIN;
     viewport.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN + TITLE_ROOM;
@@ -63,8 +72,9 @@ export class OrbitalsScreenView extends ScreenView {
     title.left = viewport.left;
     title.bottom = viewport.top - GAP / 2;
     const scale = new DerivedProperty(
-      [model.viewHalfWidthProperty, strings.slice.scaleStringProperty],
-      (width, pattern) => StringUtils.fillIn(pattern, { value: formatLength(width) }),
+      [model.viewHalfWidthProperty, strings.slice.scaleStringProperty, unitProperty],
+      (width, pattern, unit) =>
+        StringUtils.fillIn(pattern, { value: formatLength(width, unit), unit: lengthUnitSymbol(unit) }),
     );
     const scaleLabel = label(scale);
     scaleLabel.boundsProperty.link(() => {
@@ -133,7 +143,7 @@ export class OrbitalsScreenView extends ScreenView {
       top: viewport.bottom + GAP,
     });
 
-    const detailProperty = new StringUnionProperty("radial", { validValues: ["radial", "slice"] });
+    const detailProperty = new StringUnionProperty("radial", { validValues: ["radial", "slice", "angular"] });
     const detailChoice = new AquaRadioButtonGroup(
       detailProperty,
       [
@@ -147,6 +157,11 @@ export class OrbitalsScreenView extends ScreenView {
           createNode: () => label(strings.volume.sliceTabStringProperty, 110),
           options: { accessibleName: strings.volume.sliceTabStringProperty },
         },
+        {
+          value: "angular",
+          createNode: () => label(strings.volume.angularTabStringProperty),
+          options: { accessibleName: strings.volume.angularTabStringProperty },
+        },
       ],
       { orientation: "horizontal", spacing: 10, radioButtonOptions: { radius: 6 } },
     );
@@ -157,10 +172,12 @@ export class OrbitalsScreenView extends ScreenView {
       summaryProperty: model.summaryProperty,
       maxRadiusProperty: model.viewHalfWidthProperty,
       probeFractionProperty: model.probeFractionProperty,
+      lengthUnitProperty: unitProperty,
     });
     const probeValue = new DerivedProperty(
-      [model.probeFractionProperty, model.viewHalfWidthProperty, strings.volume.probeStringProperty],
-      (probeFraction, width, name) => `${name}: ${formatLength(probeFraction * width)} a<sub>0</sub>`,
+      [model.probeFractionProperty, model.viewHalfWidthProperty, strings.volume.probeStringProperty, unitProperty],
+      (probeFraction, width, name, unit) =>
+        `${name}: ${formatLength(probeFraction * width, unit)} ${lengthUnitSymbol(unit)}`,
     );
     const probeControl = new VBox({
       align: "left",
@@ -177,7 +194,7 @@ export class OrbitalsScreenView extends ScreenView {
         }),
       ],
     });
-    const readouts = new OrbitalReadoutPanel(model.summaryProperty);
+    const readouts = new OrbitalReadoutPanel(model.summaryProperty, undefined, unitProperty);
     const radialPanel = new VBox({
       children: [chart, probeControl, readouts],
       spacing: 2 * GAP,
@@ -203,7 +220,11 @@ export class OrbitalsScreenView extends ScreenView {
       left: detailChoice.left,
       top: detailTop,
     });
+    const angularPanel = new OrbitalAngularDetailNode(model, options.preferences?.showFormulasProperty);
+    angularPanel.left = detailChoice.left;
+    angularPanel.top = detailTop;
     detailProperty.link((value) => {
+      angularPanel.visible = value === "angular";
       radialPanel.visible = value === "radial";
       slicePanel.visible = value === "slice";
     });
@@ -216,15 +237,27 @@ export class OrbitalsScreenView extends ScreenView {
         model.reset();
         viewport.reset();
         detailProperty.reset();
+        angularPanel.reset();
       },
       right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
       bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
     const content = new Node({
-      children: [title, scaleLabel, viewport, belowViewport, detailChoice, radialPanel, slicePanel, controls, reset],
+      children: [
+        title,
+        scaleLabel,
+        viewport,
+        belowViewport,
+        detailChoice,
+        radialPanel,
+        slicePanel,
+        angularPanel,
+        controls,
+        reset,
+      ],
     });
     this.addChild(content);
-    this.pdomPlayAreaNode.pdomOrder = [viewport, detailChoice, radialPanel, slicePanel];
+    this.pdomPlayAreaNode.pdomOrder = [viewport, detailChoice, radialPanel, slicePanel, angularPanel];
     this.pdomControlAreaNode.pdomOrder = [belowViewport, controls, reset];
   }
 

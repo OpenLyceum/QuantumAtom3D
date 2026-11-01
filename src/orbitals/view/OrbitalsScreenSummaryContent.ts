@@ -8,22 +8,38 @@
 
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
-import { ScreenSummaryContent } from "scenerystack/sim";
 import { hydrogenicIonSymbol } from "../../common/model/hydrogen/HydrogenicIons.js";
 import { realOrbitalSubscript, spectroscopicLetter } from "../../common/model/orbital/OrbitalCatalog.js";
-import { formatEnergyEv, formatLength, formatSigned } from "../../common/view/formatters.js";
+import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
+import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
+import {
+  formatAngles,
+  formatEnergyEv,
+  formatLength,
+  formatSigned,
+  lengthUnitSymbol,
+} from "../../common/view/formatters.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import type { OrbitalsModel } from "../model/OrbitalsModel.js";
 
-export class OrbitalsScreenSummaryContent extends ScreenSummaryContent {
+export class OrbitalsScreenSummaryContent extends DisposableScreenSummaryContent {
   private readonly currentDetailsProperty: TReadOnlyProperty<string>;
 
-  public constructor(model: OrbitalsModel) {
+  public constructor(model: OrbitalsModel, unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY) {
     const a11y = StringManager.getInstance().getOrbitalsA11yStrings();
 
+    const readouts = StringManager.getInstance().getOrbitalStrings().readouts;
     const currentDetailsProperty = new DerivedProperty(
-      [model.summaryProperty, a11y.currentDetailsStringProperty],
-      (summary, pattern) => {
+      [
+        model.summaryProperty,
+        a11y.currentDetailsStringProperty,
+        unitProperty,
+        readouts.conesValueStringProperty,
+        readouts.planesValueStringProperty,
+        readouts.polarPlaneValueStringProperty,
+      ],
+      (summary, pattern, unit, conePattern, planePattern, equator) => {
         const { n, l, m, basis, nodes } = summary;
         const letter = spectroscopicLetter(l);
         // Plain text for speech: "3d xz", "2p, m = +1", "1s".
@@ -37,7 +53,22 @@ export class OrbitalsScreenSummaryContent extends ScreenSummaryContent {
           state,
           ion: hydrogenicIonSymbol(summary.nuclearCharge),
           energy: formatEnergyEv(summary.energy),
-          radius: formatLength(summary.meanRadius),
+          radius: formatLength(summary.meanRadius, unit),
+          unit: lengthUnitSymbol(unit),
+          nodeDetails: [
+            nodes.polarNodeAngles.some((a) => Math.abs(a - Math.PI / 2) < 1e-6) ? equator : "",
+            nodes.polarNodeAngles.some((a) => Math.abs(a - Math.PI / 2) >= 1e-6)
+              ? StringUtils.fillIn(conePattern, {
+                  angles: formatAngles(nodes.polarNodeAngles.filter((a) => Math.abs(a - Math.PI / 2) >= 1e-6)),
+                })
+              : "",
+
+            nodes.azimuthalNodeAngles.length > 0
+              ? StringUtils.fillIn(planePattern, { angles: formatAngles(nodes.azimuthalNodeAngles) })
+              : "",
+          ]
+            .filter(Boolean)
+            .join(". "),
           radialNodes: nodes.radialNodeRadii.length,
           angularNodes: nodes.polarNodeAngles.length + nodes.azimuthalNodeAngles.length,
         });
@@ -54,7 +85,7 @@ export class OrbitalsScreenSummaryContent extends ScreenSummaryContent {
   }
 
   public override dispose(): void {
-    this.currentDetailsProperty.dispose();
     super.dispose();
+    this.currentDetailsProperty.dispose();
   }
 }

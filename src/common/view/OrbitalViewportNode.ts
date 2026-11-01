@@ -6,6 +6,7 @@ import { Circle, DragListener, Image, KeyboardListener, Line, Node, Rectangle, T
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { OrbitalsModel } from "../../orbitals/model/OrbitalsModel.js";
+import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import quantumAtom3DQueryParameters from "../../preferences/quantumAtom3DQueryParameters.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
@@ -35,7 +36,13 @@ export class OrbitalViewportNode extends Node {
   private cameraDirty = true;
   private readonly updateScene: () => void;
 
-  public constructor(size: number, model: OrbitalsModel, phaseColormapProperty: TReadOnlyProperty<PhaseColormap>) {
+  private readonly quality: TReadOnlyProperty<RenderQuality> | undefined;
+  public constructor(
+    size: number,
+    model: OrbitalsModel,
+    phaseColormapProperty: TReadOnlyProperty<PhaseColormap>,
+    quality?: TReadOnlyProperty<RenderQuality>,
+  ) {
     const strings = StringManager.getInstance().getOrbitalStrings().volume;
     super({
       tagName: "div",
@@ -48,6 +55,7 @@ export class OrbitalViewportNode extends Node {
       mouseArea: new Bounds2(0, 0, size, size),
       touchArea: new Bounds2(0, 0, size, size),
     });
+    this.quality = quality;
     this.engine = createOrbitalRenderer();
     this.backendProperty = new StringUnionProperty<"gpu" | "cpu">(this.engine.backend, {
       validValues: ["gpu", "cpu"],
@@ -269,6 +277,9 @@ export class OrbitalViewportNode extends Node {
 
   /** Coalesce synchronous property changes, then spend a bounded amount of CPU work per frame. */
   public step(): void {
+    if (this.quality) {
+      this.engine.setQuality?.(this.quality.value);
+    }
     if (this.sceneDirty) {
       this.updateScene();
       this.sceneDirty = false;

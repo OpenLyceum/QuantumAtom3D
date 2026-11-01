@@ -1,15 +1,16 @@
-import { DerivedProperty } from "scenerystack/axon";
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
-import { ScreenSummaryContent } from "scenerystack/sim";
 import {
   cartesianExpansion,
   cartesianStates,
   oscillatorDegeneracy,
   sphericalStates,
 } from "../../common/model/oscillator/OscillatorStates.js";
+import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
-export class OscillatorScreenSummaryContent extends ScreenSummaryContent {
+export class OscillatorScreenSummaryContent extends DisposableScreenSummaryContent {
+  private readonly details: TReadOnlyProperty<string>;
   public constructor(model: OscillatorModel) {
     const s = StringManager.getInstance().getOscillatorA11yStrings();
     const labels = StringManager.getInstance().getOscillatorStrings();
@@ -48,5 +49,10 @@ export class OscillatorScreenSummaryContent extends ScreenSummaryContent {
       interactionHintContent: s.screenSummary.interactionHintStringProperty,
       currentDetailsContent: details,
     });
+    this.details = details;
+  }
+  public override dispose(): void {
+    super.dispose();
+    this.details.dispose();
   }
 }

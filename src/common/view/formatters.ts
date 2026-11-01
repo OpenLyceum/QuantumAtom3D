@@ -7,7 +7,8 @@
  */
 
 import { toFixed } from "scenerystack/dot";
-import { hartreeToEv } from "../model/AtomicUnits.js";
+import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
+import { bohrToPm, hartreeToEv } from "../model/AtomicUnits.js";
 
 /** Digits after the point for lengths in a0 and energies in eV. */
 const LENGTH_DECIMALS = 2;
@@ -27,8 +28,13 @@ export function formatEnergyEv(energy: number): string {
 }
 
 /** A length in a0 (e.g. "5.00"). */
-export function formatLength(length: number): string {
-  return withMinus(toFixed(length, LENGTH_DECIMALS));
+export function formatLength(length: number, unit: LengthUnit = "a0", power = 1): string {
+  return withMinus(toFixed(length * (unit === "pm" ? bohrToPm(1) ** power : 1), LENGTH_DECIMALS));
+}
+
+/** Unit symbol shared by charts, readouts and accessible summaries. */
+export function lengthUnitSymbol(unit: LengthUnit): string {
+  return unit === "pm" ? "pm" : "a₀";
 }
 
 /** A list of angles in radians, shown in degrees (e.g. "54.7°, 125.3°"). */

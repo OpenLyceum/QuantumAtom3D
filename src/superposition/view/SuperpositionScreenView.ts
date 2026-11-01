@@ -17,8 +17,11 @@ import {
   LIGHT_SURFACE_TEXT_FILL,
 } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
+import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
+import { formatLength, lengthUnitSymbol } from "../../common/view/formatters.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
+import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
@@ -26,13 +29,20 @@ import { ExpectationTimeSeriesNode } from "./ExpectationTimeSeriesNode.js";
 import { SuperpositionScreenSummaryContent } from "./SuperpositionScreenSummaryContent.js";
 import { SuperpositionViewportNode } from "./SuperpositionViewportNode.js";
 
-type Options = ScreenViewOptions & { phaseColormapProperty: TReadOnlyProperty<PhaseColormap> };
+type Options = ScreenViewOptions & {
+  preferences?: QuantumAtom3DPreferencesModel;
+  phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
+};
 const FONT = new PhetFont(13);
 const SIZE = 340;
 export class SuperpositionScreenView extends ScreenView {
   public readonly viewport: SuperpositionViewportNode;
   public constructor(model: SuperpositionModel, options: Options) {
-    super({ ...options, screenSummaryContent: new SuperpositionScreenSummaryContent(model) });
+    super({
+      ...options,
+      screenSummaryContent: new SuperpositionScreenSummaryContent(model, options.preferences?.lengthUnitProperty),
+    });
+    const unitProperty = options.preferences?.lengthUnitProperty ?? DEFAULT_LENGTH_UNIT_PROPERTY;
     const strings = StringManager.getInstance().getSuperpositionStrings();
     const orbital = StringManager.getInstance().getOrbitalStrings();
     const text = (value: string | TReadOnlyProperty<string>, maxWidth = 180) =>
@@ -52,14 +62,19 @@ export class SuperpositionScreenView extends ScreenView {
           constrainValue: (v: number) => Math.round(v),
         }),
       });
-    this.viewport = new SuperpositionViewportNode(SIZE, model, options.phaseColormapProperty);
+    this.viewport = new SuperpositionViewportNode(
+      SIZE,
+      model,
+      options.phaseColormapProperty,
+      options.preferences?.qualityProperty,
+    );
     this.viewport.left = this.layoutBounds.minX + SCREEN_VIEW_MARGIN;
     this.viewport.top = this.layoutBounds.minY + 35;
     const viewport = this.viewport;
     const timeText = new DerivedProperty(
-      [model.timeProperty, model.expectationsProperty, strings.timeStringProperty],
-      (time, expectation, name) =>
-        `${name}: ${atomicTimeToFs(time).toFixed(3)} fs   ⟨z⟩ = ${expectation.z.toFixed(2)} a<sub>0</sub>   ⟨r⟩ = ${expectation.r.toFixed(2)} a<sub>0</sub>`,
+      [model.timeProperty, model.expectationsProperty, strings.timeStringProperty, unitProperty],
+      (time, expectation, name, unit) =>
+        `${name}: ${atomicTimeToFs(time).toFixed(3)} fs   ⟨z⟩ = ${formatLength(expectation.z, unit)} ${lengthUnitSymbol(unit)}   ⟨r⟩ = ${formatLength(expectation.r, unit)} ${lengthUnitSymbol(unit)}`,
     );
     const timeLabel = text(timeText, SIZE);
     timeLabel.left = viewport.left;
@@ -232,7 +247,7 @@ export class SuperpositionScreenView extends ScreenView {
     const statusLabel = text(status, 500);
     statusLabel.left = rightX;
     statusLabel.top = this.layoutBounds.minY + 388;
-    const chart = new ExpectationTimeSeriesNode(470, 105, model);
+    const chart = new ExpectationTimeSeriesNode(470, 105, model, unitProperty);
     chart.left = rightX;
     chart.top = this.layoutBounds.minY + 455;
     const normalization = text(strings.normalizationStringProperty, 510);
