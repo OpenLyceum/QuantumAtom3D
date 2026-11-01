@@ -7,6 +7,7 @@ import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
+import { RENDER_MODES } from "../../common/model/orbital/RenderMode.js";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { formatLength } from "../../common/view/formatters.js";
@@ -25,7 +26,7 @@ import { SliceControlPanel } from "./SliceControlPanel.js";
 
 const VIEW_SIZE = 340;
 const DETAIL_SIZE = 275;
-const CHART_HEIGHT = 170;
+const CHART_HEIGHT = 150;
 const COLUMN_GAP = 30;
 const GAP = 12;
 const TITLE_ROOM = 30;
@@ -96,10 +97,38 @@ export class OrbitalsScreenView extends ScreenView {
       [viewport.backendProperty, strings.volume.gpuStringProperty, strings.volume.cpuStringProperty],
       (value, gpu, cpu) => (value === "gpu" ? gpu : cpu),
     );
+    const modes = new AquaRadioButtonGroup(
+      model.renderModeProperty,
+      RENDER_MODES.map((value) => ({
+        value,
+        createNode: () => label(strings.volume[`${value}StringProperty`], 100),
+        options: { accessibleName: strings.volume[`${value}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 8, radioButtonOptions: { radius: 6 } },
+    );
+    const fraction = new AquaRadioButtonGroup(
+      model.enclosedFractionProperty,
+      [0.9, 0.95].map((value) => ({
+        value,
+        createNode: () =>
+          new RichText(`${100 * value}%`, { font: LABEL_FONT, fill: QuantumAtom3DColors.textColorProperty }),
+        options: { accessibleName: `${100 * value}%` },
+      })),
+      { orientation: "horizontal", spacing: 8, radioButtonOptions: { radius: 6 } },
+    );
+    model.renderModeProperty.link((mode) => {
+      fraction.visible = mode === "isosurface";
+    });
     const belowViewport = new VBox({
       spacing: GAP,
       align: "left",
-      children: [label(backend, VIEW_SIZE), ...cameraRows, new OrbitalColorControl(model, phaseColormapProperty)],
+      children: [
+        modes,
+        fraction,
+        label(backend, VIEW_SIZE),
+        ...cameraRows,
+        new OrbitalColorControl(model, phaseColormapProperty),
+      ],
       left: viewport.left,
       top: viewport.bottom + GAP,
     });
@@ -127,10 +156,30 @@ export class OrbitalsScreenView extends ScreenView {
     const chart = new RadialDistributionChartNode(DETAIL_SIZE, CHART_HEIGHT, {
       summaryProperty: model.summaryProperty,
       maxRadiusProperty: model.viewHalfWidthProperty,
+      probeFractionProperty: model.probeFractionProperty,
+    });
+    const probeValue = new DerivedProperty(
+      [model.probeFractionProperty, model.viewHalfWidthProperty, strings.volume.probeStringProperty],
+      (probeFraction, width, name) => `${name}: ${formatLength(probeFraction * width)} a<sub>0</sub>`,
+    );
+    const probeControl = new VBox({
+      align: "left",
+      spacing: GAP / 2,
+      children: [
+        label(probeValue, DETAIL_SIZE),
+        new HSlider(model.probeFractionProperty, model.probeFractionProperty.range, {
+          ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+          trackSize: new Dimension2(DETAIL_SIZE - 25, 3),
+          keyboardStep: 0.01,
+          shiftKeyboardStep: 0.001,
+          accessibleName: strings.volume.probeStringProperty,
+          accessibleHelpText: strings.volume.probeHelpStringProperty,
+        }),
+      ],
     });
     const readouts = new OrbitalReadoutPanel(model.summaryProperty);
     const radialPanel = new VBox({
-      children: [chart, readouts],
+      children: [chart, probeControl, readouts],
       spacing: 2 * GAP,
       align: "left",
       left: detailChoice.left,

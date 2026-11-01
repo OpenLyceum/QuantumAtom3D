@@ -8,23 +8,23 @@ complex-phase colouring, radial distributions, superpositions that evolve in tim
 angular-momentum vector model, Zeeman splitting with selection rules, and the degeneracy of the
 isotropic 3D oscillator.
 
-**Status:** M2 implemented: the Orbitals screen has an interactive 3D volume, radial probability
-chart and cross-section. Dots, isosurfaces and the other four screens are still planned; see
+**Status:** M3 orbital interactions implemented: volume, probability dots, 90%/95% isosurfaces,
+3D nodes, a draggable cutting plane and linked radial probing. The other four screens remain planned; see
 [`doc/implementation-notes.md`](doc/implementation-notes.md).
 
 ## Features
 
 - **Orbitals:** ψ_nlm for n ≤ 5, in the complex or real basis, with Z = 1–6 (H, He⁺, Li²⁺, …).
   Volume rendering with phase or density colours, pointer/keyboard orbit and zoom, camera sliders,
-  a P(r) chart, readouts and a cross-section with nodal curves. Dot clouds, isosurfaces, 3D nodes
-  and linked chart hover are planned for M3.
-- **Superposition (planned):** mix eigenstates with complex coefficients and watch the charge cloud slosh at the
-  Bohr frequency. Presets include sp/sp²/sp³ hybrids.
+  probability dots, 90%/95% isosurfaces, analytic 3D nodes, a draggable cutting plane and linked
+  P(r) probing. Includes stationary-state presets and expectation-value readouts.
+- **Superposition (M4 in validation):** mix up to six eigenstates, evolve their relative phases,
+  track mean radius and mean z, and explore dipole, breathing, rotation and sp/sp²/sp³ presets.
 - **Angular Momentum (planned):** the vector model for L, and L + S → J.
 - **Zeeman (planned):** normal and anomalous splitting, Δm selection rules, and π/σ± polarization.
 - **3D Oscillator (planned):** (N+1)(N+2)/2 degeneracy, Cartesian ↔ spherical basis, comparison with hydrogen.
 - WebGPU rendering with a progressive CPU fallback, including recovery after device loss. Use
-  `?forceCpu=true` to select the CPU renderer explicitly.
+  `?forceCpu=true` to select the CPU renderer explicitly; `?seed=173` reproduces the dot samples.
 - English, Spanish and French. Default and projector colour profiles. Installable as a PWA.
 
 ## Quick Start

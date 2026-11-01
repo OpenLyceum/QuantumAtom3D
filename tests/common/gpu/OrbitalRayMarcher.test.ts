@@ -88,7 +88,7 @@ describe("packParams", () => {
   it("fills exactly PARAMS_BYTES and places the terms after six vec4s", () => {
     const buffer = new ArrayBuffer(PARAMS_BYTES);
     packParams(scene(3, 2, 1), orbitCameraFrame(0, 0), 512, buffer);
-    expect(PARAMS_BYTES).toBe(352);
+    expect(PARAMS_BYTES).toBe(464);
     const floats = new Float32Array(buffer);
     const ints = new Int32Array(buffer);
     expect(floats[19]).toBe(2); // two terms for a real d orbital

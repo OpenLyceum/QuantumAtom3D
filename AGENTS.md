@@ -60,6 +60,9 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
 `zeeman`, `oscillator`), exposed through `StringManager.get<Screen>A11yStrings()`.
 
 - Keep the 3D viewport keyboard-operable: arrows orbit and +/− zoom.
+- The cutting-plane handle shares its offset with the slice slider; radial hover shares a probe slider.
+- Node overlays are analytic ray events; maintain CPU/WGSL parity when changing their intersections.
+- `Params` occupies 464 bytes. The dot pass composites foreground surfaces per fragment.
 - Give every pointer gesture in 3D a slider equivalent.
 - Orbitals' keyboard help covers its spinners, sliders, radio buttons and checkbox. The other four
   are still scaffold stubs; fill each one in when its screen gains interactions.

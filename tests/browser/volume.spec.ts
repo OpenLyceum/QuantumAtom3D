@@ -86,7 +86,68 @@ test("keyboard help opens with orbit and zoom shortcuts", async ({ page }) => {
   await expect(page.getByRole("dialog")).toContainText("Zoom the focused 3D view");
 });
 
-test("GPU pixels match the CPU reference for eigenstates, real orbitals, Z and both palettes", async ({ page }) => {
+for (const forceCpu of [true, false]) {
+  test(`render modes, enclosed fraction and linked radial probe (${forceCpu ? "CPU" : "GPU"})`, async ({ page }) => {
+    await page.goto(`/?screens=1&forceCpu=${forceCpu}&ea`);
+    await page.getByRole("button", { name: "Reset All" }).waitFor();
+    const readPixels = () => page.evaluate<string>(`(${screen.toString()})().view.viewport.engine.canvas.toDataURL()`);
+    await page.getByRole("radio", { name: "Dots", exact: true }).press("Space");
+    await expect.poll(() => page.evaluate(`(${screen.toString()})().model.renderModeProperty.value`)).toBe("dots");
+    await page.waitForTimeout(300);
+    const dots = await readPixels();
+    await page.getByRole("radio", { name: "Isosurface", exact: true }).press("Space");
+    await page.waitForTimeout(1500);
+    const iso90 = await readPixels();
+    expect(iso90).not.toBe(dots);
+    await page.getByRole("radio", { name: "95%", exact: true }).press("Space");
+    await expect.poll(readPixels).not.toBe(iso90);
+    await page.getByRole("radio", { name: "Dots", exact: true }).press("Space");
+    await expect.poll(readPixels).toBe(dots);
+    await expect(page.getByRole("radio", { name: "95%", exact: true })).not.toBeAttached();
+    const probe = page.getByRole("slider", { name: "Probe radius", exact: true });
+    await probe.press("Home");
+    await probe.press("ArrowRight");
+    expect(await page.evaluate(`(${screen.toString()})().model.probeFractionProperty.value`)).toBeCloseTo(0.01);
+    const position = await page.evaluate<{ x: number; y: number }>(`(() => {
+      const v = (${screen.toString()})().view.viewport;
+      const p = v.localToGlobalPoint(v.localBounds.center.copy().setXY(0.75 * 340, 0.5 * 340));
+      return {x:p.x,y:p.y};
+    })()`);
+    await page.mouse.move(position.x, position.y);
+    await expect
+      .poll(() => page.evaluate<number>(`(${screen.toString()})().model.probeFractionProperty.value`))
+      .toBeCloseTo(0.5, 2);
+    await page.getByRole("button", { name: "Reset All" }).press("Space");
+    expect(await page.evaluate(`(${screen.toString()})().model.probeFractionProperty.value`)).toBe(0);
+    expect(await page.evaluate(`(${screen.toString()})().model.renderModeProperty.value`)).toBe("volume");
+    await page.getByRole("button", { name: "1s", exact: true }).press("Space");
+    expect(await page.evaluate(`(${screen.toString()})().model.quantumNumbers.nProperty.value`)).toBe(1);
+    await page.getByRole("button", { name: "2p, m = +1", exact: true }).press("Space");
+    expect(await page.evaluate(`(${screen.toString()})().model.quantumNumbers.mProperty.value`)).toBe(1);
+    await page.getByRole("checkbox", { name: "3D nodes", exact: true }).press("Space");
+    await page.getByRole("radio", { name: "Cross-section", exact: true }).press("Space");
+    await page.getByRole("checkbox", { name: "Show cutting plane in 3D", exact: true }).press("Space");
+    const center = await page.evaluate<{ x: number; y: number; yaw: number }>(`(() => {
+      const v=(${screen.toString()})().view.viewport;
+      const p=v.localToGlobalPoint(v.localBounds.center.copy().setXY(170,170));
+      return {x:p.x,y:p.y,yaw:v.camera.yawProperty.value};
+    })()`);
+    await page.mouse.move(center.x, center.y);
+    await page.mouse.down();
+    await page.mouse.move(center.x + 25, center.y, { steps: 4 });
+    await page.mouse.up();
+    expect(await page.evaluate(`(${screen.toString()})().model.sliceOffsetFractionProperty.value`)).toBeGreaterThan(0);
+    expect(await page.evaluate(`(${screen.toString()})().view.viewport.camera.yawProperty.value`)).toBe(center.yaw);
+    await page.getByRole("slider", { name: "Offset", exact: true }).press("Home");
+    expect(await page.evaluate(`(${screen.toString()})().model.sliceOffsetFractionProperty.value`)).toBe(-1);
+    await page.getByRole("radio", { name: "Dots", exact: true }).press("Space");
+    await page.waitForTimeout(250);
+    await page.getByRole("button", { name: "Reset All" }).press("Space");
+    expect(await page.evaluate(`(${screen.toString()})().model.cuttingPlaneVisibleProperty.value`)).toBe(false);
+  });
+}
+
+test("GPU volume and isosurface pixels match the CPU reference", async ({ page }) => {
   await page.goto("/?screens=1&ea");
   await page.getByRole("button", { name: "Reset All" }).waitFor();
   const status = await page.evaluate(async () => {
@@ -110,6 +171,9 @@ test("GPU pixels match the CPU reference for eigenstates, real orbitals, Z and b
       { peakDensity },
       { orbitCameraFrame },
       { createColorLuts },
+      { buildDensityGrid, enclosedProbabilityLevel },
+      { hydrogenEnclosingRadius },
+      { nodalSurfaces },
     ] = await Promise.all([
       load("common/gpu/GpuContext"),
       load("common/gpu/WebGpuOrbitalRenderer"),
@@ -119,12 +183,16 @@ test("GPU pixels match the CPU reference for eigenstates, real orbitals, Z and b
       load("common/model/orbital/PeakDensity"),
       load("common/view/OrbitCamera"),
       load("common/view/Colormaps"),
+      load("common/model/orbital/EnclosedProbability"),
+      load("common/model/hydrogen/HydrogenRadial"),
+      load("common/model/orbital/NodalSurfaces"),
     ]);
     const context = getGpuInitializationResult().context;
     const resolution = 65;
     const renderer = new WebGpuOrbitalRenderer(context, resolution);
     const errors: number[] = [];
     const centers: number[] = [];
+    const overlayErrors: number[] = [];
     const sampledError = (
       cpu: { shade(x: number, y: number, resolution: number, out: number[]): void },
       data: Uint8ClampedArray,
@@ -149,34 +217,57 @@ test("GPU pixels match the CPU reference for eigenstates, real orbitals, Z and b
       [2, 1, -1, 6, "complex"],
       [5, 4, 4, 1, "complex"],
     ] as const) {
-      for (const phaseColormap of ["hsv", "uniform"]) {
-        for (const coloring of ["phase", "density"]) {
-          const terms = orbitalTerms(n, l, m, basis);
-          const scene = {
-            terms,
-            nuclearCharge: z,
-            inversePeakAmplitude: 1 / Math.sqrt(peakDensity(new Wavefunction(terms, z))),
-            radius: (3 * n * n) / z,
-            coloring,
-            phaseColormap,
-          };
-          const frame = orbitCameraFrame(0, 0);
-          renderer.setScene(scene);
-          renderer.setCamera(frame);
-          renderer.render();
-          const data = renderer.canvas.getContext("2d").getImageData(0, 0, resolution, resolution).data;
-          const cpu = new OrbitalRayMarcher(scene, frame, createColorLuts(phaseColormap));
-          errors.push(sampledError(cpu, data));
-          if (phaseColormap === "hsv" && coloring === "phase") {
-            centers.push(Math.max(...data.slice(4 * (32 * resolution + 32), 4 * (32 * resolution + 32) + 3)));
+      const terms = orbitalTerms(n, l, m, basis);
+      const wavefunction = new Wavefunction(terms, z);
+      const grid = buildDensityGrid(wavefunction, hydrogenEnclosingRadius(n, l, z, 0.9999));
+      for (const mode of ["volume", "isosurface"]) {
+        for (const phaseColormap of ["hsv", "uniform"]) {
+          for (const coloring of ["phase", "density"]) {
+            const scene = {
+              mode,
+              isoLevel: enclosedProbabilityLevel(grid, 0.9),
+              terms,
+              nuclearCharge: z,
+              inversePeakAmplitude: 1 / Math.sqrt(peakDensity(new Wavefunction(terms, z))),
+              radius: (3 * n * n) / z,
+              coloring,
+              phaseColormap,
+            };
+            const frame = orbitCameraFrame(0, 0);
+            renderer.setScene(scene);
+            renderer.setCamera(frame);
+            renderer.render();
+            const data = renderer.canvas.getContext("2d").getImageData(0, 0, resolution, resolution).data;
+            const cpu = new OrbitalRayMarcher(scene, frame, createColorLuts(phaseColormap));
+            errors.push(sampledError(cpu, data));
+            const overlayScene = {
+              ...scene,
+              nodes: nodalSurfaces(n, l, m, z, basis),
+              cuttingPlane: { normal: [1, 0, 0], offset: 0.17 * scene.radius },
+            };
+            renderer.setScene(overlayScene);
+            const overlayFrame = orbitCameraFrame(0.43, 0.27);
+            renderer.setCamera(overlayFrame);
+            renderer.render();
+            const overlayPixels = renderer.canvas.getContext("2d").getImageData(0, 0, resolution, resolution).data;
+            overlayErrors.push(
+              sampledError(
+                new OrbitalRayMarcher(overlayScene, overlayFrame, createColorLuts(phaseColormap)),
+                overlayPixels,
+              ),
+            );
+            if (mode === "volume" && phaseColormap === "hsv" && coloring === "phase") {
+              centers.push(Math.max(...data.slice(4 * (32 * resolution + 32), 4 * (32 * resolution + 32) + 3)));
+            }
           }
         }
       }
     }
     renderer.dispose();
-    return { errors, centers };
+    return { errors, centers, overlayErrors };
   });
   expect(Math.max(...result.errors)).toBeLessThan(0.045);
+  expect(Math.max(...result.overlayErrors)).toBeLessThan(0.045);
   expect(result.centers[0]).toBeGreaterThan(40); // 1s filled centre
   expect(result.centers[1]).toBeLessThan(2); // 2p_z plane edge-on
 });

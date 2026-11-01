@@ -7,7 +7,7 @@
  * the axis, where P(r) touches zero.
  */
 
-import { Multilink, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
+import { Multilink, type NumberProperty, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
 import { ChartRectangle, ChartTransform, GridLineSet, LinePlot, TickLabelSet, TickMarkSet } from "scenerystack/bamboo";
 import { Range, toFixed, Vector2 } from "scenerystack/dot";
 import { Orientation } from "scenerystack/phet-core";
@@ -51,13 +51,15 @@ function niceStep(span: number, target: number): number {
 export type RadialDistributionChartNodeOptions = NodeOptions & {
   readonly summaryProperty: TReadOnlyProperty<OrbitalSummary>;
   readonly maxRadiusProperty: TReadOnlyProperty<number>;
+  readonly probeFractionProperty?: NumberProperty;
 };
 
 export class RadialDistributionChartNode extends Node {
   private readonly multilink: UnknownMultilink;
+  private readonly probeLink: UnknownMultilink | undefined;
 
   public constructor(width: number, height: number, options: RadialDistributionChartNodeOptions) {
-    const { summaryProperty, maxRadiusProperty, ...nodeOptions } = options;
+    const { summaryProperty, maxRadiusProperty, probeFractionProperty, ...nodeOptions } = options;
     const strings = StringManager.getInstance().getOrbitalStrings().radialChart;
 
     const chartTransform = new ChartTransform({
@@ -118,6 +120,27 @@ export class RadialDistributionChartNode extends Node {
 
     super({ children: [title, plotLayer, xAxisLabel], ...nodeOptions });
 
+    if (probeFractionProperty) {
+      const cursor = new Line(0, 0, 0, height, {
+        stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+        lineDash: [3, 3],
+        pickable: false,
+      });
+      plotLayer.addChild(cursor);
+      this.probeLink = Multilink.multilink([probeFractionProperty], (fraction) => {
+        cursor.setLine(fraction * width, 0, fraction * width, height);
+        cursor.visible = fraction > 0;
+      });
+      this.addInputListener({
+        move: (event) => {
+          const point = this.globalToLocalPoint(event.pointer.point);
+          if (point.y >= 0 && point.y <= height && point.x >= 0 && point.x <= width) {
+            probeFractionProperty.value = point.x / width;
+          }
+        },
+      });
+    }
+
     title.boundsProperty.link(() => {
       title.centerX = width / 2;
       title.bottom = -TITLE_SPACING;
@@ -169,6 +192,7 @@ export class RadialDistributionChartNode extends Node {
   }
 
   public override dispose(): void {
+    this.probeLink?.dispose();
     this.multilink.dispose();
     super.dispose();
   }

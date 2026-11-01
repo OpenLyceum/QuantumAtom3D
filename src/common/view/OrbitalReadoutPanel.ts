@@ -102,6 +102,12 @@ export class OrbitalReadoutPanel extends QuantumAtom3DPanel {
     const rows: [TReadOnlyProperty<string>, TReadOnlyProperty<string>][] = [
       [strings.energyStringProperty, energyProperty],
       [strings.meanRadiusStringProperty, lengthOf((summary) => summary.meanRadius)],
+      [
+        strings.meanSquareRadiusStringProperty,
+        derive(strings.squareLengthValueStringProperty, (summary, pattern) =>
+          StringUtils.fillIn(pattern, { value: formatLength(summary.meanSquareRadius) }),
+        ),
+      ],
       [strings.rmsRadiusStringProperty, lengthOf((summary) => summary.rmsRadius)],
       [strings.mostProbableRadiusStringProperty, lengthOf((summary) => summary.mostProbableRadius)],
       [strings.radialNodesStringProperty, radialNodesProperty],

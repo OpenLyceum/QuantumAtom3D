@@ -10,10 +10,15 @@ import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { Bounds2, Dimension2 } from "scenerystack/dot";
 import { AlignBox, HBox, HSeparator, RichText, Text, VBox } from "scenerystack/scenery";
 import { NumberControl, PhetFont, PlusMinusZoomButtonGroup } from "scenerystack/scenery-phet";
-import { Checkbox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
+import { Checkbox, RectangularPushButton, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
 import { hydrogenicIonSymbol } from "../../common/model/hydrogen/HydrogenicIons.js";
 import type { OrbitalBasis } from "../../common/model/orbital/OrbitalCatalog.js";
-import { FLAT_RECTANGULAR_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
+import { ORBITAL_PRESETS } from "../../common/model/orbital/OrbitalPresets.js";
+import {
+  FLAT_PANEL_PUSH_BUTTON_OPTIONS,
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  LIGHT_SURFACE_TEXT_FILL,
+} from "../../common/QuantumAtom3DButtonOptions.js";
 import {
   QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
   QUANTUM_ATOM_3D_NUMBER_CONTROL_OPTIONS,
@@ -28,7 +33,7 @@ import type { OrbitalsModel } from "../model/OrbitalsModel.js";
 const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
 const LABEL_FONT = new PhetFont(13);
 const ION_FONT = new PhetFont({ size: 16, weight: "bold" });
-const SECTION_SPACING = 10;
+const SECTION_SPACING = 7;
 const RADIO_SPACING = 6;
 const RADIO_RADIUS = 7;
 const ZOOM_ICON_SIZE = new Dimension2(10, 2);
@@ -134,6 +139,18 @@ export class OrbitalsControlPanel extends QuantumAtom3DPanel {
     });
 
     const separator = () => new HSeparator({ stroke: QuantumAtom3DColors.panelBorderColorProperty });
+    const presetButtons = ORBITAL_PRESETS.map((preset) => {
+      const name = strings.presets[`${preset.key}StringProperty`];
+      return new RectangularPushButton({
+        ...FLAT_PANEL_PUSH_BUTTON_OPTIONS,
+        content: new RichText(name, { font: LABEL_FONT, fill: LIGHT_SURFACE_TEXT_FILL }),
+        accessibleName: name,
+        listener: () => {
+          model.quantumNumbers.set(preset.n, preset.l, preset.m);
+          model.basisProperty.value = preset.basis;
+        },
+      });
+    });
 
     const content = new VBox({
       spacing: SECTION_SPACING,
@@ -151,7 +168,19 @@ export class OrbitalsControlPanel extends QuantumAtom3DPanel {
           spacing: SECTION_SPACING,
           children: [text(strings.zoomStringProperty), zoomButtons],
         }),
-        nodesCheckbox,
+        new HBox({
+          spacing: 10,
+          children: [
+            nodesCheckbox,
+            new Checkbox(model.nodes3DVisibleProperty, text(strings.volume.nodesStringProperty), {
+              ...QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
+              accessibleName: strings.volume.nodesStringProperty,
+            }),
+          ],
+        }),
+        text(strings.presets.titleStringProperty, TITLE_FONT),
+        new HBox({ spacing: 6, children: presetButtons.slice(0, 3) }),
+        new HBox({ spacing: 6, children: presetButtons.slice(3) }),
       ],
     });
 

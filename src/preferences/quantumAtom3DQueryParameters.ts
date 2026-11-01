@@ -14,6 +14,13 @@ import { DEFAULT_PHASE_COLORMAP, PHASE_COLORMAP_VALUES } from "../QuantumAtom3DC
 import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
 
 const quantumAtom3DQueryParameters = QueryStringMachine.getAll({
+  /** Reproducible probability samples, independent of other simulation randomness. */
+  seed: {
+    type: "number",
+    defaultValue: 173,
+    isValidValue: (value: number) => Number.isSafeInteger(value),
+    public: true,
+  },
   /** Use the progressive CPU volume renderer, even when WebGPU is available. */
   forceCpu: { type: "boolean", defaultValue: false, public: true },
   /**

@@ -14,13 +14,14 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createSuperpositionIcon } from "../common/QuantumAtom3DScreenIcons.js";
+import type { QuantumAtom3DPreferencesModel } from "../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../QuantumAtom3DColors.js";
 import { SuperpositionModel } from "./model/SuperpositionModel.js";
 import { SuperpositionKeyboardHelpContent } from "./view/SuperpositionKeyboardHelpContent.js";
 import { SuperpositionScreenView } from "./view/SuperpositionScreenView.js";
 
 // Require tandem to be explicit — accidental omission would break PhET-iO.
-type SuperpositionScreenOptions = ScreenOptions & { tandem: Tandem };
+type SuperpositionScreenOptions = ScreenOptions & { tandem: Tandem; preferences: QuantumAtom3DPreferencesModel };
 
 export class SuperpositionScreen extends Screen<SuperpositionModel, SuperpositionScreenView> {
   public constructor(options: SuperpositionScreenOptions) {
@@ -30,6 +31,7 @@ export class SuperpositionScreen extends Screen<SuperpositionModel, Superpositio
       // View factory — receives the model instance
       (model) =>
         new SuperpositionScreenView(model, {
+          phaseColormapProperty: options.preferences.phaseColormapProperty,
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<SuperpositionScreenOptions, EmptySelfOptions, ScreenOptions>()(

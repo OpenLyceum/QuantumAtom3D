@@ -7,10 +7,11 @@
  * OrbitalRenderer.ts).
  *
  * The bind-group layout is explicit, as in HeatTransfer: float storage buffers
- * and a uniform block, all fragment-only.
+ * and a uniform block shared by the fullscreen and instanced-dot pipelines.
  */
 
 import { RadialLookupTable } from "../model/orbital/RadialLookupTable.js";
+import { MAX_DOTS } from "../model/orbital/RenderMode.js";
 import { createColorLuts } from "../view/Colormaps.js";
 import type { CameraFrame } from "../view/OrbitCamera.js";
 import type { OrbitalRenderer } from "./OrbitalRenderer.js";
@@ -34,6 +35,9 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
   private readonly gpuContext: GPUCanvasContext;
   private readonly displayContext: CanvasRenderingContext2D;
   private readonly pipeline: GPURenderPipeline;
+  private readonly pointPipeline: GPURenderPipeline;
+  private readonly pointBuffer: GPUBuffer;
+  private readonly depthTexture: GPUTexture;
   private readonly bindGroup: GPUBindGroup;
   private readonly paramsBuffer: GPUBuffer;
   private readonly colorLutBuffer: GPUBuffer;
@@ -87,16 +91,27 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
     const radialTableBuffer = storage("radialTable", table.values);
     const radialMaxBuffer = storage("radialMax", table.rowMaxRadius);
     this.colorLutBuffer = storage("colorLut", createColorLuts("hsv"));
-    this.ownedBuffers = [this.paramsBuffer, radialTableBuffer, radialMaxBuffer, this.colorLutBuffer];
+    this.pointBuffer = device.createBuffer({
+      label: "probabilityPoints",
+      size: MAX_DOTS * 16,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    this.ownedBuffers = [this.paramsBuffer, radialTableBuffer, radialMaxBuffer, this.colorLutBuffer, this.pointBuffer];
+    this.depthTexture = device.createTexture({
+      size: [resolution, resolution],
+      format: "depth24plus",
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
 
-    const fragment = GPUShaderStage.FRAGMENT;
+    const stages = GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX;
     const layout = device.createBindGroupLayout({
       label: "orbitalRenderLayout",
       entries: [
-        { binding: 0, visibility: fragment, buffer: { type: "uniform" } },
-        { binding: 1, visibility: fragment, buffer: { type: "read-only-storage" } },
-        { binding: 2, visibility: fragment, buffer: { type: "read-only-storage" } },
-        { binding: 3, visibility: fragment, buffer: { type: "read-only-storage" } },
+        { binding: 0, visibility: stages, buffer: { type: "uniform" } },
+        { binding: 1, visibility: stages, buffer: { type: "read-only-storage" } },
+        { binding: 2, visibility: stages, buffer: { type: "read-only-storage" } },
+        { binding: 3, visibility: stages, buffer: { type: "read-only-storage" } },
+        { binding: 4, visibility: GPUShaderStage.VERTEX, buffer: { type: "read-only-storage" } },
       ],
     });
     this.bindGroup = device.createBindGroup({
@@ -107,6 +122,7 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
         { binding: 1, resource: { buffer: radialTableBuffer } },
         { binding: 2, resource: { buffer: radialMaxBuffer } },
         { binding: 3, resource: { buffer: this.colorLutBuffer } },
+        { binding: 4, resource: { buffer: this.pointBuffer } },
       ],
     });
     const module = device.createShaderModule({ label: "orbitalRender", code: ORBITAL_RENDER_SHADER });
@@ -116,10 +132,27 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
       vertex: { module, entryPoint: "vertexMain" },
       fragment: { module, entryPoint: "fragmentMain", targets: [{ format: presentationFormat }] },
       primitive: { topology: "triangle-list" },
+      depthStencil: { format: "depth24plus", depthWriteEnabled: false, depthCompare: "always" },
+    });
+    this.pointPipeline = device.createRenderPipeline({
+      label: "orbitalPoints",
+      layout: device.createPipelineLayout({ bindGroupLayouts: [layout] }),
+      vertex: { module, entryPoint: "pointVertex" },
+      fragment: { module, entryPoint: "pointFragment", targets: [{ format: presentationFormat }] },
+      primitive: { topology: "triangle-list" },
+      depthStencil: { format: "depth24plus", depthWriteEnabled: true, depthCompare: "less" },
     });
   }
 
   public setScene(scene: OrbitalScene): void {
+    if (scene.points && scene.points !== this.scene?.points) {
+      const count = Math.min(MAX_DOTS, scene.points.length / 3);
+      const packed = new Float32Array(count * 4);
+      for (let i = 0; i < count; i++) {
+        packed.set(scene.points.subarray(3 * i, 3 * i + 3), 4 * i);
+      }
+      this.device.queue.writeBuffer(this.pointBuffer, 0, packed);
+    }
     if (scene.phaseColormap !== this.scene?.phaseColormap) {
       this.device.queue.writeBuffer(this.colorLutBuffer, 0, createColorLuts(scene.phaseColormap));
     }
@@ -140,6 +173,12 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
     this.device.queue.writeBuffer(this.paramsBuffer, 0, this.paramsData);
     const encoder = this.device.createCommandEncoder({ label: "orbitalFrame" });
     const pass = encoder.beginRenderPass({
+      depthStencilAttachment: {
+        view: this.depthTexture.createView(),
+        depthClearValue: 1,
+        depthLoadOp: "clear",
+        depthStoreOp: "store",
+      },
       colorAttachments: [
         {
           view: this.gpuContext.getCurrentTexture().createView(),
@@ -152,6 +191,10 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
     pass.setPipeline(this.pipeline);
     pass.setBindGroup(0, this.bindGroup);
     pass.draw(3);
+    if (this.scene.mode === "dots" && this.scene.points) {
+      pass.setPipeline(this.pointPipeline);
+      pass.draw(6, Math.min(MAX_DOTS, this.scene.points.length / 3));
+    }
     pass.end();
     this.device.queue.submit([encoder.finish()]);
     this.displayContext.drawImage(this.gpuCanvas, 0, 0);
@@ -164,5 +207,6 @@ export class WebGpuOrbitalRenderer implements OrbitalRenderer {
       buffer.destroy();
     }
     this.gpuContext.unconfigure();
+    this.depthTexture.destroy();
   }
 }
