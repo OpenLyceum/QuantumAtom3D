@@ -22,16 +22,19 @@ import "./brand.js";
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
 import { AngularMomentumScreen } from "./angular-momentum/AngularMomentumScreen.js";
+import { initializeGpuContext } from "./common/gpu/GpuContext.js";
 import { StringManager } from "./i18n/StringManager.js";
 import { OrbitalsScreen } from "./orbitals/OrbitalsScreen.js";
 import { OscillatorScreen } from "./oscillator/OscillatorScreen.js";
 import { QuantumAtom3DPreferencesModel } from "./preferences/QuantumAtom3DPreferencesModel.js";
 import { QuantumAtom3DPreferencesNode } from "./preferences/QuantumAtom3DPreferencesNode.js";
+import quantumAtom3DQueryParameters from "./preferences/quantumAtom3DQueryParameters.js";
 import QuantumAtom3DColors from "./QuantumAtom3DColors.js";
 import { SuperpositionScreen } from "./superposition/SuperpositionScreen.js";
 import { ZeemanScreen } from "./zeeman/ZeemanScreen.js";
 
-onReadyToLaunch(() => {
+onReadyToLaunch(async () => {
+  await initializeGpuContext(quantumAtom3DQueryParameters.forceCpu);
   const stringManager = StringManager.getInstance();
 
   // Simulation-specific preferences; initial values come from quantumAtom3DQueryParameters.

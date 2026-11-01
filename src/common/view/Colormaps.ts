@@ -150,3 +150,24 @@ export function writePixel(data: Uint8ClampedArray, offset: number, rgb: readonl
   data[offset + 2] = (rgb[2] ?? 0) * brightness * BYTE;
   data[offset + 3] = BYTE;
 }
+
+/** Entries per colour lookup table handed to the 3D renderers. */
+export const COLOR_LUT_SIZE = 256;
+
+/**
+ * The two lookup tables the 3D renderers share, as RGBA floats: entries
+ * 0 … COLOR_LUT_SIZE − 1 are the phase wheel over [−π, π), and the next
+ * COLOR_LUT_SIZE entries are the density ramp over [0, 1]. The GPU gets this
+ * buffer verbatim and the CPU renderer reads the same one, so both colour alike.
+ */
+export function createColorLuts(colormap: PhaseColormap): Float32Array {
+  const lut = new Float32Array(2 * COLOR_LUT_SIZE * 4);
+  const rgb = [0, 0, 0];
+  for (let i = 0; i < COLOR_LUT_SIZE; i++) {
+    phaseColor(-Math.PI + (2 * Math.PI * i) / COLOR_LUT_SIZE, colormap, rgb);
+    lut.set([rgb[0] ?? 0, rgb[1] ?? 0, rgb[2] ?? 0, 1], 4 * i);
+    densityColor(i / (COLOR_LUT_SIZE - 1), rgb);
+    lut.set([rgb[0] ?? 0, rgb[1] ?? 0, rgb[2] ?? 0, 1], 4 * (COLOR_LUT_SIZE + i));
+  }
+  return lut;
+}

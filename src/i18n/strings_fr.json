@@ -19,7 +19,7 @@
     "realState": "{{n}}{{letter}}<sub>{{subscript}}</sub>",
     "nuclearCharge": "Charge nucléaire Z",
     "zoom": "Zoom",
-    "showNodes": "Afficher les nœuds",
+    "showNodes": "Nœuds de la coupe",
     "readouts": {
       "title": "Propriétés",
       "energy": "E",
@@ -49,14 +49,28 @@
       "phaseLegend": "luminosité ∝ |ψ|",
       "densityLegend": "0 → max",
       "scale": "±{{value}} a<sub>0</sub>"
+    },
+    "volume": {
+      "title": "Orbitale 3D",
+      "help": "Glissez ou utilisez les flèches pour tourner. Plus et moins règlent le zoom. Les curseurs d’azimut et d’élévation tournent aussi la vue.",
+      "orbitHelp": "Tourner la vue 3D sélectionnée",
+      "zoomHelp": "Zoomer la vue 3D sélectionnée",
+      "yaw": "Azimut",
+      "pitch": "Élévation",
+      "gpu": "Rendu WebGPU",
+      "cpu": "Rendu CPU · affiné au repos",
+      "radialTab": "Probabilité radiale",
+      "sliceTab": "Coupe",
+      "orbitDescription": "Tournez la vue 3D sélectionnée avec les flèches gauche, droite, haut et bas.",
+      "zoomDescription": "Zoomez la vue 3D sélectionnée avec les touches plus ou moins."
     }
   },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "La zone de jeu montre une coupe du nuage de probabilité de l'électron, colorée selon la phase de la fonction d'onde ou selon sa densité, et un graphique de la distribution radiale de probabilité P(r).",
+        "playArea": "La zone d’exploration montre le nuage de probabilité électronique en 3D, coloré selon la phase ou la densité. Choisissez la probabilité radiale et les propriétés, ou une coupe du nuage.",
         "controlArea": "La zone de contrôle comprend des sélecteurs pour les nombres quantiques n, l et m, un choix entre fonctions angulaires complexes et réelles, des curseurs pour la charge nucléaire, le zoom et le décalage de la coupe, et un bouton Tout réinitialiser.",
-        "interactionHint": "Changez n, l et m pour voir comment la taille, la forme et les nœuds de l'orbitale changent."
+        "interactionHint": "Changez n, l et m pour voir comment la taille, la forme et les nœuds de l'orbitale changent. Glissez ou utilisez les flèches pour tourner. Plus et moins règlent le zoom. Les curseurs d’azimut et d’élévation tournent aussi la vue."
       },
       "currentDetails": "{{state}} de {{ion}}. Énergie {{energy}} électronvolts. Rayon moyen {{radius}} rayons de Bohr. {{radialNodes}} nœuds radiaux et {{angularNodes}} nœuds angulaires.",
       "controls": {
@@ -71,7 +85,7 @@
         "zoom": "Zoom",
         "plane": "Plan de coupe",
         "offsetHelp": "Déplace la coupe le long de l'axe qui lui est perpendiculaire.",
-        "coloring": "Coloration de la coupe",
+        "coloring": "Couleur de l’orbitale",
         "complexBasis": "Harmoniques sphériques complexes Y l m",
         "realBasis": "Orbitales réelles comme p x et d x y",
         "nuclearCharge": "Charge nucléaire Z"
