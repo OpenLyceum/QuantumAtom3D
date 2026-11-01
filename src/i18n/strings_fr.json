@@ -120,11 +120,11 @@
     },
     "angularMomentum": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "Le diagramme montre les vecteurs de moment cinétique, les cônes de précession et les projections permises. Le tracé polaire montre la densité angulaire.",
+        "controlArea": "Choisissez l et m, ou activez le spin pour choisir j et sa projection. Animez la précession ou réglez sa phase avec le curseur.",
+        "interactionHint": "Les vecteurs illustrent le modèle vectoriel quantique. La vitesse est illustrative."
       },
-      "currentDetails": "La simulation est dans son état initial."
+      "currentDetails": "l = {{l}}; m = {{m}}; j = {{j}}; mⱼ = {{mj}}."
     },
     "zeeman": {
       "screenSummary": {
@@ -173,5 +173,18 @@
       "sp2": "sp²",
       "sp3": "sp³"
     }
+  },
+  "angular": {
+    "title": "Moment cinétique quantique",
+    "l": "Nombre quantique orbital l",
+    "m": "Nombre quantique magnétique m",
+    "spin": "Inclure le spin (s = ½)",
+    "mj": "Projection totale mⱼ",
+    "phase": "Phase de précession",
+    "density": "Densité de probabilité angulaire",
+    "densityHelp": "Le rayon montre la densité par angle solide, normalisée à son maximum. Le spin est éliminé par trace.",
+    "note": "Modèle vectoriel quantique schématique ; vitesse illustrative. Ces vecteurs ne sont pas des trajectoires électroniques.",
+    "upper": "j = l + ½",
+    "lower": "j = |l − ½|"
   }
 }

@@ -120,3 +120,19 @@ within each level by a unitary matrix ⟨n_x n_y n_z | n_r l m⟩, which the sim
 - B. H. Bransden and C. J. Joachain, *Physics of Atoms and Molecules*, 2nd ed., ch. 3 and 6.
 - NIST Digital Library of Mathematical Functions, §14 (Legendre functions) and §18 (orthogonal
   polynomials).
+
+## Angular Momentum screen
+
+For an uncoupled |l,m> state, the vector illustration has length sqrt(l(l+1)) hbar and
+z projection m hbar. Its transverse length is sqrt(l(l+1)-m²) hbar. The displayed uncertainty
+product is Delta Lx Delta Ly = [l(l+1)-m²] hbar²/2, satisfying the lower bound |m| hbar²/2.
+
+With electron spin s=1/2, allowed j values are l+1/2 and (for l>0) l-1/2. The coupled vectors
+close exactly as L+S=J. Their projections onto J follow the scalar-product identity
+L dot J = [j(j+1)+l(l+1)-s(s+1)] hbar²/2. This is a schematic vector model, not a trajectory
+or a simultaneous measurement of noncommuting components. Animation speed has no physical units.
+
+The polar plot shows density per solid angle, without the sin(theta) integration measure.
+Its plotted radius is normalized to its maximum. In spin mode it traces over spin: the two
+orbital m values are mj-1/2 and mj+1/2, weighted by their Clebsch-Gordan probabilities.
+The uncoupled uncertainty formula is hidden in spin mode because it does not describe |j,mj>.

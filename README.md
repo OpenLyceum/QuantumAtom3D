@@ -8,8 +8,8 @@ complex-phase colouring, radial distributions, superpositions that evolve in tim
 angular-momentum vector model, Zeeman splitting with selection rules, and the degeneracy of the
 isotropic 3D oscillator.
 
-**Status:** M3 orbital interactions implemented: volume, probability dots, 90%/95% isosurfaces,
-3D nodes, a draggable cutting plane and linked radial probing. The other four screens remain planned; see
+**Status:** Orbitals, Superposition and Angular Momentum screens are implemented. A Superposition
+isosurface visual check remains open. Zeeman and 3D Oscillator remain planned; see
 [`doc/implementation-notes.md`](doc/implementation-notes.md).
 
 ## Features
@@ -20,7 +20,8 @@ isotropic 3D oscillator.
   P(r) probing. Includes stationary-state presets and expectation-value readouts.
 - **Superposition (M4 in validation):** mix up to six eigenstates, evolve their relative phases,
   track mean radius and mean z, and explore dipole, breathing, rotation and sp/sp²/sp³ presets.
-- **Angular Momentum (planned):** the vector model for L, and L + S → J.
+- **Angular Momentum:** orbital precession cones, projections and uncertainties; L + S → J
+  coupling, half-integer projections and a spin-traced angular-density plot.
 - **Zeeman (planned):** normal and anomalous splitting, Δm selection rules, and π/σ± polarization.
 - **3D Oscillator (planned):** (N+1)(N+2)/2 degeneracy, Cartesian ↔ spherical basis, comparison with hydrogen.
 - WebGPU rendering with a progressive CPU fallback, including recovery after device loss. Use

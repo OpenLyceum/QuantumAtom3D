@@ -1,160 +1,164 @@
-/**
- * AngularMomentumScreenView.ts
- *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. QuantumAtom3DControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
- */
-
-import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import type { Range } from "scenerystack/dot";
+import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
+import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
+import { AquaRadioButtonGroup, Checkbox, HSlider, NumberSpinner } from "scenerystack/sun";
+import { angularMagnitude, orbitalUncertaintyProduct } from "../../common/model/angular/VectorModel.js";
+import {
+  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+} from "../../common/QuantumAtom3DButtonOptions.js";
+import {
+  QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
+  QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+} from "../../common/QuantumAtom3DControlOptions.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
+import { AngularDensityNode } from "./AngularDensityNode.js";
+import { AngularMomentumDiagramNode } from "./AngularMomentumDiagramNode.js";
 import { AngularMomentumScreenSummaryContent } from "./AngularMomentumScreenSummaryContent.js";
-
 export type AngularMomentumScreenViewOptions = ScreenViewOptions;
-
 export class AngularMomentumScreenView extends ScreenView {
-  public constructor(model: AngularMomentumModel, providedOptions?: AngularMomentumScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See AngularMomentumScreenSummaryContent for the four content regions.
-    const options = optionize<AngularMomentumScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new AngularMomentumScreenSummaryContent(model),
-      },
-      providedOptions,
+  public constructor(model: AngularMomentumModel, options?: ScreenViewOptions) {
+    super({ ...options, screenSummaryContent: new AngularMomentumScreenSummaryContent(model) });
+    const strings = StringManager.getInstance().getAngularStrings();
+    const label = (value: string | TReadOnlyProperty<string>, maxWidth = 420) =>
+      new RichText(value, { font: new PhetFont(14), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const spinner = (property: NumberProperty, range: TReadOnlyProperty<Range>, name: TReadOnlyProperty<string>) =>
+      new NumberSpinner(property, range, {
+        arrowsPosition: "leftRight",
+        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
+        numberDisplayOptions: {
+          textOptions: { font: new PhetFont(15) },
+          minBackgroundWidth: 40,
+          numberFormatter: (value: number) => `${value}`,
+        },
+        accessibleName: name,
+      });
+    const diagram = new AngularMomentumDiagramNode(model);
+    diagram.left = this.layoutBounds.minX + 25;
+    diagram.top = this.layoutBounds.minY + 45;
+    const title = label(strings.titleStringProperty);
+    title.left = diagram.left;
+    title.bottom = diagram.top - 10;
+    const readouts = new DerivedProperty(
+      [model.lProperty, model.mProperty, model.spinProperty, model.jProperty, model.mjProperty],
+      (l, m, spin, j, mj) =>
+        spin
+          ? `|L| = ${angularMagnitude(l).toFixed(3)} ℏ, |S| = ${Math.sqrt(0.75).toFixed(3)} ℏ<br>|J| = ${angularMagnitude(j).toFixed(3)} ℏ, J<sub>z</sub> = ${mj} ℏ`
+          : `|L| = ${angularMagnitude(l).toFixed(3)} ℏ, L<sub>z</sub> = ${m} ℏ<br>ΔL<sub>x</sub> ΔL<sub>y</sub> = ${orbitalUncertaintyProduct(l, m).toFixed(2)} ℏ² ≥ ${Math.abs(m) / 2} ℏ²`,
     );
-    super(options);
-
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: QuantumAtom3DColors.backgroundColorProperty,
+    const readout = label(readouts);
+    readout.left = diagram.left;
+    readout.top = diagram.bottom + 15;
+    const mControl = new HBox({
+      spacing: 15,
+      children: [
+        label(strings.mStringProperty),
+        spinner(model.mProperty, model.mRangeProperty, strings.mStringProperty),
+      ],
     });
-    this.addChild(backgroundRect);
-
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().angularMomentumStringProperty, {
-      font: "bold 36px sans-serif",
-      fill: QuantumAtom3DColors.textColorProperty,
-      center: this.layoutBounds.center,
+    const jControl = new AquaRadioButtonGroup(
+      model.branchProperty,
+      (["upper", "lower"] as const).map((value) => ({
+        value,
+        createNode: () => label(value === "upper" ? strings.upperStringProperty : strings.lowerStringProperty),
+        options: { accessibleName: value === "upper" ? strings.upperStringProperty : strings.lowerStringProperty },
+      })),
+      { orientation: "horizontal", spacing: 15, radioButtonOptions: { radius: 7 } },
+    );
+    const mjControl = new HBox({
+      spacing: 15,
+      children: [
+        label(strings.mjStringProperty),
+        spinner(model.mjProperty, model.mjRangeProperty, strings.mjStringProperty),
+      ],
     });
-    this.addChild(placeholderText);
-
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getAngularMomentumA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.<control>StringProperty,
-    //   });
-    //   this.addChild(exampleButton);
-
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
-    const resetAllButton = new ResetAllButton({
+    model.spinProperty.link((spin) => {
+      mControl.visible = !spin;
+      jControl.visible = spin;
+      mjControl.visible = spin;
+    });
+    const jReadout = label(new DerivedProperty([model.jProperty], (j) => `j = ${j}`));
+    model.spinProperty.link((spin) => {
+      jReadout.visible = spin;
+    });
+    const controls = new VBox({
+      align: "left",
+      spacing: 15,
+      children: [
+        new HBox({
+          spacing: 15,
+          children: [
+            label(strings.lStringProperty),
+            spinner(model.lProperty, model.lProperty.rangeProperty, strings.lStringProperty),
+          ],
+        }),
+        mControl,
+        new Checkbox(model.spinProperty, label(strings.spinStringProperty), {
+          ...QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
+          accessibleName: strings.spinStringProperty,
+        }),
+        jControl,
+        jReadout,
+        mjControl,
+      ],
+      left: diagram.right + 55,
+      top: diagram.top,
+    });
+    const phase = new HBox({
+      spacing: 20,
+      children: [
+        new TimeControlNode(model.timer.isPlayingProperty, {
+          playPauseStepButtonOptions: {
+            ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
+            stepForwardButtonOptions: {
+              ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
+              listener: () => {
+                model.phaseProperty.value = (model.phaseProperty.value + 0.05) % (2 * Math.PI);
+              },
+            },
+          },
+        }),
+        label(strings.phaseStringProperty),
+        new HSlider(model.phaseProperty, model.phaseProperty.range, {
+          ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+          accessibleName: strings.phaseStringProperty,
+          keyboardStep: Math.PI / 36,
+          shiftKeyboardStep: Math.PI / 180,
+        }),
+      ],
+      left: diagram.left,
+      top: readout.bottom + 20,
+    });
+    const density = new AngularDensityNode(model);
+    density.left = controls.left + 15;
+    density.top = this.layoutBounds.minY + 315;
+    const densityTitle = label(strings.densityStringProperty, 420);
+    densityTitle.left = controls.left;
+    densityTitle.bottom = density.top - 10;
+    const densityHelp = label(strings.densityHelpStringProperty, 430);
+    densityHelp.left = controls.left;
+    densityHelp.top = density.bottom + 8;
+    const note = label(strings.noteStringProperty, 930);
+    note.left = diagram.left;
+    note.bottom = this.layoutBounds.maxY - 20;
+    const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
-        this.reset();
       },
-      right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
-      bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
+      right: this.layoutBounds.maxX - 20,
+      bottom: this.layoutBounds.maxY - 20,
     });
-    this.addChild(resetAllButton);
-
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
     this.addChild(
       new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
+        children: [diagram, title, readout, controls, phase, density, densityTitle, densityHelp, note, reset],
       }),
     );
+    this.pdomControlAreaNode.pdomOrder = [controls, phase, reset];
   }
-
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
-  }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeAngularMomentumScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in AngularMomentumScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeAngularMomentumScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeAngularMomentumScreenView();
-  //   super.dispose();
-  // }
 }

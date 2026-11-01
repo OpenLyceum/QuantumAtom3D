@@ -203,3 +203,16 @@ M4 validation includes analytic dipole amplitude/period, breathing, norm conserv
 orthonormality, coherent-sampler moments, disposal checks, CPU/GPU pixel comparisons and browser
 mixing/playback/reset tests. An intermittent hybrid-isosurface screenshot discrepancy remains under
 investigation; repeated identical renderer calls were stable. Keep the M4 PR in draft until resolved.
+
+## Angular Momentum (M5)
+
+The screen uses Scenery paths and arrows, with no WebGPU dependency. Quantum-number spinners
+maintain allowed projections as l and j change, including half-integer mj values. A phase slider
+and play/pause/single-step controls drive schematic precession. The vector diagram shows the
+outer precession cone, the internal L-about-J cone, the head-to-tail L+S triangle and a projection
+ladder. The polar plot updates for the selected orbital or spin-traced coupled state.
+
+Unit tests cover vector lengths, closure, projection, uncertainty bounds and spin weights for
+all allowed l<=4 states. The shared memory harness checks model and diagram/plot disposal.
+Browser tests cover clamps, half-integer controls, playback, reset, keyboard help, pointer fuzz
+and keyboard fuzz. The earlier M4 isosurface screenshot discrepancy remains unresolved.

@@ -1,43 +1,66 @@
-/**
- * AngularMomentumModel.ts
- *
- * The top-level model for the simulation screen.
- *
- * Add your simulation's state here using reactive Property objects from
- * scenerystack/axon. The view observes these properties and updates automatically.
- *
- * ── Example ──────────────────────────────────────────────────────────────────
- *   import { BooleanProperty, NumberProperty } from "scenerystack/axon";
- *
- *   public readonly isRunningProperty = new BooleanProperty(false);
- *   public readonly timeProperty = new NumberProperty(0);    // seconds
- *
- * ── Step cycle ────────────────────────────────────────────────────────────────
- * The Sim calls step(dt) on every animation frame. Advance your model state
- * in that method (e.g. integrate equations, update positions).
- *
- * ── Reset ─────────────────────────────────────────────────────────────────────
- * reset() is called when the user presses Reset All. Call .reset() on every
- * Property declared here.
- */
-import type { TModel } from "scenerystack/joist";
-
-export class AngularMomentumModel implements TModel {
-  /**
-   * Resets all model state to initial values.
-   * Called when the user presses the Reset All button.
-   */
-  public reset(): void {
-    // TODO: call .reset() on every Property declared in this model
+/** Quantum angular-momentum controls and a schematic precession clock. */
+import { BooleanProperty, DerivedProperty, NumberProperty, Property, StringUnionProperty } from "scenerystack/axon";
+import { Range } from "scenerystack/dot";
+import { coupledVectors, orbitalVector } from "../../common/model/angular/VectorModel.js";
+import { TimeModel } from "../../common/TimeModel.js";
+export class AngularMomentumModel {
+  public readonly lProperty = new NumberProperty(1, { range: new Range(0, 4), numberType: "Integer" });
+  public readonly mProperty = new NumberProperty(0, { numberType: "Integer" });
+  public readonly mRangeProperty = new Property(new Range(-1, 1));
+  public readonly spinProperty = new BooleanProperty(false);
+  public readonly branchProperty = new StringUnionProperty<"upper" | "lower">("upper", {
+    validValues: ["upper", "lower"],
+  });
+  public readonly jProperty = new DerivedProperty([this.lProperty, this.branchProperty], (l, branch) =>
+    l === 0 ? 0.5 : l + (branch === "upper" ? 0.5 : -0.5),
+  );
+  public readonly mjProperty = new NumberProperty(0.5);
+  public readonly mjRangeProperty = new Property(new Range(-1.5, 1.5));
+  public readonly phaseProperty = new NumberProperty(0, { range: new Range(0, 2 * Math.PI) });
+  public readonly timer = new TimeModel();
+  public readonly vectorsProperty = new DerivedProperty(
+    [this.lProperty, this.mProperty, this.spinProperty, this.jProperty, this.mjProperty, this.phaseProperty],
+    (l, m, spin, j, mj, phase) =>
+      spin
+        ? coupledVectors(l, j, mj, phase, 2 * phase)
+        : { orbital: orbitalVector(l, m, phase), spin: [0, 0, 0] as const, total: orbitalVector(l, m, phase) },
+  );
+  public constructor() {
+    this.lProperty.link((l) => {
+      this.mProperty.value = Math.max(-l, Math.min(l, this.mProperty.value));
+      this.mRangeProperty.value = new Range(-l, l);
+    });
+    this.jProperty.link((j) => {
+      this.mjProperty.value = Math.max(-j, Math.min(j, this.mjProperty.value));
+      this.mjRangeProperty.value = new Range(-j, j);
+    });
   }
-
-  /**
-   * Steps the model forward by dt seconds.
-   * Called every animation frame by the Sim framework.
-   *
-   * @param _dt - elapsed time in seconds since the last frame
-   */
-  public step(_dt: number): void {
-    // TODO: advance simulation state here
+  public step(dt: number): void {
+    if (this.timer.isPlayingProperty.value) {
+      this.phaseProperty.value = (this.phaseProperty.value + Math.max(0, dt) * 0.7) % (2 * Math.PI);
+    }
+    this.timer.step(dt);
+  }
+  public reset(): void {
+    this.lProperty.reset();
+    this.mProperty.reset();
+    this.spinProperty.reset();
+    this.branchProperty.reset();
+    this.mjProperty.reset();
+    this.phaseProperty.reset();
+    this.timer.reset();
+  }
+  public dispose(): void {
+    this.vectorsProperty.dispose();
+    this.jProperty.dispose();
+    this.lProperty.dispose();
+    this.mProperty.dispose();
+    this.mRangeProperty.dispose();
+    this.spinProperty.dispose();
+    this.branchProperty.dispose();
+    this.mjProperty.dispose();
+    this.mjRangeProperty.dispose();
+    this.phaseProperty.dispose();
+    this.timer.dispose();
   }
 }
