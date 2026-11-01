@@ -44,14 +44,24 @@ export function sphericalHarmonicNorm(l: number, m: number): number {
 }
 
 /**
+ * The constant in front of sin^|m| θ · P-polynomial in Θ_lm: the norm, with the
+ * (−1)^m of negative odd m folded in. The GPU shader takes this per term, so it
+ * only evaluates the polynomial.
+ */
+export function sphericalHarmonicPrefactor(l: number, m: number): number {
+  const absM = Math.abs(m);
+  const sign = m < 0 && absM % 2 === 1 ? -1 : 1;
+  return sign * sphericalHarmonicNorm(l, m);
+}
+
+/**
  * The real polar factor Θ_lm(cos θ) such that Y_lm = Θ_lm e^{imφ}. Valid for
  * every m in [−l, l]; negative m picks up the (−1)^m of Y_l,−m = (−1)^m Y*_lm.
  */
 export function sphericalHarmonicTheta(l: number, m: number, cosTheta: number): number {
   const absM = Math.abs(m);
   const sinTheta = Math.sqrt(Math.max(0, 1 - cosTheta * cosTheta));
-  const value = sphericalHarmonicNorm(l, m) * sinTheta ** absM * associatedLegendrePolynomialPart(l, m, cosTheta);
-  return m < 0 && absM % 2 === 1 ? -value : value;
+  return sphericalHarmonicPrefactor(l, m) * sinTheta ** absM * associatedLegendrePolynomialPart(l, m, cosTheta);
 }
 
 /** A complex number written into by the hot-loop evaluators, to avoid allocating per sample. */

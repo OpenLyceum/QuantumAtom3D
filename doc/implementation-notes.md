@@ -7,7 +7,7 @@ Developer-facing notes. The physics is in [model.md](./model.md).
 Five screens. Each screen has its own model, built from shared classes in `src/common/model/`.
 
 ```
-main.ts                  awaits initializeGpuContext() once (M2), then sim.start()
+main.ts                  awaits initializeGpuContext() once, then sim.start()
   ├─ OrbitalsScreen        eigenstate viewer: dots / volume / isosurface, P(r), slice, nodes
   ├─ SuperpositionScreen   up to 6 terms with complex coefficients, time evolution (TimeModel)
   ├─ AngularMomentumScreen vector model (L, S, J), 2D projection, no GPU
@@ -74,9 +74,27 @@ reference implementation: a browser spec compares GPU and CPU pixels.
 - The Monte Carlo sampler: inverse-CDF sampling for eigenstates, Metropolis for superpositions, seeded.
 - Analytic node positions, found by bisection.
 
-## State of the Orbitals screen (M1)
+## State of the Orbitals screen (M2)
 
-This milestone is 2D only:
+The left column is a rotatable 3D volume. The middle column switches between the radial chart with
+readouts and the cross-section with its plane/offset controls. The right column selects the state.
+
+- **3D volume.** WebGPU ray-marches 128 samples across the viewing sphere at 512² resolution,
+  evaluating the angular functions in WGSL and interpolating a 1024-sample radial table. Both
+  palettes and density colouring use the same lookup tables as the CPU reference. Brightness and
+  opacity are visualization mappings, not absolute probability measurements.
+- **Fallback.** No device, a shader diagnostic, or failed canvas presentation selects CPU at startup.
+  Losing the device or encountering a rendering error switches existing viewports to CPU as well.
+  The CPU image progresses through 32², 64², 128² and 256², with a 12 ms work budget checked after
+  each row. This is a responsiveness budget rather than a strict deadline. Finished frames persist;
+  stationary scenes do no further rendering work. `?forceCpu=true` forces this path.
+- **Camera.** Physics z is up. Dragging, arrow keys and the azimuth/elevation sliders orbit the same
+  camera. Plus/minus adjust the model's zoom. Reset All restores camera, state and detail panel.
+- **Current limits.** Adaptive GPU resolution and quality preferences are pending. Dots, isosurfaces,
+  nodal surfaces in 3D, picking, and linked chart hover belong to M3. The nodes checkbox currently
+  affects the cross-section only.
+
+The M1 tools remain available:
 
 - **Cross-section** (`SliceHeatmapNode`). ψ is sampled at 128² on an xy, xz or yz plane, painted into
   an offscreen canvas, and scaled up by a `CanvasNode`. In phase colouring, hue is arg ψ and brightness
@@ -94,7 +112,7 @@ This milestone is 2D only:
 |---|---|
 | M0 ✓ | Scaffold, fleet onboarding, phase-colour preference |
 | M1 ✓ | Math core and tests; Orbitals screen in 2D (P(r), slice, readouts) |
-| M2 | GPU engine, CPU renderer, camera; volume and phase rendering on Orbitals |
+| M2 ✓ | GPU engine, CPU renderer, camera; volume and phase rendering on Orbitals |
 | M3 | Dots, isosurface, nodal surfaces, cutting plane, P(r) ↔ 3D hover, presets |
 | M4 | Superposition screen |
 | M5 | Angular Momentum screen |
@@ -116,3 +134,16 @@ This milestone is 2D only:
 - **Shader changes.** Verify them in a browser against the CPU backend. Run the specs in
   `tests/browser/` with Chrome flags `--enable-unsafe-webgpu --enable-features=Vulkan`. Run with
   `--disable-features=WebGPU,WebGPUService` to exercise the fallback.
+
+### M2 verification (2026-10-31)
+
+- Unit tests cover radial interpolation, ray-march physical landmarks, uniform packing, progressive
+  CPU scheduling, camera reset and disposal of the renderer/viewport against live model properties.
+- `tests/browser/volume.spec.ts` compares GPU and CPU pixels for six states, including real orbitals,
+  a negative m, Z = 6 and l = 4, with both palettes and both colour modes. It checks the 1s centre
+  and the edge-on 2p_z nodal plane separately. It also exercises real keyboard/pointer controls,
+  Z-independent view scale, Reset All, missing WebGPU, shader errors and device-loss recovery.
+- WSL Chromium on this machine cannot present WebGPU canvases, so GPU comparisons run in Windows
+  Chrome against the WSL Vite server. Set `QUANTUM_CHROME` to the Chrome executable and
+  `QUANTUM_REQUIRE_GPU=1` to disallow a skipped comparison. Use a freshly started Vite server and a
+  Windows-local Playwright `--output` directory to avoid cross-filesystem trace locks.
