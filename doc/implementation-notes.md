@@ -175,3 +175,31 @@ The M1 tools remain available:
   pixels, with a maximum channel-error tolerance of 0.045. Browser interaction tests run on both
   backends and cover deterministic dots, enclosed fraction, radial probing, presets, cutting-plane
   dragging/slider parity and reset.
+
+## Superposition (M4)
+
+Six rows select n/l/m, a nonnegative coefficient magnitude and a phase in radians. Duplicate
+basis states are combined before normalization. Complete cancellation produces an empty state and
+an explanatory message. Controls retain their relative input weights; the combined wavefunction is
+normalized. Editing a coefficient restarts physical time. Presets pause and reset time.
+
+The physical clock is in atomic units, separate from the composed wall-clock timer. CPU float64
+relative phases are wrapped before upload. A common phase is removed so degenerate n=2 hybrids
+remain stationary in both density and phase colouring. Presets include dipole sloshing, breathing,
+rotation, and representative sp/sp²/sp³ hybrids. The full hybrid families are tested for orthonormality.
+
+Mean r and z use radial position matrix elements (cached Simpson quadrature) with exact angular
+selection rules. The displayed period, frequency, wavelength and electric-dipole flag refer to the
+first two distinct occupied states. A multi-term state can have additional frequencies. The live
+history holds the most recent 600 samples, with instantaneous values in the screen summary.
+
+Probability dots use independence Metropolis-Hastings with the incoherent mixture as proposal.
+Initial clouds receive 16 sweeps; evolving clouds receive two sweeps per update at about 10 Hz.
+They are stochastic probability samples; finite sweeps can lag rapid state changes. CPU animated
+scenes update at about 10 Hz and refine while paused. Iso thresholds use the finite 64³ density grid,
+refreshed at most four times per second during playback. Grid construction is synchronous.
+
+M4 validation includes analytic dipole amplitude/period, breathing, norm conservation, hybrid
+orthonormality, coherent-sampler moments, disposal checks, CPU/GPU pixel comparisons and browser
+mixing/playback/reset tests. An intermittent hybrid-isosurface screenshot discrepancy remains under
+investigation; repeated identical renderer calls were stable. Keep the M4 PR in draft until resolved.

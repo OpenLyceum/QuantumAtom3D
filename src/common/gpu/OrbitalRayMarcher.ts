@@ -59,7 +59,7 @@ export class OrbitalRayMarcher {
       compositeSurfaces(events, hit, out);
       return;
     }
-    const stepOpacity = (VOLUME_OPACITY_GAIN * step) / radius;
+    const stepOpacity = ((this.scene.opacityGain ?? VOLUME_OPACITY_GAIN) * step) / radius;
     let transmittance = 1;
     let eventIndex = 0;
     const compositeUntil = (limit: number) => {

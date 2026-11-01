@@ -18,8 +18,8 @@ isotropic 3D oscillator.
   Volume rendering with phase or density colours, pointer/keyboard orbit and zoom, camera sliders,
   probability dots, 90%/95% isosurfaces, analytic 3D nodes, a draggable cutting plane and linked
   P(r) probing. Includes stationary-state presets and expectation-value readouts.
-- **Superposition (planned):** mix eigenstates with complex coefficients and watch the charge cloud slosh at the
-  Bohr frequency. Presets include sp/sp²/sp³ hybrids.
+- **Superposition (M4 in validation):** mix up to six eigenstates, evolve their relative phases,
+  track mean radius and mean z, and explore dipole, breathing, rotation and sp/sp²/sp³ presets.
 - **Angular Momentum (planned):** the vector model for L, and L + S → J.
 - **Zeeman (planned):** normal and anomalous splitting, Δm selection rules, and π/σ± polarization.
 - **3D Oscillator (planned):** (N+1)(N+2)/2 degeneracy, Cartesian ↔ spherical basis, comparison with hydrogen.

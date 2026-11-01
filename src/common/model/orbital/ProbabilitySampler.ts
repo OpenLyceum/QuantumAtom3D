@@ -48,6 +48,37 @@ export class InverseCdf {
   }
 }
 
+/** Reusable distribution tables for independent draws from one eigenstate. */
+export class EigenstateSampler {
+  private readonly radial: InverseCdf;
+  private readonly polar: InverseCdf;
+  private readonly azimuth: InverseCdf | null;
+  public constructor(n: number, l: number, m: number, basis: OrbitalBasis, z: number) {
+    this.radial = new InverseCdf(
+      (s) => s * s * hydrogenRadialCutoff(n, z),
+      (r) => hydrogenRadialDistribution(n, l, z, r),
+    );
+    this.polar = new InverseCdf(
+      (s) => 2 * s - 1,
+      (cos) => sphericalHarmonicTheta(l, m, cos) ** 2,
+    );
+    this.azimuth =
+      basis === "real" && m !== 0
+        ? new InverseCdf(
+            (s) => 2 * Math.PI * s,
+            (phi) => (m > 0 ? Math.cos(m * phi) : Math.sin(m * phi)) ** 2,
+          )
+        : null;
+  }
+  public sample(random: Random): readonly [number, number, number] {
+    const r = this.radial.sample(random.nextDouble());
+    const cos = this.polar.sample(random.nextDouble());
+    const phi = this.azimuth ? this.azimuth.sample(random.nextDouble()) : 2 * Math.PI * random.nextDouble();
+    const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
+    return [r * sin * Math.cos(phi), r * sin * Math.sin(phi), r * cos];
+  }
+}
+
 /** Packed xyz positions in a0. They are probability samples, not electron trajectories. */
 export function sampleEigenstate(
   n: number,
@@ -59,28 +90,10 @@ export function sampleEigenstate(
   seed: number,
 ): Float32Array {
   const random = new Random({ seed });
-  const radial = new InverseCdf(
-    (s) => s * s * hydrogenRadialCutoff(n, z),
-    (r) => hydrogenRadialDistribution(n, l, z, r),
-  );
-  const polar = new InverseCdf(
-    (s) => 2 * s - 1,
-    (cos) => sphericalHarmonicTheta(l, m, cos) ** 2,
-  );
-  const azimuth =
-    basis === "real" && m !== 0
-      ? new InverseCdf(
-          (s) => 2 * Math.PI * s,
-          (phi) => (m > 0 ? Math.cos(m * phi) : Math.sin(m * phi)) ** 2,
-        )
-      : null;
+  const sampler = new EigenstateSampler(n, l, m, basis, z);
   const points = new Float32Array(3 * count);
   for (let i = 0; i < count; i++) {
-    const r = radial.sample(random.nextDouble());
-    const cos = polar.sample(random.nextDouble());
-    const phi = azimuth ? azimuth.sample(random.nextDouble()) : 2 * Math.PI * random.nextDouble();
-    const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
-    points.set([r * sin * Math.cos(phi), r * sin * Math.sin(phi), r * cos], 3 * i);
+    points.set(sampler.sample(random), 3 * i);
   }
   return points;
 }

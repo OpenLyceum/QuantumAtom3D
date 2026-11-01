@@ -1,160 +1,259 @@
-/**
- * SuperpositionScreenView.ts
- *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. QuantumAtom3DControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
- */
-
-import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+/** Coherent-state mixer, animated 3D view and expectation-value history. */
+import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { Bounds2, Dimension2, type Range } from "scenerystack/dot";
+import { AlignBox, HBox, Node, RichText, Text, VBox } from "scenerystack/scenery";
+import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
+import { AquaRadioButtonGroup, HSlider, NumberSpinner, RectangularPushButton } from "scenerystack/sun";
+import { atomicTimeToFs, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
+import { hydrogenEnergy } from "../../common/model/hydrogen/HydrogenExpectations.js";
+import { SUPERPOSITION_PRESETS, type SuperpositionPreset } from "../../common/model/orbital/SuperpositionPresets.js";
+import { dipoleAllowed } from "../../common/model/orbital/SuperpositionState.js";
+import {
+  FLAT_PANEL_PUSH_BUTTON_OPTIONS,
+  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+  LIGHT_SURFACE_TEXT_FILL,
+} from "../../common/QuantumAtom3DButtonOptions.js";
+import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
+import { type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
+import { ExpectationTimeSeriesNode } from "./ExpectationTimeSeriesNode.js";
 import { SuperpositionScreenSummaryContent } from "./SuperpositionScreenSummaryContent.js";
+import { SuperpositionViewportNode } from "./SuperpositionViewportNode.js";
 
-export type SuperpositionScreenViewOptions = ScreenViewOptions;
-
+type Options = ScreenViewOptions & { phaseColormapProperty: TReadOnlyProperty<PhaseColormap> };
+const FONT = new PhetFont(13);
+const SIZE = 340;
 export class SuperpositionScreenView extends ScreenView {
-  public constructor(model: SuperpositionModel, providedOptions?: SuperpositionScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See SuperpositionScreenSummaryContent for the four content regions.
-    const options = optionize<SuperpositionScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new SuperpositionScreenSummaryContent(model),
-      },
-      providedOptions,
+  public readonly viewport: SuperpositionViewportNode;
+  public constructor(model: SuperpositionModel, options: Options) {
+    super({ ...options, screenSummaryContent: new SuperpositionScreenSummaryContent(model) });
+    const strings = StringManager.getInstance().getSuperpositionStrings();
+    const orbital = StringManager.getInstance().getOrbitalStrings();
+    const text = (value: string | TReadOnlyProperty<string>, maxWidth = 180) =>
+      new RichText(value, { font: FONT, fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const slider = (property: NumberProperty, name: TReadOnlyProperty<string>, width = 110) =>
+      new HSlider(property, property.range, {
+        ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+        trackSize: new Dimension2(width, 3),
+        accessibleName: name,
+        keyboardStep:
+          property === model.zoomProperty || property === model.nuclearChargeProperty
+            ? 1
+            : property.range.getLength() / 100,
+        ...((property === model.zoomProperty || property === model.nuclearChargeProperty) && {
+          shiftKeyboardStep: 1,
+          pageKeyboardStep: 1,
+          constrainValue: (v: number) => Math.round(v),
+        }),
+      });
+    this.viewport = new SuperpositionViewportNode(SIZE, model, options.phaseColormapProperty);
+    this.viewport.left = this.layoutBounds.minX + SCREEN_VIEW_MARGIN;
+    this.viewport.top = this.layoutBounds.minY + 35;
+    const viewport = this.viewport;
+    const timeText = new DerivedProperty(
+      [model.timeProperty, model.expectationsProperty, strings.timeStringProperty],
+      (time, expectation, name) =>
+        `${name}: ${atomicTimeToFs(time).toFixed(3)} fs   ⟨z⟩ = ${expectation.z.toFixed(2)} a<sub>0</sub>   ⟨r⟩ = ${expectation.r.toFixed(2)} a<sub>0</sub>`,
     );
-    super(options);
-
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: QuantumAtom3DColors.backgroundColorProperty,
+    const timeLabel = text(timeText, SIZE);
+    timeLabel.left = viewport.left;
+    timeLabel.bottom = viewport.top - 8;
+    const timeControls = new TimeControlNode(model.timer.isPlayingProperty, {
+      playPauseStepButtonOptions: {
+        ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
+        stepForwardButtonOptions: {
+          ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
+          listener: () => model.advance(1 / 60),
+        },
+      },
     });
-    this.addChild(backgroundRect);
-
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().superpositionStringProperty, {
-      font: "bold 36px sans-serif",
-      fill: QuantumAtom3DColors.textColorProperty,
-      center: this.layoutBounds.center,
+    const modes = new AquaRadioButtonGroup(
+      model.renderModeProperty,
+      (["volume", "dots", "isosurface"] as const).map((mode) => ({
+        value: mode,
+        createNode: () => text(orbital.volume[`${mode}StringProperty`]),
+        options: { accessibleName: orbital.volume[`${mode}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 8, radioButtonOptions: { radius: 6 } },
+    );
+    const coloring = new OrbitalColorControl(
+      { sliceColoringProperty: model.coloringProperty },
+      options.phaseColormapProperty,
+    );
+    const below = new VBox({
+      align: "left",
+      spacing: 9,
+      left: viewport.left,
+      top: viewport.bottom + 10,
+      children: [
+        new HBox({
+          spacing: 16,
+          children: [
+            timeControls,
+            text(strings.speedStringProperty),
+            slider(model.speedProperty, strings.speedStringProperty, 95),
+          ],
+        }),
+        modes,
+        coloring,
+        new HBox({
+          spacing: 10,
+          children: [
+            text(orbital.volume.yawStringProperty, 70),
+            slider(viewport.camera.yawProperty, orbital.volume.yawStringProperty, 95),
+            text(orbital.volume.pitchStringProperty, 70),
+            slider(viewport.camera.pitchProperty, orbital.volume.pitchStringProperty, 95),
+          ],
+        }),
+        new HBox({
+          spacing: 10,
+          children: [
+            text(orbital.zoomStringProperty, 70),
+            slider(model.zoomProperty, orbital.zoomStringProperty, 95),
+            text(orbital.nuclearChargeStringProperty, 90),
+            slider(model.nuclearChargeProperty, orbital.nuclearChargeStringProperty, 70),
+          ],
+        }),
+      ],
     });
-    this.addChild(placeholderText);
-
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getSuperpositionA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.<control>StringProperty,
-    //   });
-    //   this.addChild(exampleButton);
-
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
-    const resetAllButton = new ResetAllButton({
+    const rightX = viewport.right + 35;
+    const spinner = (property: NumberProperty, range: TReadOnlyProperty<Range>, name: TReadOnlyProperty<string>) =>
+      new NumberSpinner(property, range, {
+        arrowsPosition: "leftRight",
+        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
+        numberDisplayOptions: { textOptions: { font: FONT }, minBackgroundWidth: 20 },
+        accessibleName: name,
+      });
+    const count = new HBox({
+      spacing: 10,
+      children: [
+        text(strings.termsStringProperty),
+        spinner(model.termCountProperty, model.termCountProperty.rangeProperty, strings.termsStringProperty),
+      ],
+    });
+    const presetButtons = (Object.keys(SUPERPOSITION_PRESETS) as SuperpositionPreset[]).map(
+      (key) =>
+        new RectangularPushButton({
+          ...FLAT_PANEL_PUSH_BUTTON_OPTIONS,
+          content: new Text(strings.presets[`${key}StringProperty`], {
+            font: FONT,
+            fill: LIGHT_SURFACE_TEXT_FILL,
+            maxWidth: 100,
+          }),
+          accessibleName: strings.presets[`${key}StringProperty`],
+          listener: () => {
+            model.loadPreset(key);
+          },
+        }),
+    );
+    const presetRow = new HBox({ spacing: 6, children: presetButtons });
+    const rowBox = (children: Node[]) =>
+      new HBox({
+        spacing: 7,
+        children: children.map(
+          (child, index) =>
+            new AlignBox(child, {
+              alignBounds: new Bounds2(0, 0, [15, 80, 80, 80, 120, 120][index] ?? 80, 30),
+              xAlign: "center",
+              yAlign: "center",
+            }),
+        ),
+      });
+    const coefficientSlider = (property: NumberProperty, name: TReadOnlyProperty<string>) =>
+      new VBox({
+        spacing: 1,
+        children: [text(new DerivedProperty([property], (value) => value.toFixed(2))), slider(property, name, 95)],
+      });
+    const rows = model.rows.map((row, index) => {
+      const name = (label: TReadOnlyProperty<string>) =>
+        new DerivedProperty([strings.termStringProperty, label], (term, part) => `${term} ${index + 1}: ${part}`);
+      const q = row.quantumNumbers;
+      const result = rowBox([
+        text(`${index + 1}`),
+        spinner(q.nProperty, q.nProperty.rangeProperty, name(orbital.principalStringProperty)),
+        spinner(q.lProperty, q.lRangeProperty, name(orbital.orbitalStringProperty)),
+        spinner(q.mProperty, q.mRangeProperty, name(orbital.magneticStringProperty)),
+        coefficientSlider(row.magnitudeProperty, name(strings.magnitudeStringProperty)),
+        coefficientSlider(row.phaseProperty, name(strings.phaseStringProperty)),
+      ]);
+      model.termCountProperty.link((value) => {
+        result.visible = index < value;
+      });
+      return result;
+    });
+    const columns = rowBox([
+      text(""),
+      text(orbital.principalStringProperty),
+      text(orbital.orbitalStringProperty),
+      text(orbital.magneticStringProperty),
+      text(strings.magnitudeStringProperty),
+      text(strings.phaseStringProperty),
+    ]);
+    const mixer = new VBox({
+      align: "left",
+      spacing: 9,
+      children: [presetRow, count, columns, ...rows],
+      left: rightX,
+      top: this.layoutBounds.minY + 20,
+    });
+    const status = new DerivedProperty(
+      [
+        model.termsProperty,
+        model.nuclearChargeProperty,
+        strings.emptyStringProperty,
+        strings.stationaryStringProperty,
+        strings.pairStringProperty,
+        strings.allowedStringProperty,
+        strings.forbiddenStringProperty,
+      ],
+      (terms, charge, empty, stationary, pair, allowed, forbidden) => {
+        const a = terms[0];
+        const b = terms[1];
+        if (!a) {
+          return empty;
+        }
+        if (!b || terms.every((term) => term.n === a.n)) {
+          return stationary;
+        }
+        const gap = Math.abs(hydrogenEnergy(a.n, charge) - hydrogenEnergy(b.n, charge));
+        if (gap === 0) {
+          return `${pair}: ΔE = 0`;
+        }
+        const period = atomicTimeToFs((2 * Math.PI) / gap);
+        return `${pair}: T = ${period.toFixed(3)} fs, f = ${(1 / period).toFixed(3)} PHz, λ = ${wavelengthNmForEnergy(gap).toFixed(1)} nm<br>${dipoleAllowed(a, b) ? allowed : forbidden}`;
+      },
+    );
+    const statusLabel = text(status, 500);
+    statusLabel.left = rightX;
+    statusLabel.top = this.layoutBounds.minY + 388;
+    const chart = new ExpectationTimeSeriesNode(470, 105, model);
+    chart.left = rightX;
+    chart.top = this.layoutBounds.minY + 455;
+    const normalization = text(strings.normalizationStringProperty, 510);
+    normalization.left = rightX;
+    normalization.top = this.layoutBounds.minY + 355;
+    const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
-        this.reset();
+        viewport.reset();
       },
       right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
       bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
-    this.addChild(resetAllButton);
-
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
     this.addChild(
-      new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
-      }),
+      new Node({ children: [viewport, timeLabel, below, mixer, normalization, statusLabel, chart, reset] }),
     );
+    this.pdomPlayAreaNode.pdomOrder = [viewport];
+    this.pdomControlAreaNode.pdomOrder = [mixer, below, reset];
   }
-
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
   public override step(_dt: number): void {
-    // TODO: implement animation updates here
+    this.viewport.step();
   }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeSuperpositionScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in SuperpositionScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeSuperpositionScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeSuperpositionScreenView();
-  //   super.dispose();
-  // }
 }

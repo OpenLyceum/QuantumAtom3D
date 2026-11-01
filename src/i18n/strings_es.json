@@ -112,11 +112,11 @@
     },
     "superposition": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "La vista 3D muestra una superposición coherente. La gráfica sigue el radio medio y la posición z media en el tiempo.",
+        "controlArea": "Mezcla hasta seis estados hidrogenoides mediante números cuánticos, magnitudes y fases. Elige un estado predefinido, representación, carga y velocidad.",
+        "interactionHint": "Reproduce, pausa o avanza paso a paso. Las flechas giran la vista 3D enfocada; más y menos ajustan el zoom. Los deslizadores permiten el control por teclado."
       },
-      "currentDetails": "La simulación está en su estado inicial."
+      "currentDetails": "{{count}} estados distintos ocupados. Tiempo {{time}} femtosegundos. Posición z media {{z}} radios de Bohr y radio medio {{r}} radios de Bohr."
     },
     "angularMomentum": {
       "screenSummary": {
@@ -148,5 +148,30 @@
     "phaseColormap": "Colores de fase",
     "phaseColormapHsv": "Rueda de tonos (HSV)",
     "phaseColormapUniform": "Uniforme (luminosidad constante)"
+  },
+  "superposition": {
+    "time": "Tiempo",
+    "speed": "Velocidad",
+    "terms": "Términos",
+    "term": "Término",
+    "magnitude": "Magnitud |c|",
+    "phase": "Fase (rad)",
+    "empty": "Los coeficientes se cancelan. Elige un estado no nulo.",
+    "stationary": "Densidad estacionaria: los estados ocupados tienen la misma energía.",
+    "pair": "Dos primeros estados",
+    "allowed": "Transición dipolar permitida",
+    "forbidden": "Transición dipolar prohibida",
+    "normalization": "El estado combinado se normaliza automáticamente. Los puntos son muestras de probabilidad, no trayectorias.",
+    "meanRadius": "⟨r⟩ (a₀)",
+    "meanZ": "⟨z⟩ (a₀)",
+    "timeAxis": "Tiempo (fs)",
+    "presets": {
+      "dipole": "Dipolo",
+      "breathing": "Respiración",
+      "rotating": "Rotación",
+      "sp": "sp",
+      "sp2": "sp²",
+      "sp3": "sp³"
+    }
   }
 }

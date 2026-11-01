@@ -10,7 +10,10 @@ import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import type { OrbitalsModel, SliceColoring } from "../model/OrbitalsModel.js";
 
 export class OrbitalColorControl extends HBox {
-  public constructor(model: OrbitalsModel, phaseColormapProperty: TReadOnlyProperty<PhaseColormap>) {
+  public constructor(
+    model: Pick<OrbitalsModel, "sliceColoringProperty">,
+    phaseColormapProperty: TReadOnlyProperty<PhaseColormap>,
+  ) {
     const strings = StringManager.getInstance().getOrbitalStrings().slice;
     const a11y = StringManager.getInstance().getOrbitalsA11yStrings().controls;
     const label = (property: TReadOnlyProperty<string>) =>

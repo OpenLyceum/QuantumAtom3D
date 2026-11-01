@@ -112,11 +112,11 @@
     },
     "superposition": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La vue 3D montre une superposition cohérente. Le graphique suit le rayon moyen et la position z moyenne dans le temps.",
+        "controlArea": "Mélangez jusqu’à six états hydrogénoïdes avec leurs nombres quantiques, modules et phases. Choisissez un état prédéfini, le rendu, la charge et la vitesse.",
+        "interactionHint": "Lancez, suspendez ou avancez pas à pas. Les flèches tournent la vue 3D sélectionnée ; plus et moins règlent le zoom. Les curseurs permettent aussi le contrôle au clavier."
       },
-      "currentDetails": "La simulation est dans son état initial."
+      "currentDetails": "{{count}} états distincts occupés. Temps {{time}} femtosecondes. Position z moyenne {{z}} rayons de Bohr et rayon moyen {{r}} rayons de Bohr."
     },
     "angularMomentum": {
       "screenSummary": {
@@ -148,5 +148,30 @@
     "phaseColormap": "Couleurs de phase",
     "phaseColormapHsv": "Roue des teintes (TSV)",
     "phaseColormapUniform": "Uniforme (luminosité constante)"
+  },
+  "superposition": {
+    "time": "Temps",
+    "speed": "Vitesse",
+    "terms": "Termes",
+    "term": "Terme",
+    "magnitude": "Module |c|",
+    "phase": "Phase (rad)",
+    "empty": "Les coefficients s’annulent. Choisissez un état non nul.",
+    "stationary": "Densité stationnaire : les états occupés ont la même énergie.",
+    "pair": "Deux premiers états",
+    "allowed": "Transition dipolaire permise",
+    "forbidden": "Transition dipolaire interdite",
+    "normalization": "L’état combiné est normalisé automatiquement. Les points sont des échantillons de probabilité, pas des trajectoires.",
+    "meanRadius": "⟨r⟩ (a₀)",
+    "meanZ": "⟨z⟩ (a₀)",
+    "timeAxis": "Temps (fs)",
+    "presets": {
+      "dipole": "Dipôle",
+      "breathing": "Respiration",
+      "rotating": "Rotation",
+      "sp": "sp",
+      "sp2": "sp²",
+      "sp3": "sp³"
+    }
   }
 }

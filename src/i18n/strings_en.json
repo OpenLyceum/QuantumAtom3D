@@ -112,11 +112,11 @@
     },
     "superposition": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The 3D view shows a coherent superposition. The graph tracks mean radius and mean z position over time.",
+        "controlArea": "Mix up to six hydrogenic states using quantum numbers, coefficient magnitudes and phases. Choose a preset, rendering mode, charge and playback speed.",
+        "interactionHint": "Play, pause or step through time. Arrow keys rotate the focused 3D view; plus and minus zoom. Sliders provide keyboard equivalents."
       },
-      "currentDetails": "The simulation is in its initial state."
+      "currentDetails": "{{count}} distinct occupied states. Time {{time}} femtoseconds. Mean z {{z}} Bohr radii and mean radius {{r}} Bohr radii."
     },
     "angularMomentum": {
       "screenSummary": {
@@ -148,5 +148,30 @@
     "phaseColormap": "Phase colours",
     "phaseColormapHsv": "Hue wheel (HSV)",
     "phaseColormapUniform": "Uniform (constant lightness)"
+  },
+  "superposition": {
+    "time": "Time",
+    "speed": "Speed",
+    "terms": "Terms",
+    "term": "Term",
+    "magnitude": "Magnitude |c|",
+    "phase": "Phase (rad)",
+    "empty": "The coefficients cancel. Choose a nonzero state.",
+    "stationary": "Stationary density: all occupied states share one energy.",
+    "pair": "First two states",
+    "allowed": "Electric-dipole allowed",
+    "forbidden": "Electric-dipole forbidden",
+    "normalization": "The combined state is normalized automatically. Dots are probability samples, not trajectories.",
+    "meanRadius": "⟨r⟩ (a₀)",
+    "meanZ": "⟨z⟩ (a₀)",
+    "timeAxis": "Time (fs)",
+    "presets": {
+      "dipole": "Dipole",
+      "breathing": "Breathing",
+      "rotating": "Rotating",
+      "sp": "sp",
+      "sp2": "sp²",
+      "sp3": "sp³"
+    }
   }
 }

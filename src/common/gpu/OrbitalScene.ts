@@ -42,6 +42,7 @@ export const PARAMS_BYTES = 13 * 16 + MAX_RENDER_TERMS * 2 * 16;
 export type OrbitalColoring = "phase" | "density";
 
 export type OrbitalScene = {
+  readonly opacityGain?: number;
   readonly nodes?: NodalSurfaceSet;
   readonly cuttingPlane?: { readonly normal: Point3; readonly offset: number };
   readonly overlayColor?: Point3;
@@ -80,7 +81,10 @@ export function packParams(scene: OrbitalScene, frame: CameraFrame, resolution: 
   floats.set([...frame.right, 0], 0);
   floats.set([...frame.up, 0], 4);
   floats.set([...frame.forward, 0], 8);
-  floats.set([scene.nuclearCharge, scene.inversePeakAmplitude, VOLUME_OPACITY_GAIN, scene.radius], 12);
+  floats.set(
+    [scene.nuclearCharge, scene.inversePeakAmplitude, scene.opacityGain ?? VOLUME_OPACITY_GAIN, scene.radius],
+    12,
+  );
   const termCount = Math.min(scene.terms.length, MAX_RENDER_TERMS);
   floats.set([scene.radius, resolution, RENDER_STEPS, termCount], 16);
   uints.set(

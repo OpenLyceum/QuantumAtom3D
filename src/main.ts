@@ -48,6 +48,7 @@ onReadyToLaunch(async () => {
       backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
     }),
     new SuperpositionScreen({
+      preferences: simPreferences,
       name: stringManager.getScreenNames().superpositionStringProperty,
       tandem: Tandem.ROOT.createTandem("superpositionScreen"),
       backgroundColorProperty: QuantumAtom3DColors.backgroundColorProperty,
