@@ -67,7 +67,7 @@ export type QuantumAtom3DPreferenceStrings = {
   readonly titleStringProperty: ReadOnlyProperty<string>;
   readonly phaseColormapStringProperty: ReadOnlyProperty<string>;
   readonly phaseColormapHsvStringProperty: ReadOnlyProperty<string>;
-  readonly phaseColormapTwilightStringProperty: ReadOnlyProperty<string>;
+  readonly phaseColormapUniformStringProperty: ReadOnlyProperty<string>;
 };
 
 /**
@@ -115,6 +115,11 @@ export class StringManager {
       zeemanStringProperty: stringProperties.screens.zeemanStringProperty,
       oscillatorStringProperty: stringProperties.screens.oscillatorStringProperty,
     };
+  }
+
+  /** Visible labels shared by the orbital views (controls, readouts, P(r) chart, cross-section). */
+  public getOrbitalStrings() {
+    return stringProperties.orbital;
   }
 
   /** Accessibility strings for the Orbitals screen. */

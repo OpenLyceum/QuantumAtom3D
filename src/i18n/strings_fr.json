@@ -7,14 +7,75 @@
     "zeeman": "Zeeman",
     "oscillator": "3D Oscillator"
   },
+  "orbital": {
+    "quantumNumbers": "Nombres quantiques",
+    "principal": "n",
+    "orbital": "l",
+    "magnetic": "m",
+    "basis": "Fonctions angulaires",
+    "complexBasis": "Complexes Y<sub>lm</sub>",
+    "realBasis": "Réelles (p<sub>x</sub>, d<sub>xy</sub>, …)",
+    "complexState": "{{n}}{{letter}}, m = {{m}}",
+    "realState": "{{n}}{{letter}}<sub>{{subscript}}</sub>",
+    "nuclearCharge": "Charge nucléaire Z",
+    "zoom": "Zoom",
+    "showNodes": "Afficher les nœuds",
+    "readouts": {
+      "title": "Propriétés",
+      "energy": "E",
+      "meanRadius": "⟨r⟩",
+      "rmsRadius": "r<sub>rms</sub>",
+      "mostProbableRadius": "r<sub>pic</sub>",
+      "radialNodes": "Nœuds radiaux",
+      "angularNodes": "Nœuds angulaires",
+      "energyValue": "{{value}} eV",
+      "lengthValue": "{{value}} a<sub>0</sub>",
+      "nodeCount": "{{count}}",
+      "conesValue": "cônes θ = {{angles}}",
+      "planesValue": "plans φ = {{angles}}",
+      "polarPlaneValue": "plan xy (θ = 90°)"
+    },
+    "radialChart": {
+      "title": "P(r) = r²|R<sub>nl</sub>|²",
+      "xAxis": "r (a<sub>0</sub>)"
+    },
+    "slice": {
+      "title": "Coupe",
+      "plane": "Plan",
+      "offset": "Décalage",
+      "coloring": "Couleur",
+      "phase": "Phase de ψ",
+      "density": "Densité |ψ|²",
+      "phaseLegend": "luminosité ∝ |ψ|",
+      "densityLegend": "0 → max",
+      "scale": "±{{value}} a<sub>0</sub>"
+    }
+  },
   "a11y": {
     "orbitals": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "La zone de jeu montre une coupe du nuage de probabilité de l'électron, colorée selon la phase de la fonction d'onde ou selon sa densité, et un graphique de la distribution radiale de probabilité P(r).",
+        "controlArea": "La zone de contrôle comprend des sélecteurs pour les nombres quantiques n, l et m, un choix entre fonctions angulaires complexes et réelles, des curseurs pour la charge nucléaire, le zoom et le décalage de la coupe, et un bouton Tout réinitialiser.",
+        "interactionHint": "Changez n, l et m pour voir comment la taille, la forme et les nœuds de l'orbitale changent."
       },
-      "currentDetails": "La simulation est dans son état initial."
+      "currentDetails": "{{state}} de {{ion}}. Énergie {{energy}} électronvolts. Rayon moyen {{radius}} rayons de Bohr. {{radialNodes}} nœuds radiaux et {{angularNodes}} nœuds angulaires.",
+      "controls": {
+        "principal": "Nombre quantique principal n",
+        "principalHelp": "De 1 à 5. Fixe l'énergie et la taille globale de l'orbitale.",
+        "orbital": "Nombre quantique orbital l",
+        "orbitalHelp": "De 0 à n moins 1. Fixe la forme et le nombre de nœuds angulaires.",
+        "magnetic": "Nombre quantique magnétique m",
+        "magneticHelp": "De moins l à l. Fixe l'orientation, ou la vitesse à laquelle la phase tourne autour de l'axe z.",
+        "basis": "Fonctions angulaires",
+        "nuclearChargeHelp": "Une charge plus grande attire l'électron ; l'orbitale rétrécit comme un sur Z.",
+        "zoom": "Zoom",
+        "plane": "Plan de coupe",
+        "offsetHelp": "Déplace la coupe le long de l'axe qui lui est perpendiculaire.",
+        "coloring": "Coloration de la coupe",
+        "complexBasis": "Harmoniques sphériques complexes Y l m",
+        "realBasis": "Orbitales réelles comme p x et d x y",
+        "nuclearCharge": "Charge nucléaire Z"
+      }
     },
     "superposition": {
       "screenSummary": {
@@ -53,6 +114,6 @@
     "title": "Simulation",
     "phaseColormap": "Couleurs de phase",
     "phaseColormapHsv": "Roue des teintes (TSV)",
-    "phaseColormapTwilight": "Crépuscule (perceptuellement uniforme)"
+    "phaseColormapUniform": "Uniforme (luminosité constante)"
   }
 }

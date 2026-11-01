@@ -94,6 +94,54 @@ const QuantumAtom3DColors = {
     default: "#1a1a1a",
     projector: "#1a1a1a",
   }),
+
+  // ── Charts ───────────────────────────────────────────────────────────────────
+
+  /** Plot area behind the P(r) chart. */
+  chartBackgroundColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "chartBackground", {
+    default: "#10172e",
+    projector: "#ffffff",
+  }),
+
+  /** Grid lines inside charts. */
+  chartGridColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "chartGrid", {
+    default: "#2a3558",
+    projector: "#dddddd",
+  }),
+
+  /** The P(r) curve. */
+  radialCurveColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "radialCurve", {
+    default: "#4fc3f7",
+    projector: "#0d47a1",
+  }),
+
+  /** Marker for ⟨r⟩ on the P(r) chart. */
+  meanRadiusColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "meanRadius", {
+    default: "#ffb74d",
+    projector: "#e65100",
+  }),
+
+  /** Markers for nodal surfaces (on the chart and over the cross-section). */
+  nodeMarkerColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "nodeMarker", {
+    default: "#b0bec5",
+    projector: "#546e7a",
+  }),
+
+  // ── Cross-section ─────────────────────────────────────────────────────────────
+  // The heatmap itself is computed from ψ and is deliberately not themed: its
+  // colours are data. Only the chrome around it follows the profile.
+
+  /** Frame around the cross-section heatmap. */
+  sliceFrameColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "sliceFrame", {
+    default: "#5c6b94",
+    projector: "#555555",
+  }),
+
+  /** Node overlay drawn over the heatmap; stays light because the heatmap is dark where ψ is small. */
+  sliceNodeOverlayColorProperty: new ProfileColorProperty(QuantumAtom3DNamespace, "sliceNodeOverlay", {
+    default: "rgba(255,255,255,0.55)",
+    projector: "rgba(255,255,255,0.7)",
+  }),
 };
 
 export default QuantumAtom3DColors;
