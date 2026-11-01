@@ -127,6 +127,9 @@ export class StringManager {
   public getAngularStrings() {
     return stringProperties.angular;
   }
+  public getZeemanStrings() {
+    return stringProperties.zeeman;
+  }
 
   /** Accessibility strings for the Orbitals screen. */
   public getOrbitalsA11yStrings() {

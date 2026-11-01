@@ -1,160 +1,264 @@
-/**
- * ZeemanScreenView.ts
- *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. QuantumAtom3DControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
- */
-
-import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { HBox, Line, Node, RichText, VBox } from "scenerystack/scenery";
+import { ArrowNode, PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
+import { AquaRadioButtonGroup, HSlider, NumberSpinner } from "scenerystack/sun";
+import { atomicFieldToTesla, atomicTimeToFs, hartreeToEv } from "../../common/model/AtomicUnits.js";
+import { orbitalVector } from "../../common/model/angular/VectorModel.js";
+import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
+import {
+  FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+} from "../../common/QuantumAtom3DButtonOptions.js";
+import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
+import { orbitCameraFrame, projectToScreen } from "../../common/view/OrbitCamera.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
+import { polarizationColor, ZeemanDiagramNode } from "./ZeemanDiagramNode.js";
 import { ZeemanScreenSummaryContent } from "./ZeemanScreenSummaryContent.js";
-
-export type ZeemanScreenViewOptions = ScreenViewOptions;
-
+import { ZeemanSpectrumNode } from "./ZeemanSpectrumNode.js";
 export class ZeemanScreenView extends ScreenView {
-  public constructor(model: ZeemanModel, providedOptions?: ZeemanScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See ZeemanScreenSummaryContent for the four content regions.
-    const options = optionize<ZeemanScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
-      {
-        screenSummaryContent: new ZeemanScreenSummaryContent(model),
-      },
-      providedOptions,
+  public constructor(model: ZeemanModel, options?: ScreenViewOptions) {
+    super({ ...options, screenSummaryContent: new ZeemanScreenSummaryContent(model) });
+    const strings = StringManager.getInstance().getZeemanStrings();
+    const text = (value: string | TReadOnlyProperty<string>, maxWidth = 335) =>
+      new RichText(value, { font: new PhetFont(13), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const title = text(strings.diagramStringProperty, 560);
+    title.left = this.layoutBounds.minX + 25;
+    title.top = this.layoutBounds.minY + 15;
+    const subtitle = text(strings.centredStringProperty, 560);
+    subtitle.lineWrap = 560;
+    subtitle.left = title.left;
+    subtitle.top = title.bottom + 5;
+    const diagram = new ZeemanDiagramNode(model);
+    diagram.left = title.left + 5;
+    diagram.top = this.layoutBounds.minY + 70;
+    const fieldValue = new DerivedProperty(
+      [model.fieldProperty, model.capProperty, strings.fieldStringProperty],
+      (field, cap, label) =>
+        `${label}: ${atomicFieldToTesla(field).toPrecision(4)} T / ${atomicFieldToTesla(cap).toPrecision(4)} T`,
     );
-    super(options);
-
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: QuantumAtom3DColors.backgroundColorProperty,
+    const fieldSlider = new HSlider(model.fieldFractionProperty, model.fieldFractionProperty.range, {
+      ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
+      accessibleName: strings.fieldStringProperty,
+      accessibleHelpText: strings.capHelpStringProperty,
+      keyboardStep: 0.01,
+      shiftKeyboardStep: 0.001,
     });
-    this.addChild(backgroundRect);
-
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text(StringManager.getInstance().getScreenNames().zeemanStringProperty, {
-      font: "bold 36px sans-serif",
-      fill: QuantumAtom3DColors.textColorProperty,
-      center: this.layoutBounds.center,
+    model.capProperty.link((cap) => {
+      fieldSlider.pdomMapPDOMValue = (value) => Number(atomicFieldToTesla(cap * value).toPrecision(8));
     });
-    this.addChild(placeholderText);
-
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getZeemanA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.<control>StringProperty,
-    //   });
-    //   this.addChild(exampleButton);
-
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
-    const resetAllButton = new ResetAllButton({
+    const fieldControl = new VBox({ align: "left", spacing: 8, children: [text(fieldValue), fieldSlider] });
+    const modes = new AquaRadioButtonGroup(
+      model.modeProperty,
+      (["normal", "anomalous"] as const).map((value) => ({
+        value,
+        createNode: () => text(strings[`${value}StringProperty`]),
+        options: { accessibleName: strings[`${value}StringProperty`] },
+      })),
+      { orientation: "horizontal", spacing: 14, radioButtonOptions: { radius: 7 } },
+    );
+    const lines = new AquaRadioButtonGroup(
+      model.lineProperty,
+      (["halpha", "lyalpha"] as const).map((value) => ({
+        value,
+        createNode: () => text(value === "halpha" ? "Hα (3 → 2)" : "Lyα (2 → 1)"),
+        options: { accessibleName: value === "halpha" ? "Hα (3 → 2)" : "Lyα (2 → 1)" },
+      })),
+      { orientation: "horizontal", spacing: 14, radioButtonOptions: { radius: 7 } },
+    );
+    const directions = new AquaRadioButtonGroup(
+      model.directionProperty,
+      (["perpendicular", "along"] as const).map((value) => ({
+        value,
+        createNode: () => text(strings[`${value}StringProperty`]),
+        options: { accessibleName: strings[`${value}StringProperty`] },
+      })),
+      { spacing: 8, radioButtonOptions: { radius: 7 } },
+    );
+    const spinner = (
+      property: typeof model.nuclearChargeProperty,
+      range: TReadOnlyProperty<import("scenerystack/dot").Range>,
+      name: TReadOnlyProperty<string>,
+      offset = 0,
+    ) =>
+      new NumberSpinner(property, range, {
+        arrowsPosition: "leftRight",
+        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
+        numberDisplayOptions: {
+          textOptions: { font: new PhetFont(14) },
+          numberFormatter: (value) => `${value + offset}`,
+          minBackgroundWidth: 40,
+        },
+        accessibleName: name,
+      });
+    const capLabel = text(strings.capStringProperty);
+    capLabel.lineWrap = 335;
+    model.modeProperty.link((mode) => {
+      capLabel.visible = mode === "anomalous";
+    });
+    const controls = new VBox({
+      align: "left",
+      spacing: 14,
+      children: [
+        modes,
+        lines,
+        new HBox({
+          spacing: 10,
+          children: [
+            text(strings.chargeStringProperty),
+            spinner(
+              model.nuclearChargeProperty,
+              model.nuclearChargeProperty.rangeProperty,
+              strings.chargeStringProperty,
+            ),
+          ],
+        }),
+        fieldControl,
+        capLabel,
+        text(strings.viewStringProperty),
+        directions,
+        new HBox({
+          spacing: 10,
+          children: [
+            text(strings.selectedStringProperty),
+            spinner(model.selectedIndexProperty, model.selectedRangeProperty, strings.selectedStringProperty, 1),
+          ],
+        }),
+      ],
+      left: this.layoutBounds.maxX - 365,
+      top: this.layoutBounds.minY + 20,
+    });
+    const selected = new DerivedProperty(
+      [model.upperLevelsProperty, model.selectedIndexProperty, model.modeProperty],
+      (levels, index, mode) => {
+        const level = levels[index];
+        return level
+          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${level.g.toFixed(3)}, E=${hartreeToEv(level.energy).toFixed(8)} eV`
+          : "";
+      },
+    );
+    const selectedLabel = text(selected);
+    selectedLabel.left = controls.left;
+    selectedLabel.top = this.layoutBounds.minY + 370;
+    const spectrumTitle = text(
+      new DerivedProperty(
+        [model.transitionsProperty, strings.spectrumStringProperty],
+        (transitions, label) => `${label}: ${distinctPhotonEnergies(transitions).length}`,
+      ),
+      550,
+    );
+    spectrumTitle.left = title.left;
+    spectrumTitle.top = this.layoutBounds.minY + 465;
+    const spectrum = new ZeemanSpectrumNode(500, model);
+    spectrum.left = title.left + 20;
+    spectrum.top = spectrumTitle.bottom + 8;
+    const legend = new HBox({
+      spacing: 25,
+      children: (["pi", "sigmaPlus", "sigmaMinus"] as const).map(
+        (value, index) =>
+          new RichText(["π (Δm=0)", "σ⁺ (Δm=+1)", "σ⁻ (Δm=−1)"][index] ?? "", {
+            font: new PhetFont(12),
+            fill: polarizationColor(value),
+          }),
+      ),
+    });
+    legend.left = title.left;
+    legend.top = spectrum.bottom + 6;
+    const period = new DerivedProperty(
+      [
+        model.upperLevelsProperty,
+        model.selectedIndexProperty,
+        model.fieldProperty,
+        strings.periodStringProperty,
+        strings.offStringProperty,
+      ],
+      (levels, index, field, label, off) => {
+        const level = levels[index];
+        if (!level || field === 0) {
+          return off;
+        }
+        const q = model.modeProperty.value === "normal" ? level.l : level.j;
+        if (q === 0) {
+          return `${label}: — (L=0)`;
+        }
+        return `${label}: ${atomicTimeToFs((4 * Math.PI) / (level.g * field)).toPrecision(4)} fs`;
+      },
+    );
+    const periodLabel = text(period, 335);
+    periodLabel.left = controls.left;
+    periodLabel.top = this.layoutBounds.minY + 435;
+    const axis = new Line(0, 50, 0, -50, { stroke: QuantumAtom3DColors.textColorProperty });
+    const arrow = new ArrowNode(0, 0, 20, -20, {
+      fill: QuantumAtom3DColors.radialCurveColorProperty,
+      stroke: null,
+      tailWidth: 3,
+      headWidth: 10,
+      headHeight: 10,
+    });
+    const precession = new Node({ children: [axis, arrow], x: controls.left + 70, y: this.layoutBounds.minY + 525 });
+    const update = () => {
+      const level = model.upperLevelsProperty.value[model.selectedIndexProperty.value];
+      if (!level) {
+        return;
+      }
+      const q = model.modeProperty.value === "normal" ? level.l : level.j;
+      arrow.visible = q > 0;
+      const [x, y] = projectToScreen(orbitCameraFrame(0.3, 0.2), orbitalVector(q, level.m, model.phaseProperty.value));
+      const scale = 45 / Math.max(1, Math.sqrt(q * (q + 1)));
+      if (q > 0) {
+        arrow.setTailAndTip(0, 0, x * scale, -y * scale);
+      }
+    };
+    model.phaseProperty.link(update);
+    model.upperLevelsProperty.link(update);
+    model.selectedIndexProperty.link(update);
+    const playback = new TimeControlNode(model.timer.isPlayingProperty, {
+      playPauseStepButtonOptions: {
+        ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
+        stepForwardButtonOptions: {
+          ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
+          listener: () => {
+            model.phaseProperty.value =
+              (model.phaseProperty.value + 0.05 * model.fieldFractionProperty.value) % (2 * Math.PI);
+          },
+        },
+      },
+    });
+    playback.left = controls.left + 145;
+    playback.centerY = precession.y;
+    const note = text(strings.noteStringProperty, 920);
+    note.left = title.left;
+    note.bottom = this.layoutBounds.maxY - 12;
+    const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
-        this.reset();
       },
-      right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
-      bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
+      right: this.layoutBounds.maxX - 18,
+      bottom: this.layoutBounds.maxY - 18,
     });
-    this.addChild(resetAllButton);
-
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
     this.addChild(
       new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
+        children: [
+          title,
+          subtitle,
+          diagram,
+          controls,
+          selectedLabel,
+          spectrumTitle,
+          spectrum,
+          legend,
+          periodLabel,
+          precession,
+          playback,
+          note,
+          reset,
         ],
       }),
     );
+    this.pdomControlAreaNode.pdomOrder = [controls, playback, reset];
   }
-
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
-  public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
-  }
-
-  // ── Accessibility / listeners: dispose ─────────────────────────────────────
-  // ScreenView is `isDisposable: false` and lives for the whole sim, so this
-  // class rarely needs dispose(). Child Nodes (and a live currentDetails
-  // DerivedProperty you own on a short-lived object) do. When you add
-  // DerivedProperty / Multilink / Property.link against model state, keep the
-  // references and tear them down — forks copy what they see. Pattern:
-  //
-  // private readonly disposeZeemanScreenView: () => void;
-  //
-  // // in the constructor, after creating the listeners:
-  // const statusMultilink = Multilink.multilink(
-  //   [model.someProperty, model.otherProperty],
-  //   (a, b) => { /* update view from model */ },
-  // );
-  // const detailsProperty = new DerivedProperty(
-  //   [model.stateProperty],
-  //   (state) => `State: ${state}`,
-  // ); // → pass as currentDetailsContent in ZeemanScreenSummaryContent
-  // const onExternal = (v: number) => { /* … */ };
-  // model.externalProperty.link(onExternal); // Property you do NOT own
-  //
-  // this.disposeZeemanScreenView = () => {
-  //   statusMultilink.dispose();                 // Multilink you created
-  //   detailsProperty.dispose();                 // DerivedProperty you created
-  //   model.externalProperty.unlink(onExternal); // undo external link
-  // };
-  //
-  // public override dispose(): void {
-  //   this.disposeZeemanScreenView();
-  //   super.dispose();
-  // }
 }

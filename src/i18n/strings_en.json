@@ -128,11 +128,11 @@
     },
     "zeeman": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The diagram shows magnetic sublevels grouped by l and j, labelled with their zero-field energies. Lines show transitions from the selected upper level. The spectrum shows positions of all allowed transitions.",
+        "controlArea": "Choose normal or anomalous splitting, spectral series, charge, magnetic field, viewing direction and upper level. Play or step the schematic Larmor precession.",
+        "interactionHint": "Along the magnetic field, only sigma components are visible. The anomalous mode restricts the field to its labelled weak-field cap."
       },
-      "currentDetails": "The simulation is in its initial state."
+      "currentDetails": "Field {{field}} tesla, cap {{cap}} tesla. {{count}} distinct spectral positions."
     },
     "oscillator": {
       "screenSummary": {
@@ -186,5 +186,23 @@
     "note": "Schematic quantum vector model; animation speed is illustrative. These vectors are not electron trajectories.",
     "upper": "j = l + ½",
     "lower": "j = |l − ½|"
+  },
+  "zeeman": {
+    "diagram": "Magnetic sublevels",
+    "centred": "Each l,j group is centred on its labelled zero-field energy; shifts are magnified.",
+    "field": "Magnetic field",
+    "normal": "Normal (spinless)",
+    "anomalous": "Anomalous (fine structure)",
+    "charge": "Nuclear charge Z",
+    "perpendicular": "Perpendicular to B",
+    "along": "Along B (σ only)",
+    "view": "Viewing direction",
+    "selected": "Upper level",
+    "cap": "Weak-field cap: largest magnetic shift ≤ 5% of the smallest fine-structure gap.",
+    "capHelp": "The slider spans zero to the labelled cap. Changing mode, line or charge changes that cap.",
+    "spectrum": "Spectral positions (nm)",
+    "period": "Larmor period",
+    "off": "B = 0: no Larmor precession",
+    "note": "Line positions only; intensities, Lamb and hyperfine shifts omitted. Precession animation speed is illustrative."
   }
 }
