@@ -19,6 +19,9 @@ import { TimeModel } from "../src/common/TimeModel.js";
 import { OrbitalViewportNode } from "../src/common/view/OrbitalViewportNode.js";
 import { OrbitCamera } from "../src/common/view/OrbitCamera.js";
 import { OrbitalsModel } from "../src/orbitals/model/OrbitalsModel.js";
+import { OscillatorModel } from "../src/oscillator/model/OscillatorModel.js";
+import { BasisOverlapNode } from "../src/oscillator/view/BasisOverlapNode.js";
+import { OscillatorViewportNode } from "../src/oscillator/view/OscillatorViewportNode.js";
 import type { PhaseColormap } from "../src/QuantumAtom3DConstants.js";
 import { CoefficientRow, SuperpositionModel } from "../src/superposition/model/SuperpositionModel.js";
 import { ExpectationTimeSeriesNode } from "../src/superposition/view/ExpectationTimeSeriesNode.js";
@@ -34,8 +37,12 @@ const colormap = new Property<PhaseColormap>("hsv");
 const superpositionModel = new SuperpositionModel();
 const angularModel = new AngularMomentumModel();
 const zeemanModel = new ZeemanModel();
+const oscillatorModel = new OscillatorModel();
 
 describeDisposalLeaks([
+  { name: "OscillatorModel", create: () => new OscillatorModel() },
+  { name: "OscillatorViewportNode", create: () => new OscillatorViewportNode(320, oscillatorModel, colormap) },
+  { name: "BasisOverlapNode", create: () => new BasisOverlapNode(oscillatorModel) },
   { name: "ZeemanModel", create: () => new ZeemanModel() },
   { name: "ZeemanDiagramNode", create: () => new ZeemanDiagramNode(zeemanModel) },
   { name: "ZeemanSpectrumNode", create: () => new ZeemanSpectrumNode(500, zeemanModel) },

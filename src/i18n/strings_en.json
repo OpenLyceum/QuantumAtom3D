@@ -136,11 +136,11 @@
     },
     "oscillator": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "The 3D view shows oscillator states in reduced coordinates. The overlap matrix compares the Cartesian and spherical bases. Rows are Cartesian; columns are spherical.",
+        "controlArea": "Choose shell N, the rendered basis and a state in each basis. Row and column selectors highlight one overlap coefficient. Rotate, zoom or select volume or isosurface rendering.",
+        "interactionHint": "The overlap matrix uses colour strength for squared magnitude. The complex coefficient is read separately. The two bases span the same degenerate energy shell."
       },
-      "currentDetails": "The simulation is in its initial state."
+      "currentDetails": "N={{N}}; E={{energy}} ℏω; d={{count}}; {{basis}}. (nₓ,nᵧ,n_z)=({{cart}}); (nᵣ,l,m)=({{sphere}}); ⟨cart|sph⟩={{re}} + ({{im}})i."
     }
   },
   "preferences": {
@@ -204,5 +204,16 @@
     "period": "Larmor period",
     "off": "B = 0: no Larmor precession",
     "note": "Line positions only; intensities, Lamb and hyperfine shifts omitted. Precession animation speed is illustrative."
+  },
+  "oscillator": {
+    "units": "Lengths: √(ℏ/mω); energies: ℏω",
+    "shell": "Shell N",
+    "cartesian": "Cartesian",
+    "spherical": "Spherical",
+    "cartState": "Cartesian state (nₓ,nᵧ,n_z)",
+    "sphereState": "Spherical state (nᵣ,l,m)",
+    "overlap": "|⟨Cartesian|spherical⟩|²: colour strength 0 → 1",
+    "comparison": "Oscillator / hydrogen degeneracy",
+    "note": "Columns: (nᵣ,l,m); rows: (nₓ,nᵧ,n_z). Oscillator SU(3), hydrogen SO(4). Isosurface: approximately 90%."
   }
 }

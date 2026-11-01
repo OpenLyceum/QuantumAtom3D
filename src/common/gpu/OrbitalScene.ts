@@ -19,16 +19,18 @@
  */
 
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
+import { MAX_N } from "../../QuantumAtom3DConstants.js";
 import { sphericalHarmonicPrefactor } from "../model/math/sphericalHarmonics.js";
 import type { NodalSurfaceSet } from "../model/orbital/NodalSurfaces.js";
 import type { OrbitalTerm } from "../model/orbital/OrbitalTerm.js";
 import { radialRowIndex } from "../model/orbital/RadialLookupTable.js";
 import type { Point3 } from "../model/orbital/RaySurfaces.js";
 import type { RenderMode } from "../model/orbital/RenderMode.js";
+import { oscillatorRowIndex } from "../model/oscillator/OscillatorStates.js";
 import type { CameraFrame } from "../view/OrbitCamera.js";
 
 /** Most terms a scene can carry (the uniform block has room for exactly this many). */
-export const MAX_RENDER_TERMS = 8;
+export const MAX_RENDER_TERMS = 16;
 
 /** Ray-march samples across the sphere's diameter. */
 export const RENDER_STEPS = 128;
@@ -36,12 +38,13 @@ export const RENDER_STEPS = 128;
 /** Optical depth per unit amplitude across one sphere radius. */
 export const VOLUME_OPACITY_GAIN = 4;
 
-/** Six vec4s, eight terms of two vec4s, then seven render/overlay vec4s (464 bytes). */
+/** Six vec4s, sixteen terms of two vec4s, then seven render/overlay vec4s (720 bytes). */
 export const PARAMS_BYTES = 13 * 16 + MAX_RENDER_TERMS * 2 * 16;
 
 export type OrbitalColoring = "phase" | "density";
 
 export type OrbitalScene = {
+  readonly family?: "hydrogen" | "oscillator";
   readonly opacityGain?: number;
   readonly nodes?: NodalSurfaceSet;
   readonly cuttingPlane?: { readonly normal: Point3; readonly offset: number };
@@ -82,7 +85,12 @@ export function packParams(scene: OrbitalScene, frame: CameraFrame, resolution: 
   floats.set([...frame.up, 0], 4);
   floats.set([...frame.forward, 0], 8);
   floats.set(
-    [scene.nuclearCharge, scene.inversePeakAmplitude, scene.opacityGain ?? VOLUME_OPACITY_GAIN, scene.radius],
+    [
+      scene.family === "oscillator" ? 1 : scene.nuclearCharge,
+      scene.inversePeakAmplitude,
+      scene.opacityGain ?? VOLUME_OPACITY_GAIN,
+      scene.radius,
+    ],
     12,
   );
   const termCount = Math.min(scene.terms.length, MAX_RENDER_TERMS);
@@ -114,6 +122,10 @@ export function packParams(scene: OrbitalScene, frame: CameraFrame, resolution: 
     }
     const base = 24 + 8 * k;
     floats.set([term.re, term.im, sphericalHarmonicPrefactor(term.l, term.m), 0], base);
-    ints.set([term.n, term.l, term.m, radialRowIndex(term.n, term.l)], base + 4);
+    const row =
+      scene.family === "oscillator"
+        ? radialRowIndex(MAX_N + 1, 0) + oscillatorRowIndex(term.n, term.l)
+        : radialRowIndex(term.n, term.l);
+    ints.set([term.n, term.l, term.m, row], base + 4);
   }
 }

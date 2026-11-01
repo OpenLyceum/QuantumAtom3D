@@ -9,6 +9,7 @@
  */
 
 export type OrbitalTerm = {
+  /** Principal n for hydrogen; radial n_r for oscillator terms. */
   readonly n: number;
   readonly l: number;
   readonly m: number;

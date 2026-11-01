@@ -130,6 +130,9 @@ export class StringManager {
   public getZeemanStrings() {
     return stringProperties.zeeman;
   }
+  public getOscillatorStrings() {
+    return stringProperties.oscillator;
+  }
 
   /** Accessibility strings for the Orbitals screen. */
   public getOrbitalsA11yStrings() {
