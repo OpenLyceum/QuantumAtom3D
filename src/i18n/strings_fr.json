@@ -128,11 +128,11 @@
     },
     "zeeman": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "Le diagramme montre les sous-niveaux magnétiques groupés par l et j et leurs énergies sans champ. Les lignes partent du niveau supérieur sélectionné. Le spectre montre toutes les transitions permises.",
+        "controlArea": "Choisissez le mode, la série, la charge, le champ, la direction et le niveau supérieur. Animez la précession de Larmor schématique.",
+        "interactionHint": "Selon le champ, seules les composantes sigma sont visibles. Le mode anomal limite le champ au régime faible indiqué."
       },
-      "currentDetails": "La simulation est dans son état initial."
+      "currentDetails": "Champ {{field}} teslas, limite {{cap}} teslas. {{count}} positions spectrales distinctes."
     },
     "oscillator": {
       "screenSummary": {
@@ -186,5 +186,23 @@
     "note": "Modèle vectoriel quantique schématique ; vitesse illustrative. Ces vecteurs ne sont pas des trajectoires électroniques.",
     "upper": "j = l + ½",
     "lower": "j = |l − ½|"
+  },
+  "zeeman": {
+    "diagram": "Sous-niveaux magnétiques",
+    "centred": "Chaque groupe l,j est centré sur son énergie sans champ indiquée ; les déplacements sont agrandis.",
+    "field": "Champ magnétique",
+    "normal": "Normal (sans spin)",
+    "anomalous": "Anomal (structure fine)",
+    "charge": "Charge nucléaire Z",
+    "perpendicular": "Perpendiculaire à B",
+    "along": "Selon B (σ seulement)",
+    "view": "Direction d’observation",
+    "selected": "Niveau supérieur",
+    "cap": "Champ faible : déplacement magnétique maximal ≤ 5 % du plus petit écart de structure fine.",
+    "capHelp": "Le curseur va de zéro à la limite indiquée. Le mode, la raie et la charge modifient cette limite.",
+    "spectrum": "Positions spectrales (nm)",
+    "period": "Période de Larmor",
+    "off": "B = 0 : aucune précession de Larmor",
+    "note": "Positions seules ; intensités, déplacements de Lamb et hyperfins omis. Vitesse de précession illustrative."
   }
 }

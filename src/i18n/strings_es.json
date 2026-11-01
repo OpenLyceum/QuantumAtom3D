@@ -128,11 +128,11 @@
     },
     "zeeman": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "El diagrama muestra subniveles magnéticos agrupados por l y j con sus energías sin campo. Las líneas parten del nivel superior elegido. El espectro muestra todas las transiciones permitidas.",
+        "controlArea": "Elige modo, serie, carga, campo, dirección y nivel superior. Reproduce la precesión de Larmor esquemática.",
+        "interactionHint": "A lo largo del campo solo se ven componentes sigma. El modo anómalo limita el campo al régimen débil indicado."
       },
-      "currentDetails": "La simulación está en su estado inicial."
+      "currentDetails": "Campo {{field}} teslas, límite {{cap}} teslas. {{count}} posiciones espectrales distintas."
     },
     "oscillator": {
       "screenSummary": {
@@ -186,5 +186,23 @@
     "note": "Modelo vectorial cuántico esquemático; velocidad ilustrativa. Estos vectores no son trayectorias electrónicas.",
     "upper": "j = l + ½",
     "lower": "j = |l − ½|"
+  },
+  "zeeman": {
+    "diagram": "Subniveles magnéticos",
+    "centred": "Cada grupo l,j se centra en su energía sin campo indicada; los desplazamientos se amplían.",
+    "field": "Campo magnético",
+    "normal": "Normal (sin espín)",
+    "anomalous": "Anómalo (estructura fina)",
+    "charge": "Carga nuclear Z",
+    "perpendicular": "Perpendicular a B",
+    "along": "A lo largo de B (solo σ)",
+    "view": "Dirección de observación",
+    "selected": "Nivel superior",
+    "cap": "Campo débil: desplazamiento magnético máximo ≤ 5 % de la menor separación de estructura fina.",
+    "capHelp": "El deslizador va de cero al límite indicado. El modo, la línea y la carga cambian ese límite.",
+    "spectrum": "Posiciones espectrales (nm)",
+    "period": "Período de Larmor",
+    "off": "B = 0: sin precesión de Larmor",
+    "note": "Solo posiciones; se omiten intensidades y desplazamientos de Lamb e hiperfinos. Velocidad de precesión ilustrativa."
   }
 }

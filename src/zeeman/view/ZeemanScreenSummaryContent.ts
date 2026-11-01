@@ -1,41 +1,27 @@
-/**
- * ZeemanScreenSummaryContent.ts
- *
- * The accessible screen summary read by screen readers (SceneryStack's
- * Interactive Description). It appears at the top of the parallel DOM and gives
- * a non-visual user a way to orient themselves and to re-read the simulation's
- * current state at any time.
- *
- * A summary has four regions (all optional, but provide at least the first
- * three in every sim for consistency across OpenLyceum):
- *   - playAreaContent       — what the play area contains
- *   - controlAreaContent    — what the controls do
- *   - currentDetailsContent — a LIVE paragraph describing current state
- *   - interactionHintContent — a short hint on how to get started
- *
- * ── Making "current details" live ─────────────────────────────────────────────
- * The template has no model state, so currentDetails is a static string. In a
- * real sim, build a DerivedProperty over the relevant model Properties and pass
- * it as `currentDetailsContent` so the paragraph updates as the sim runs.
- * See LunarLander/src/.../LunarLanderScreenSummaryContent.ts for the pattern.
- * If that DerivedProperty (or any Multilink) is owned by a short-lived object,
- * dispose it on teardown — see the commented dispose() stub in ZeemanScreenView.
- */
+import { DerivedProperty } from "scenerystack/axon";
+import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
+import { atomicFieldToTesla } from "../../common/model/AtomicUnits.js";
+import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
-
 export class ZeemanScreenSummaryContent extends ScreenSummaryContent {
-  // `model` is unused in the template but kept in the signature so real sims can
-  // derive a live currentDetailsContent from it without changing call sites.
-  public constructor(_model: ZeemanModel) {
-    const a11y = StringManager.getInstance().getZeemanA11yStrings();
-
+  public constructor(model: ZeemanModel) {
+    const s = StringManager.getInstance().getZeemanA11yStrings();
+    const details = new DerivedProperty(
+      [model.fieldProperty, model.capProperty, model.transitionsProperty, s.currentDetailsStringProperty],
+      (field, cap, transitions, pattern) =>
+        StringUtils.fillIn(pattern, {
+          field: atomicFieldToTesla(field).toPrecision(4),
+          cap: atomicFieldToTesla(cap).toPrecision(4),
+          count: distinctPhotonEnergies(transitions).length,
+        }),
+    );
     super({
-      playAreaContent: a11y.screenSummary.playAreaStringProperty,
-      controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: a11y.currentDetailsStringProperty,
-      interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
+      playAreaContent: s.screenSummary.playAreaStringProperty,
+      controlAreaContent: s.screenSummary.controlAreaStringProperty,
+      interactionHintContent: s.screenSummary.interactionHintStringProperty,
+      currentDetailsContent: details,
     });
   }
 }

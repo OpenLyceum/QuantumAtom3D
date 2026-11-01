@@ -216,3 +216,22 @@ Unit tests cover vector lengths, closure, projection, uncertainty bounds and spi
 all allowed l<=4 states. The shared memory harness checks model and diagram/plot disposal.
 Browser tests cover clamps, half-integer controls, playback, reset, keyboard help, pointer fuzz
 and keyboard fuzz. The earlier M4 isosurface screenshot discrepancy remains unresolved.
+
+## Zeeman (M6)
+
+The screen offers normal/anomalous mode, Halpha/Lyman-alpha series, charge Z=1–6,
+viewing direction, field and selected upper sublevel. Models keep magnetic field in atomic
+units. The field slider stores a fraction of the current cap; its visible and accessible values
+are mapped to teslas. The cap updates when mode, charge or series changes.
+
+Each l,j group is centred independently on its labelled zero-field energy, with magnetic
+shifts magnified on a common scale. Thus the diagram displays splitting rather than the
+absolute optical energy gap. Lines originate at the selected upper sublevel. The spectrum
+includes every allowed transition, in three polarization rows, on a wavelength axis whose
+bounds correspond to the current cap. Degenerate sublevels collapse at B=0.
+
+Changing series briefly produces intermediate property states. Same-shell optical transitions
+are rejected and an empty intermediate spectrum is safely skipped. Tests cover this path,
+field-unit accessibility, weak-field scaling, polarization filtering, playback and reset.
+Unit physics tests include Landé factors, Dirac limits, normal triplets, the ten anomalous
+Lyman-alpha positions, wavelength shifts and field caps. No GPU is needed.

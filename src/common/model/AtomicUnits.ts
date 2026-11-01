@@ -44,6 +44,14 @@ export function atomicTimeToFs(time: number): number {
   return time * ATOMIC_TIME_IN_FS;
 }
 
+/** Atomic magnetic field: mu_B B = B_atomic/2 hartrees. */
+export function teslaToAtomicField(field: number): number {
+  return (2 * BOHR_MAGNETON_EV_PER_T * field) / HARTREE_IN_EV;
+}
+export function atomicFieldToTesla(field: number): number {
+  return (field * HARTREE_IN_EV) / (2 * BOHR_MAGNETON_EV_PER_T);
+}
+
 /** Photon wavelength in nanometres for a transition energy in hartrees (sign ignored). */
 export function wavelengthNmForEnergy(energy: number): number {
   return HC_EV_NM / Math.abs(hartreeToEv(energy));

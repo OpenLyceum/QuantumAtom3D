@@ -136,3 +136,28 @@ The polar plot shows density per solid angle, without the sin(theta) integration
 Its plotted radius is normalized to its maximum. In spin mode it traces over spin: the two
 orbital m values are mj-1/2 and mj+1/2, weighted by their Clebsch-Gordan probabilities.
 The uncoupled uncertainty formula is hidden in spin mode because it does not describe |j,mj>.
+
+## Zeeman screen
+
+Normal mode is a spinless model with energy shift m_l B/2 in atomic units (mu_B=1/2).
+Anomalous mode uses Dirac-Coulomb binding energies plus g_j m_j B/2, with the LS-coupling
+Landé factor and g_s=2. Hyperfine structure, Lamb shifts, finite nuclear mass, the electron
+anomalous magnetic moment, quadratic diamagnetism and line intensities are omitted.
+
+The anomalous field cap limits the largest absolute magnetic shift to 5% of the smallest
+nonzero fine-structure gap within any participating (n,l) pair. It scales approximately as Z^4
+and changes with the spectral series. This is a conservative fine-structure weak-field model;
+it does not describe the Paschen–Back crossover or hyperfine Zeeman patterns.
+
+Optical transitions obey Delta l=±1, Delta j=0,±1 and Delta m=0,±1. Polarizations use
+q=m_upper-m_lower for the emitted photon relative to +B: pi for q=0, sigma± for q=±1.
+Viewing along B removes pi transitions. Spectrum marks denote wavelength positions only;
+coincident transitions are not assigned a summed intensity. Halpha and Lyman-alpha labels
+identify the hydrogenic series; the model's infinite nuclear mass shifts absolute wavelengths
+slightly from measured hydrogen values.
+
+Larmor angular frequency is g B/2 in atomic units. The readout gives its physical period;
+animated precession uses an illustrative speed. All tesla/eV/nm/fs conversion stays in AtomicUnits.
+
+References: [NIST Zeeman compendium](https://www.nist.gov/pml/atomic-spectroscopy-compendium-basic-ideas-notation-data-and-formulas/atomic-spectroscopy-zeeman),
+[MIT hydrogen fine-structure notes](https://ocw.mit.edu/courses/8-06-quantum-physics-iii-spring-2018/439fc15f7ed10dd76c69dc3f7fea600e_MIT8_06S18ch2.pdf).

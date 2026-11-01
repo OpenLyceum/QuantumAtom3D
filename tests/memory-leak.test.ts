@@ -23,6 +23,9 @@ import type { PhaseColormap } from "../src/QuantumAtom3DConstants.js";
 import { CoefficientRow, SuperpositionModel } from "../src/superposition/model/SuperpositionModel.js";
 import { ExpectationTimeSeriesNode } from "../src/superposition/view/ExpectationTimeSeriesNode.js";
 import { SuperpositionViewportNode } from "../src/superposition/view/SuperpositionViewportNode.js";
+import { ZeemanModel } from "../src/zeeman/model/ZeemanModel.js";
+import { ZeemanDiagramNode } from "../src/zeeman/view/ZeemanDiagramNode.js";
+import { ZeemanSpectrumNode } from "../src/zeeman/view/ZeemanSpectrumNode.js";
 import { describeDisposalLeaks } from "./helpers/memoryLeak.js";
 
 // These outlive the viewport, so the test detects listeners left on external state.
@@ -30,8 +33,12 @@ const viewportModel = new OrbitalsModel();
 const colormap = new Property<PhaseColormap>("hsv");
 const superpositionModel = new SuperpositionModel();
 const angularModel = new AngularMomentumModel();
+const zeemanModel = new ZeemanModel();
 
 describeDisposalLeaks([
+  { name: "ZeemanModel", create: () => new ZeemanModel() },
+  { name: "ZeemanDiagramNode", create: () => new ZeemanDiagramNode(zeemanModel) },
+  { name: "ZeemanSpectrumNode", create: () => new ZeemanSpectrumNode(500, zeemanModel) },
   { name: "AngularMomentumModel", create: () => new AngularMomentumModel() },
   { name: "AngularMomentumDiagramNode", create: () => new AngularMomentumDiagramNode(angularModel) },
   { name: "AngularDensityNode", create: () => new AngularDensityNode(angularModel) },
