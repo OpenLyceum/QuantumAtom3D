@@ -70,7 +70,7 @@ reference implementation: a browser spec compares GPU and CPU pixels.
 
 **Other CPU-side work:**
 
-- A 64³ density grid, used only to turn an enclosed-probability fraction into an iso level.
+- Cooperative spherical cubature, used only to turn an enclosed-probability fraction into an iso level.
 - The 128² slice heatmap.
 - The Monte Carlo sampler: inverse-CDF sampling for eigenstates, Metropolis for superpositions, seeded.
 - Analytic node positions, found by bisection.
@@ -96,10 +96,10 @@ readouts and the cross-section with its plane/offset controls. The right column 
   GPU uses instanced circular billboards; CPU uses depth-sorted canvas circles. CPU dots are drawn
   in one frame, so their overlay workload does not have the volume renderer's row budget.
 - **Isosurfaces.** The first crossing of a 90% or 95% density threshold is refined by bisection and
-  shaded with the density gradient. A camera-independent 64³ midpoint grid spans the radius
+  shaded with the density gradient. A camera-independent weighted spherical grid spans the radius
   containing 99.99% of the radial probability. The selected fraction is of the probability captured
-  by this finite grid, so it is approximate. Grid and thresholds are cached across camera, zoom and
-  colour changes. Dense-grid construction is synchronous on state changes.
+  by this finite grid, so it is approximate. Thresholds are cached across camera, zoom and
+  colour changes. Sampling and threshold search yield between animation frames.
 - **Surfaces.** Radial spheres, polar half-cones (or the equatorial plane), and real-basis azimuthal
   planes use analytic ray intersections. Translucent events are composited in depth order with the
   volume, isosurface or dots. The cutting plane samples ψ at its exact intersection. Its blue handle
@@ -196,9 +196,11 @@ history holds the most recent 600 samples, with instantaneous values in the scre
 
 Probability dots use independence Metropolis-Hastings with the incoherent mixture as proposal.
 Initial clouds receive 16 sweeps; evolving clouds receive two sweeps per update at about 10 Hz.
+The sweeps are now divided across animation frames with the seeded sequence preserved.
 They are stochastic probability samples; finite sweeps can lag rapid state changes. CPU animated
-scenes update at about 10 Hz and refine while paused. Iso thresholds use the finite 64³ density grid,
-refreshed at most four times per second during playback. Grid construction is synchronous.
+scenes update at about 10 Hz and refine while paused. Iso thresholds use weighted spherical cubature. During playback one snapshot completes before
+another is requested, at least 250 ms apart; a threshold may lag the current phase. Pausing
+supersedes pending work with the current state. Sampling and threshold search are cooperative.
 
 M4 validation includes analytic dipole amplitude/period, breathing, norm conservation, hybrid
 orthonormality, coherent-sampler moments, disposal checks, CPU/GPU pixel comparisons and browser
@@ -256,8 +258,8 @@ Cartesian (4,0,0) requires nine terms, exceeding the original eight-slot plan. H
 the default Wavefunction family. Oscillator CPU and GPU paths use the same term expansions.
 
 The oscillator offers volume and approximately 90% isosurface modes, a phase/density legend,
-orbit and zoom controls. Isosurfaces use a 64³ grid in a fixed reduced-coordinate box. Peak
-normalization is a coarse 3D visualization estimate. The degeneracy comparison excludes spin
+orbit and zoom controls. Isosurfaces use weighted spherical cubature with reduced radius 6. Cartesian peak
+normalization uses separable 1D maxima; spherical states factor radial and angular maxima. The degeneracy comparison excludes spin
 and pairs oscillator shell N with hydrogen principal number n=N+1 to show their growth.
 
 ### Display validation
@@ -295,5 +297,22 @@ returns to the launch state, retaining dialog preferences. quality/lengthUnit/sh
 seed their corresponding preferences. No persistence beyond the session is added.
 
 Release tagging and real low-end/mobile performance measurements remain separate follow-up
-work. Isosurface grid construction remains synchronous, and the superposition phase control
+work. The superposition phase control
 is a keyboard-accessible slider rather than the dial sketched in the original plan.
+
+## Final review and portrait layout
+
+See [the functional review](review-2026-11-01.md) for findings, measurements, sources and
+remaining human/device release checks. Runtime surfaces use square-root radial cubature
+and Gauss-Legendre angular quadrature, rather than the original uniform 64³ box. The
+legacy Cartesian grid remains an independent test/reference utility. A weighted bisection
+search avoids a synchronous full-array sort. Density work and Metropolis sweeps yield
+after small batches, with a nominal 4 ms scheduling budget. Paused state changes replace
+pending jobs, so an obsolete job cannot publish a threshold or dot cloud.
+
+`ResponsiveScreenView` retains each screen's desktop node matrices and groups the same
+nodes into a portrait VBox. It clips the column, scrolls on wheel/touch, and reveals focused
+PDOM controls. It restores desktop parentage and traversal order on rotation. Screen views,
+portrait toolbar controls, and their shared sim/preferences links live for the entire sim.
+The compact display dialog uses physical-window bounds; it does not inherit the desktop
+popup scaling. The default framework footer remains available.

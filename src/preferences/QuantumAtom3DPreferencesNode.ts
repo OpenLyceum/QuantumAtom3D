@@ -6,7 +6,7 @@
  * quantumAtom3DQueryParameters).
  */
 
-import { Text, VBox } from "scenerystack/scenery";
+import { RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { AquaRadioButtonGroup, Checkbox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
 import type { Tandem } from "scenerystack/tandem";
@@ -17,7 +17,7 @@ import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
 import type { QuantumAtom3DPreferencesModel } from "./QuantumAtom3DPreferencesModel.js";
 
 export class QuantumAtom3DPreferencesNode extends VBox {
-  public constructor(preferencesModel: QuantumAtom3DPreferencesModel, tandem?: Tandem) {
+  public constructor(preferencesModel: QuantumAtom3DPreferencesModel, tandem?: Tandem, compact = false) {
     const prefStrings = StringManager.getInstance().getPreferences();
 
     // The Preferences dialog is always white, so use the dark "light control surface"
@@ -33,8 +33,12 @@ export class QuantumAtom3DPreferencesNode extends VBox {
       fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
     });
 
-    const createItemText = (stringProperty: typeof prefStrings.phaseColormapHsvStringProperty): Text =>
-      new Text(stringProperty, { font: new PhetFont(14), fill: QuantumAtom3DColors.controlSurfaceTextColorProperty });
+    const createItemText = (stringProperty: typeof prefStrings.phaseColormapHsvStringProperty): RichText =>
+      new RichText(stringProperty, {
+        font: new PhetFont(14),
+        fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
+        ...(compact && { lineWrap: 260 }),
+      });
 
     const colormapRadioButtons = new VerticalAquaRadioButtonGroup<PhaseColormap>(
       preferencesModel.phaseColormapProperty,
@@ -65,7 +69,11 @@ export class QuantumAtom3DPreferencesNode extends VBox {
         createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
         options: { accessibleName: prefStrings[`${value}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 12, accessibleName: prefStrings.lengthUnitStringProperty },
+      {
+        orientation: compact ? "vertical" : "horizontal",
+        spacing: 12,
+        accessibleName: prefStrings.lengthUnitStringProperty,
+      },
     );
     const qualityButtons = new AquaRadioButtonGroup(
       preferencesModel.qualityProperty,
@@ -74,7 +82,11 @@ export class QuantumAtom3DPreferencesNode extends VBox {
         createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
         options: { accessibleName: prefStrings[`${value}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 12, accessibleName: prefStrings.qualityStringProperty },
+      {
+        orientation: compact ? "vertical" : "horizontal",
+        spacing: 12,
+        accessibleName: prefStrings.qualityStringProperty,
+      },
     );
     const formulas = new Checkbox(
       preferencesModel.showFormulasProperty,

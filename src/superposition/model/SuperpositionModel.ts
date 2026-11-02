@@ -118,6 +118,9 @@ export class SuperpositionModel implements TModel {
 
   /** Single-step advances even while paused, unlike the normal animation callback. */
   public advance(dt: number): void {
+    if (!Number.isFinite(dt) || dt <= 0) {
+      return;
+    }
     this.timeProperty.value += Math.max(0, dt) * this.speedProperty.value;
   }
   public step(dt: number): void {

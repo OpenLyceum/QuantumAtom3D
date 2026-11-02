@@ -3,7 +3,7 @@ import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "sc
 import { Bounds2, Dimension2, type Range } from "scenerystack/dot";
 import { AlignBox, HBox, Node, RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
-import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider, NumberSpinner, RectangularPushButton } from "scenerystack/sun";
 import { atomicTimeToFs, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
 import { hydrogenEnergy } from "../../common/model/hydrogen/HydrogenExpectations.js";
@@ -19,6 +19,7 @@ import {
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
 import { formatLength, lengthUnitSymbol } from "../../common/view/formatters.js";
+import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
@@ -35,7 +36,7 @@ type Options = ScreenViewOptions & {
 };
 const FONT = new PhetFont(13);
 const SIZE = 340;
-export class SuperpositionScreenView extends ScreenView {
+export class SuperpositionScreenView extends ResponsiveScreenView {
   public readonly viewport: SuperpositionViewportNode;
   public constructor(model: SuperpositionModel, options: Options) {
     super({
@@ -167,9 +168,16 @@ export class SuperpositionScreenView extends ScreenView {
           },
         }),
     );
-    const presetRow = new HBox({ spacing: 6, children: presetButtons });
-    const rowBox = (children: Node[]) =>
-      new HBox({
+    const presetBox = new HBox({ spacing: 6, lineSpacing: 8, children: presetButtons });
+    const presetRow = new Node({ children: [presetBox] });
+    this.portraitProperty.link((portrait) => {
+      presetBox.wrap = portrait;
+      presetBox.preferredWidth = portrait ? 340 : null;
+    });
+    const rowBox = (children: Node[]) => {
+      const box = new HBox({
+        wrap: false,
+        lineSpacing: 12,
         spacing: 7,
         children: children.map(
           (child, index) =>
@@ -180,10 +188,25 @@ export class SuperpositionScreenView extends ScreenView {
             }),
         ),
       });
+      this.portraitProperty.link((portrait) => {
+        box.wrap = portrait;
+        box.preferredWidth = portrait ? 340 : null;
+      });
+      return new Node({ children: [box] });
+    };
     const coefficientSlider = (property: NumberProperty, name: TReadOnlyProperty<string>) =>
       new VBox({
         spacing: 1,
-        children: [text(new DerivedProperty([property], (value) => value.toFixed(2))), slider(property, name, 95)],
+        children: [
+          new RichText(name, {
+            font: new PhetFont(11),
+            fill: QuantumAtom3DColors.textColorProperty,
+            maxWidth: 110,
+            visibleProperty: this.portraitProperty,
+          }),
+          text(new DerivedProperty([property], (value) => value.toFixed(2))),
+          slider(property, name, 95),
+        ],
       });
     const rows = model.rows.map((row, index) => {
       const name = (label: TReadOnlyProperty<string>) =>
@@ -262,11 +285,21 @@ export class SuperpositionScreenView extends ScreenView {
       right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
       bottom: this.layoutBounds.maxY - SCREEN_VIEW_MARGIN,
     });
-    this.addChild(
-      new Node({ children: [viewport, timeLabel, below, mixer, normalization, statusLabel, chart, reset] }),
-    );
+    const content = new Node({
+      children: [viewport, timeLabel, below, mixer, normalization, statusLabel, chart, reset],
+    });
+    this.addChild(content);
     this.pdomPlayAreaNode.pdomOrder = [viewport];
     this.pdomControlAreaNode.pdomOrder = [mixer, below, reset];
+    this.setResponsiveContent(content, [
+      [viewport, timeLabel],
+      [below],
+      [mixer],
+      [normalization],
+      [statusLabel],
+      [chart],
+      [reset],
+    ]);
   }
   public override step(_dt: number): void {
     this.viewport.step();

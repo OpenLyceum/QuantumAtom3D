@@ -2,7 +2,7 @@ import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import type { Range } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
-import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider, NumberSpinner } from "scenerystack/sun";
 import {
   cartesianExpansion,
@@ -16,6 +16,7 @@ import {
   FLAT_RESET_ALL_BUTTON_OPTIONS,
 } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
+import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
@@ -29,7 +30,7 @@ export type OscillatorScreenViewOptions = ScreenViewOptions & {
   preferences?: QuantumAtom3DPreferencesModel;
   phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
 };
-export class OscillatorScreenView extends ScreenView {
+export class OscillatorScreenView extends ResponsiveScreenView {
   public readonly viewport: OscillatorViewportNode;
   public constructor(model: OscillatorModel, options: OscillatorScreenViewOptions) {
     super({ ...options, screenSummaryContent: new OscillatorScreenSummaryContent(model) });
@@ -212,25 +213,21 @@ export class OscillatorScreenView extends ScreenView {
       right: this.layoutBounds.maxX - 18,
       bottom: this.layoutBounds.maxY - 18,
     });
-    this.addChild(
-      new Node({
-        children: [
-          viewport,
-          title,
-          below,
-          controls,
-          energy,
-          matrixTitle,
-          coefficientLabel,
-          overlap,
-          ladder,
-          note,
-          reset,
-        ],
-      }),
-    );
+    const content = new Node({
+      children: [viewport, title, below, controls, energy, matrixTitle, coefficientLabel, overlap, ladder, note, reset],
+    });
+    this.addChild(content);
     this.pdomPlayAreaNode.pdomOrder = [viewport];
     this.pdomControlAreaNode.pdomOrder = [controls, below, reset];
+    this.setResponsiveContent(content, [
+      [viewport, title],
+      [below],
+      [controls, energy],
+      [matrixTitle, coefficientLabel, overlap],
+      [ladder],
+      [note],
+      [reset],
+    ]);
   }
   public override step(_dt: number): void {
     this.viewport.step();

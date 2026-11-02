@@ -1,5 +1,11 @@
 /** One canvas image at the Scenery/render-engine boundary, following HeatTransfer FieldNode. */
-import { Multilink, StringUnionProperty, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
+import {
+  BooleanProperty,
+  Multilink,
+  StringUnionProperty,
+  type TReadOnlyProperty,
+  type UnknownMultilink,
+} from "scenerystack/axon";
 import { Bounds2, type Vector2 } from "scenerystack/dot";
 import type { OneKeyStroke } from "scenerystack/scenery";
 import { Circle, DragListener, Image, KeyboardListener, Line, Node, Rectangle, Text } from "scenerystack/scenery";
@@ -13,18 +19,19 @@ import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import { createOrbitalRenderer } from "../gpu/createOrbitalRenderer.js";
 import type { OrbitalRenderer } from "../gpu/OrbitalRenderer.js";
 import { hydrogenEnclosingRadius } from "../model/hydrogen/HydrogenRadial.js";
-import { buildDensityGrid, type DensityGrid, enclosedProbabilityLevel } from "../model/orbital/EnclosedProbability.js";
 import { peakDensity } from "../model/orbital/PeakDensity.js";
 import { sampleEigenstate } from "../model/orbital/ProbabilitySampler.js";
 import { DOT_COUNT } from "../model/orbital/RenderMode.js";
 import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
 import { OrbitCamera, projectToScreen, type Vec3 } from "./OrbitCamera.js";
+import { ProgressiveSurface } from "./ProgressiveSurface.js";
 
 const KEYBOARD_ANGLE = Math.PI / 36;
 const DRAG_ANGLE = 0.008;
 const AXIS_LENGTH = 28;
 
 export class OrbitalViewportNode extends Node {
+  public readonly surfacePendingProperty = new BooleanProperty(false);
   public readonly camera = new OrbitCamera();
   public readonly engine: OrbitalRenderer;
   public readonly backendProperty: StringUnionProperty<"gpu" | "cpu">;
@@ -32,6 +39,8 @@ export class OrbitalViewportNode extends Node {
   private readonly links: UnknownMultilink[];
   private readonly dragListener: DragListener;
   private readonly keyboardListener: KeyboardListener<readonly OneKeyStroke[]>;
+  private readonly model: OrbitalsModel;
+  private readonly surface = new ProgressiveSurface();
   private sceneDirty = true;
   private cameraDirty = true;
   private readonly updateScene: () => void;
@@ -56,6 +65,7 @@ export class OrbitalViewportNode extends Node {
       touchArea: new Bounds2(0, 0, size, size),
     });
     this.quality = quality;
+    this.model = model;
     this.engine = createOrbitalRenderer();
     this.backendProperty = new StringUnionProperty<"gpu" | "cpu">(this.engine.backend, {
       validValues: ["gpu", "cpu"],
@@ -90,6 +100,18 @@ export class OrbitalViewportNode extends Node {
         pickable: false,
       }),
     );
+    this.addChild(
+      new Text(strings.surfacePendingStringProperty, {
+        font: new PhetFont(12),
+        fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+        left: 10,
+        top: 10,
+        maxWidth: size - 20,
+        visibleProperty: this.surfacePendingProperty,
+        tagName: "p",
+        accessibleParagraph: strings.surfacePendingStringProperty,
+      }),
+    );
     const axes = (["x", "y", "z"] as const).map((name, index) => {
       const direction = [0, 0, 0];
       direction[index] = 1;
@@ -107,16 +129,14 @@ export class OrbitalViewportNode extends Node {
     // Cache normalization across camera, colour and zoom changes. Compute it once per state.
     let lastWavefunction = model.wavefunctionProperty.value;
     let peak = peakDensity(lastWavefunction);
-    let grid: DensityGrid | null = null;
-    const isoLevels = new Map<number, number>();
+
     let points: Float32Array | undefined;
     this.updateScene = () => {
       const wavefunction = model.wavefunctionProperty.value;
       if (wavefunction !== lastWavefunction) {
         lastWavefunction = wavefunction;
         peak = peakDensity(wavefunction);
-        grid = null;
-        isoLevels.clear();
+
         points = undefined;
       }
       const { n, l, m, basis, nuclearCharge } = model.summaryProperty.value;
@@ -124,13 +144,7 @@ export class OrbitalViewportNode extends Node {
       if (mode === "dots" && !points) {
         points = sampleEigenstate(n, l, m, basis, nuclearCharge, DOT_COUNT, quantumAtom3DQueryParameters.seed);
       }
-      if (mode === "isosurface" && !grid) {
-        grid = buildDensityGrid(wavefunction, hydrogenEnclosingRadius(n, l, nuclearCharge, 0.9999));
-      }
-      const fraction = model.enclosedFractionProperty.value;
-      if (mode === "isosurface" && grid && !isoLevels.has(fraction)) {
-        isoLevels.set(fraction, enclosedProbabilityLevel(grid, fraction));
-      }
+      this.surfacePendingProperty.value = mode === "isosurface" && this.surface.pending;
       this.engine.setScene({
         ...(model.nodes3DVisibleProperty.value && { nodes: model.summaryProperty.value.nodes }),
         ...(model.cuttingPlaneVisibleProperty.value && {
@@ -141,9 +155,9 @@ export class OrbitalViewportNode extends Node {
           QuantumAtom3DColors.sliceNodeOverlayColorProperty.value.green / 255,
           QuantumAtom3DColors.sliceNodeOverlayColorProperty.value.blue / 255,
         ],
-        mode,
+        mode: mode === "isosurface" && this.surface.level === 0 ? "volume" : mode,
         ...(points && { points }),
-        isoLevel: isoLevels.get(fraction) ?? 0,
+        isoLevel: this.surface.level,
         terms: wavefunction.terms,
         nuclearCharge: wavefunction.nuclearCharge,
         inversePeakAmplitude: peak > 0 ? 1 / Math.sqrt(peak) : 0,
@@ -280,6 +294,22 @@ export class OrbitalViewportNode extends Node {
     if (this.quality) {
       this.engine.setQuality?.(this.quality.value);
     }
+    if (this.model.renderModeProperty.value === "isosurface") {
+      const { n, l, nuclearCharge } = this.model.summaryProperty.value;
+      const previousLevel = this.surface.level;
+      this.surface.step(
+        this.model.wavefunctionProperty.value,
+        hydrogenEnclosingRadius(n, l, nuclearCharge, 0.9999),
+        this.model.enclosedFractionProperty.value,
+      );
+      this.surfacePendingProperty.value = this.surface.pending;
+      if (this.surface.level !== previousLevel) {
+        this.sceneDirty = true;
+      }
+    } else if (this.surface.pending) {
+      this.surface.reset();
+      this.surfacePendingProperty.value = false;
+    }
     if (this.sceneDirty) {
       this.updateScene();
       this.sceneDirty = false;
@@ -308,6 +338,7 @@ export class OrbitalViewportNode extends Node {
     this.dragListener.dispose();
     this.keyboardListener.dispose();
     this.engine.dispose();
+    this.surfacePendingProperty.dispose();
     this.camera.dispose();
     this.backendProperty.dispose();
     for (const child of this.children.slice()) {

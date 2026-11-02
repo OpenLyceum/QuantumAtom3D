@@ -116,3 +116,22 @@ export const OSCILLATOR_RADIAL_STATES = Array.from({ length: 5 }, (_, N) =>
 export function oscillatorRowIndex(nr: number, l: number): number {
   return OSCILLATOR_RADIAL_STATES.findIndex((s) => s.nr === nr && s.l === l);
 }
+
+const cartesianPeaks = new Map<number, number>();
+/** Product of independent one-dimensional maxima; avoids a 3D normalization grid on shell changes. */
+export function cartesianPeakDensity(state: CartesianState): number {
+  return state.reduce((peak, n) => {
+    let one = cartesianPeaks.get(n);
+    if (one === undefined) {
+      one = 0;
+      const samples = 4000;
+      for (let i = 0; i <= samples; i++) {
+        const x = (6 * i) / samples;
+        const h = hermite(n, x);
+        one = Math.max(one, (h * h * Math.exp(-x * x)) / (Math.sqrt(Math.PI) * 2 ** n * factorial(n)));
+      }
+      cartesianPeaks.set(n, one);
+    }
+    return peak * one;
+  }, 1);
+}

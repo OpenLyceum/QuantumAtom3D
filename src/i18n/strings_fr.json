@@ -73,7 +73,9 @@
       "probe": "Rayon sondé",
       "probeHelp": "Déplacez le curseur radial et affichez la sphère correspondante dans la vue 3D. Zéro masque la sphère.",
       "nodes": "Nœuds 3D",
-      "angularTab": "Yₗₘ"
+      "angularTab": "Yₗₘ",
+      "surfacePending": "Calcul de l’isosurface…",
+      "samplingPending": "Échantillonnage des points…"
     },
     "presets": {
       "title": "États prédéfinis",
@@ -88,6 +90,12 @@
       "title": "Densité de probabilité angulaire",
       "description": "Coupe polaire à φ = {{phi}}°. Le rayon montre la densité angulaire normalisée à son maximum. Densité par angle solide, sans le facteur d’intégration sin θ.",
       "phi": "Coupe angulaire φ"
+    },
+    "mobile": {
+      "scroll": "Faire défiler la page",
+      "help": "Utilisez la barre, la molette ou balayez hors des commandes. Flèche bas descend ; flèche haut monte. Le focus clavier révèle les commandes.",
+      "screen": "Écran",
+      "settings": "Réglages d’affichage"
     }
   },
   "a11y": {

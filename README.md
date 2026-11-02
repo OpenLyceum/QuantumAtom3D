@@ -31,6 +31,7 @@ isotropic 3D oscillator.
 - Preferences for phase colours, rendering quality, length units and the angular-tab formula.
   Share an initial orbital with, for example, `?screens=1&n=3&l=2&m=0&Z=2&basis=real&lengthUnit=pm`.
   Invalid dependent quantum numbers are clamped; Reset All returns to the URL's initial state.
+- Portrait layout with scrolling, focus reveal, screen navigation and compact display settings.
 - English, Spanish and French. Default and projector colour profiles. Installable as a PWA.
 
 ## Quick Start

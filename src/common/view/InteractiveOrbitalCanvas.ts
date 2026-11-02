@@ -1,5 +1,11 @@
 /** Shared canvas/camera boundary for time-dependent orbital screens. Scene construction stays outside. */
-import { Multilink, type NumberProperty, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
+import {
+  BooleanProperty,
+  Multilink,
+  type NumberProperty,
+  type TReadOnlyProperty,
+  type UnknownMultilink,
+} from "scenerystack/axon";
 import { Bounds2, type Vector2 } from "scenerystack/dot";
 import {
   DragListener,
@@ -20,6 +26,8 @@ import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
 import { OrbitCamera, projectToScreen, type Vec3 } from "./OrbitCamera.js";
 
 export class InteractiveOrbitalCanvas extends Node {
+  public readonly samplingPendingProperty = new BooleanProperty(false);
+  public readonly surfacePendingProperty = new BooleanProperty(false);
   public readonly engine = createOrbitalRenderer();
   public readonly camera = new OrbitCamera();
   private readonly canvasImage: Image;
@@ -50,6 +58,30 @@ export class InteractiveOrbitalCanvas extends Node {
         pickable: false,
       }),
     ];
+    this.addChild(
+      new Text(strings.surfacePendingStringProperty, {
+        font: new PhetFont(12),
+        fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+        left: 10,
+        top: 10,
+        maxWidth: size - 20,
+        visibleProperty: this.surfacePendingProperty,
+        tagName: "p",
+        accessibleParagraph: strings.surfacePendingStringProperty,
+      }),
+    );
+    this.addChild(
+      new Text(strings.samplingPendingStringProperty, {
+        font: new PhetFont(12),
+        fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
+        left: 10,
+        top: 10,
+        maxWidth: size - 20,
+        visibleProperty: this.samplingPendingProperty,
+        tagName: "p",
+        accessibleParagraph: strings.samplingPendingStringProperty,
+      }),
+    );
     const axes = (["x", "y", "z"] as const).map((name, index) => {
       const direction: Vec3 = [index === 0 ? 1 : 0, index === 1 ? 1 : 0, index === 2 ? 1 : 0];
       const line = new Line(0, 0, 0, 0, { stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty, pickable: false });
@@ -126,6 +158,8 @@ export class InteractiveOrbitalCanvas extends Node {
     this.keys.dispose();
     this.camera.dispose();
     this.engine.dispose();
+    this.surfacePendingProperty.dispose();
+    this.samplingPendingProperty.dispose();
     for (const child of this.children.slice()) {
       child.dispose();
     }
