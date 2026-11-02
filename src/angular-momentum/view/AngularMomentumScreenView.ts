@@ -2,7 +2,7 @@ import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "sc
 import type { Range } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
-import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, Checkbox, HSlider, NumberSpinner } from "scenerystack/sun";
 import { angularMagnitude, orbitalUncertaintyProduct } from "../../common/model/angular/VectorModel.js";
 import {
@@ -14,6 +14,7 @@ import {
   QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
   QUANTUM_ATOM_3D_SLIDER_OPTIONS,
 } from "../../common/QuantumAtom3DControlOptions.js";
+import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
@@ -21,7 +22,7 @@ import { AngularDensityNode } from "./AngularDensityNode.js";
 import { AngularMomentumDiagramNode } from "./AngularMomentumDiagramNode.js";
 import { AngularMomentumScreenSummaryContent } from "./AngularMomentumScreenSummaryContent.js";
 export type AngularMomentumScreenViewOptions = ScreenViewOptions;
-export class AngularMomentumScreenView extends ScreenView {
+export class AngularMomentumScreenView extends ResponsiveScreenView {
   public constructor(model: AngularMomentumModel, options?: ScreenViewOptions) {
     super({ ...options, screenSummaryContent: new AngularMomentumScreenSummaryContent(model) });
     const strings = StringManager.getInstance().getAngularStrings();
@@ -154,11 +155,19 @@ export class AngularMomentumScreenView extends ScreenView {
       right: this.layoutBounds.maxX - 20,
       bottom: this.layoutBounds.maxY - 20,
     });
-    this.addChild(
-      new Node({
-        children: [diagram, title, readout, controls, phase, density, densityTitle, densityHelp, note, reset],
-      }),
-    );
+    const content = new Node({
+      children: [diagram, title, readout, controls, phase, density, densityTitle, densityHelp, note, reset],
+    });
+    this.addChild(content);
     this.pdomControlAreaNode.pdomOrder = [controls, phase, reset];
+    this.setResponsiveContent(content, [
+      [title, diagram],
+      [readout],
+      [controls],
+      [phase],
+      [densityTitle, density, densityHelp],
+      [note],
+      [reset],
+    ]);
   }
 }

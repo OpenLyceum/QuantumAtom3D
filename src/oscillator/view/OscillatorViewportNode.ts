@@ -1,8 +1,9 @@
 import type { TReadOnlyProperty } from "scenerystack/axon";
-import { buildDensityGrid, enclosedProbabilityLevel } from "../../common/model/orbital/EnclosedProbability.js";
 import { peakDensity } from "../../common/model/orbital/PeakDensity.js";
 import type { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
+import { cartesianPeakDensity, cartesianStates } from "../../common/model/oscillator/OscillatorStates.js";
 import { InteractiveOrbitalCanvas } from "../../common/view/InteractiveOrbitalCanvas.js";
+import { ProgressiveSurface } from "../../common/view/ProgressiveSurface.js";
 import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
@@ -12,7 +13,7 @@ export class OscillatorViewportNode extends InteractiveOrbitalCanvas {
   private lastWave: Wavefunction | null = null;
   private style = "";
   private inversePeak = 0;
-  private isoLevel = 0;
+  private readonly surface = new ProgressiveSurface();
   public constructor(
     size: number,
     model: OscillatorModel,
@@ -30,14 +31,19 @@ export class OscillatorViewportNode extends InteractiveOrbitalCanvas {
     const style = `${model.modeProperty.value},${model.coloringProperty.value},${model.viewHalfWidthProperty.value},${this.palette.value}`;
     if (changed) {
       this.lastWave = wave;
-      const peak = peakDensity(wave);
+      const state = cartesianStates(model.shellProperty.value)[model.cartesianIndexProperty.value];
+      const peak = model.basisProperty.value === "cartesian" && state ? cartesianPeakDensity(state) : peakDensity(wave);
       this.inversePeak = peak > 0 ? 1 / Math.sqrt(peak) : 0;
-      this.isoLevel = 0;
+      this.surface.reset();
     }
-    if (changed || style !== this.style) {
-      if (model.modeProperty.value === "isosurface" && this.isoLevel === 0) {
-        this.isoLevel = enclosedProbabilityLevel(buildDensityGrid(wave, 6), 0.9);
-      }
+    const previousLevel = this.surface.level;
+    if (model.modeProperty.value === "isosurface") {
+      this.surface.step(wave, 6);
+    } else if (this.surface.pending) {
+      this.surface.reset();
+    }
+    this.surfacePendingProperty.value = this.surface.pending;
+    if (changed || style !== this.style || this.surface.level !== previousLevel) {
       this.engine.setScene({
         family: "oscillator",
         terms: wave.terms,
@@ -46,8 +52,9 @@ export class OscillatorViewportNode extends InteractiveOrbitalCanvas {
         radius: model.viewHalfWidthProperty.value,
         coloring: model.coloringProperty.value,
         phaseColormap: this.palette.value,
-        mode: model.modeProperty.value,
-        isoLevel: this.isoLevel,
+        mode:
+          model.modeProperty.value === "isosurface" && this.surface.level === 0 ? "volume" : model.modeProperty.value,
+        isoLevel: this.surface.level,
       });
       this.style = style;
     }

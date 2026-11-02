@@ -19,10 +19,15 @@
 // brand.js MUST be first; importing it runs the whole chain (init→assert→splash→brand) before main.
 import "./brand.js";
 
-import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
+import { Property } from "scenerystack/axon";
+import { HBox, RichText } from "scenerystack/scenery";
+import { PhetFont } from "scenerystack/scenery-phet";
+import { Dialog, onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
+import { ComboBox, RectangularPushButton } from "scenerystack/sun";
 import { Tandem } from "scenerystack/tandem";
 import { AngularMomentumScreen } from "./angular-momentum/AngularMomentumScreen.js";
 import { initializeGpuContext } from "./common/gpu/GpuContext.js";
+import { FLAT_PANEL_PUSH_BUTTON_OPTIONS } from "./common/QuantumAtom3DButtonOptions.js";
 import { StringManager } from "./i18n/StringManager.js";
 import { OrbitalsScreen } from "./orbitals/OrbitalsScreen.js";
 import { OscillatorScreen } from "./oscillator/OscillatorScreen.js";
@@ -101,5 +106,67 @@ onReadyToLaunch(async () => {
     },
   });
 
+  // The framework footer follows the desktop scale. Supply full-size portrait navigation without
+  // reaching into its private NavigationBar. These controls and their listeners live for the sim.
+  let mobileSettings: Dialog | null = null;
+  const mobileStrings = stringManager.getOrbitalStrings().mobile;
+  let toolsReady = false;
+  sim.screenBoundsProperty.lazyLink((bounds) => {
+    if (!bounds || toolsReady) {
+      return;
+    }
+    toolsReady = true;
+    for (const screen of screens) {
+      if (!sim.simScreens.includes(screen)) {
+        continue;
+      }
+      const selected = new Property(sim.simScreens[0] ?? screen);
+      sim.selectedScreenProperty.link((value) => {
+        if (sim.simScreens.includes(value)) {
+          selected.value = value;
+        }
+      });
+      selected.lazyLink((value) => {
+        sim.selectedScreenProperty.value = value;
+      });
+      const label = (text: import("scenerystack/axon").TReadOnlyProperty<string>) =>
+        new RichText(text, {
+          font: new PhetFont(13),
+          fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
+          maxWidth: 165,
+        });
+      const selector = new ComboBox(
+        selected,
+        sim.simScreens.map((value) => ({ value, createNode: () => label(value.nameProperty) })),
+        screen.view,
+        {
+          accessibleName: mobileStrings.screenStringProperty,
+        },
+      );
+      const settings = new RectangularPushButton({
+        ...FLAT_PANEL_PUSH_BUTTON_OPTIONS,
+        content: label(mobileStrings.settingsStringProperty),
+        accessibleName: mobileStrings.settingsStringProperty,
+        listener: () => {
+          mobileSettings ??= new Dialog(new QuantumAtom3DPreferencesNode(simPreferences, undefined, true), {
+            accessibleName: mobileStrings.settingsStringProperty,
+            layoutBounds: null,
+            layoutStrategy: (dialog, _bounds, screenBounds) => {
+              dialog.setScaleMagnitude(
+                Math.min(
+                  1,
+                  (screenBounds.width - 24) / dialog.localBounds.width,
+                  (screenBounds.height - 24) / dialog.localBounds.height,
+                ),
+              );
+              dialog.center = screenBounds.center;
+            },
+          });
+          mobileSettings.show();
+        },
+      });
+      screen.view.setPortraitTools(new HBox({ spacing: 12, children: [selector, settings] }));
+    }
+  });
   sim.start();
 });

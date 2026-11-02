@@ -1,11 +1,11 @@
 import type { TReadOnlyProperty } from "scenerystack/axon";
 import { hydrogenEnclosingRadius } from "../../common/model/hydrogen/HydrogenRadial.js";
-import { buildDensityGrid, enclosedProbabilityLevel } from "../../common/model/orbital/EnclosedProbability.js";
 import { MetropolisSampler } from "../../common/model/orbital/MetropolisSampler.js";
 import type { OrbitalTerm } from "../../common/model/orbital/OrbitalTerm.js";
 import { peakDensity } from "../../common/model/orbital/PeakDensity.js";
 import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
 import { InteractiveOrbitalCanvas } from "../../common/view/InteractiveOrbitalCanvas.js";
+import { ProgressiveSurface } from "../../common/view/ProgressiveSurface.js";
 import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import quantumAtom3DQueryParameters from "../../preferences/quantumAtom3DQueryParameters.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
@@ -22,8 +22,11 @@ export class SuperpositionViewportNode extends InteractiveOrbitalCanvas {
   private inversePeak = 0;
   private sampler: MetropolisSampler | null = null;
   private points: Float32Array | undefined;
-  private isoLevel = 0;
-  private lastGridTime = -Infinity;
+  private dotSnapshot: Wavefunction | null = null;
+  private lastDotWave: Wavefunction | null = null;
+  private lastDotTime = -Infinity;
+  private readonly surface = new ProgressiveSurface();
+  private surfaceRadius = 1;
   private lastSceneTime = -Infinity;
   public constructor(
     size: number,
@@ -34,6 +37,37 @@ export class SuperpositionViewportNode extends InteractiveOrbitalCanvas {
     super(size, model.zoomProperty, quality);
     this.model = model;
     this.palette = palette;
+  }
+  private updateDots(
+    terms: readonly OrbitalTerm[],
+    charge: number,
+    wave: Wavefunction,
+    mode: string,
+    playing: boolean,
+    now: number,
+  ): boolean {
+    let pointsChanged = false;
+    if (mode === "dots") {
+      this.sampler ??= new MetropolisSampler(terms, charge, 3000, quantumAtom3DQueryParameters.seed);
+      if (!playing && this.sampler.isUpdating && this.dotSnapshot !== wave) {
+        this.sampler.cancel();
+      }
+      if (!this.sampler.isUpdating && this.lastDotWave !== wave && (!playing || now - this.lastDotTime >= 100)) {
+        this.dotSnapshot = wave;
+        this.sampler.begin(wave, this.points ? 2 : 16);
+      }
+      const points = this.sampler.advance();
+      if (points) {
+        this.points = points;
+        pointsChanged = true;
+        this.lastDotWave = this.dotSnapshot;
+        this.lastDotTime = now;
+      }
+    } else {
+      this.sampler?.cancel();
+    }
+    this.samplingPendingProperty.value = mode === "dots" && !!this.sampler?.isUpdating && !this.points;
+    return pointsChanged;
   }
   public override step(): void {
     const model = this.model;
@@ -57,28 +91,29 @@ export class SuperpositionViewportNode extends InteractiveOrbitalCanvas {
       this.inversePeak = peak > 0 ? 1 / peak : 0;
       this.sampler = null;
       this.points = undefined;
-      this.lastGridTime = -Infinity;
+      this.lastDotWave = null;
+      this.lastDotTime = -Infinity;
+      this.dotSnapshot = null;
+      this.surface.reset();
+      this.surfaceRadius = Math.max(1, ...terms.map((term) => hydrogenEnclosingRadius(term.n, term.l, charge, 0.9999)));
     }
     const playing = model.timer.isPlayingProperty.value;
+    const pointsChanged = this.updateDots(terms, charge, wave, mode, playing, now);
+    const previousLevel = this.surface.level;
+    if (mode === "isosurface") {
+      this.surface.step(wave, this.surfaceRadius, 0.9, playing);
+    } else if (this.surface.pending) {
+      this.surface.reset();
+    }
+    this.surfacePendingProperty.value = this.surface.pending;
     const interval = mode === "dots" ? 100 : this.engine.backend === "cpu" ? 100 : 0;
     if (
       stateChanged ||
+      pointsChanged ||
+      this.surface.level !== previousLevel ||
       style !== this.lastStyle ||
       (wave !== this.lastWave && (!playing || now - this.lastSceneTime >= interval))
     ) {
-      if (mode === "dots") {
-        const fresh = !this.sampler;
-        this.sampler ??= new MetropolisSampler(terms, charge, 3000, quantumAtom3DQueryParameters.seed);
-        this.points = this.sampler.update(wave, fresh ? 16 : 2);
-      }
-      if (
-        mode === "isosurface" &&
-        (stateChanged || mode !== this.lastStyle.split(",")[0] || !playing || now - this.lastGridTime >= 250)
-      ) {
-        const halfWidth = Math.max(1, ...terms.map((term) => hydrogenEnclosingRadius(term.n, term.l, charge, 0.9999)));
-        this.isoLevel = terms.length > 0 ? enclosedProbabilityLevel(buildDensityGrid(wave, halfWidth), 0.9) : 0;
-        this.lastGridTime = now;
-      }
       this.engine.setScene({
         opacityGain: 16,
         terms: wave.terms,
@@ -87,8 +122,8 @@ export class SuperpositionViewportNode extends InteractiveOrbitalCanvas {
         radius: model.viewHalfWidthProperty.value,
         coloring: model.coloringProperty.value,
         phaseColormap: this.palette.value,
-        mode,
-        isoLevel: this.isoLevel,
+        mode: mode === "isosurface" && this.surface.level === 0 ? "volume" : mode,
+        isoLevel: this.surface.level,
         ...(this.points && { points: this.points }),
       });
       this.lastWave = wave;

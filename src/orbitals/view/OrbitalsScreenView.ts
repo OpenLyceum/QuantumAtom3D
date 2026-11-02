@@ -4,7 +4,7 @@ import { Dimension2 } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
-import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
 import { RENDER_MODES } from "../../common/model/orbital/RenderMode.js";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
@@ -15,6 +15,7 @@ import { OrbitalAngularDetailNode } from "../../common/view/OrbitalAngularDetail
 import { OrbitalReadoutPanel } from "../../common/view/OrbitalReadoutPanel.js";
 import { OrbitalViewportNode } from "../../common/view/OrbitalViewportNode.js";
 import { RadialDistributionChartNode } from "../../common/view/RadialDistributionChartNode.js";
+import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { SliceHeatmapNode } from "../../common/view/SliceHeatmapNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
@@ -40,7 +41,7 @@ type SelfOptions = {
 };
 export type OrbitalsScreenViewOptions = SelfOptions & ScreenViewOptions;
 
-export class OrbitalsScreenView extends ScreenView {
+export class OrbitalsScreenView extends ResponsiveScreenView {
   public readonly viewport: OrbitalViewportNode;
 
   public constructor(model: OrbitalsModel, providedOptions: OrbitalsScreenViewOptions) {
@@ -259,6 +260,14 @@ export class OrbitalsScreenView extends ScreenView {
     this.addChild(content);
     this.pdomPlayAreaNode.pdomOrder = [viewport, detailChoice, radialPanel, slicePanel, angularPanel];
     this.pdomControlAreaNode.pdomOrder = [belowViewport, controls, reset];
+    this.setResponsiveContent(content, [
+      [title, scaleLabel, viewport],
+      [belowViewport],
+      [controls],
+      [detailChoice],
+      [radialPanel, slicePanel, angularPanel],
+      [reset],
+    ]);
   }
 
   public override step(_dt: number): void {

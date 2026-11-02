@@ -56,6 +56,9 @@ export class ZeemanModel {
     });
   }
   public step(dt: number): void {
+    if (!Number.isFinite(dt) || dt <= 0) {
+      return;
+    }
     if (this.timer.isPlayingProperty.value) {
       this.phaseProperty.value =
         (this.phaseProperty.value + Math.max(0, dt) * 2 * this.fieldFractionProperty.value) % (2 * Math.PI);

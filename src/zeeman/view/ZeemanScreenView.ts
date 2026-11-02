@@ -1,7 +1,7 @@
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { HBox, Line, Node, RichText, VBox } from "scenerystack/scenery";
 import { ArrowNode, PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
-import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider, NumberSpinner } from "scenerystack/sun";
 import { atomicFieldToTesla, atomicTimeToFs, hartreeToEv } from "../../common/model/AtomicUnits.js";
 import { orbitalVector } from "../../common/model/angular/VectorModel.js";
@@ -13,13 +13,14 @@ import {
 } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { orbitCameraFrame, projectToScreen } from "../../common/view/OrbitCamera.js";
+import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
 import { polarizationColor, ZeemanDiagramNode } from "./ZeemanDiagramNode.js";
 import { ZeemanScreenSummaryContent } from "./ZeemanScreenSummaryContent.js";
 import { ZeemanSpectrumNode } from "./ZeemanSpectrumNode.js";
-export class ZeemanScreenView extends ScreenView {
+export class ZeemanScreenView extends ResponsiveScreenView {
   public constructor(model: ZeemanModel, options?: ScreenViewOptions) {
     super({ ...options, screenSummaryContent: new ZeemanScreenSummaryContent(model) });
     const strings = StringManager.getInstance().getZeemanStrings();
@@ -240,25 +241,33 @@ export class ZeemanScreenView extends ScreenView {
       right: this.layoutBounds.maxX - 18,
       bottom: this.layoutBounds.maxY - 18,
     });
-    this.addChild(
-      new Node({
-        children: [
-          title,
-          subtitle,
-          diagram,
-          controls,
-          selectedLabel,
-          spectrumTitle,
-          spectrum,
-          legend,
-          periodLabel,
-          precession,
-          playback,
-          note,
-          reset,
-        ],
-      }),
-    );
+    const content = new Node({
+      children: [
+        title,
+        subtitle,
+        diagram,
+        controls,
+        selectedLabel,
+        spectrumTitle,
+        spectrum,
+        legend,
+        periodLabel,
+        precession,
+        playback,
+        note,
+        reset,
+      ],
+    });
+    this.addChild(content);
     this.pdomControlAreaNode.pdomOrder = [controls, playback, reset];
+    this.setResponsiveContent(content, [
+      [title, subtitle, diagram],
+      [controls, selectedLabel],
+      [spectrumTitle, spectrum, legend],
+      [periodLabel],
+      [precession, playback],
+      [note],
+      [reset],
+    ]);
   }
 }

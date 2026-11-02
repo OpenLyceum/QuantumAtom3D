@@ -18,7 +18,8 @@ for (const profile of ["default", "projector"]) {
     await page.evaluate(
       `${model}.shellProperty.value=4;${model}.cartesianIndexProperty.value=14;${model}.modeProperty.value='isosurface'`,
     );
-    await page.waitForTimeout(500);
+    await expect.poll(() => page.evaluate(`${viewport}.surfacePendingProperty.value`)).toBe(false);
+    await expect.poll(() => page.evaluate(`${viewport}.surface.level > 0`)).toBe(true);
     const clip = await page.evaluate<{ x: number; y: number; width: number; height: number }>(
       `(()=>{const v=${viewport};const a=v.localToGlobalPoint(v.localBounds.center.copy().setXY(0,0));const b=v.localToGlobalPoint(v.localBounds.center.copy().setXY(320,320));return {x:a.x,y:a.y,width:b.x-a.x,height:b.y-a.y};})()`,
     );

@@ -38,19 +38,51 @@ export class MetropolisSampler {
       0,
     );
   }
+  private pending: { wave: Wavefunction; index: number; remaining: number } | null = null;
+  public get isUpdating(): boolean {
+    return this.pending !== null;
+  }
+  public begin(wave: Wavefunction, sweeps: number): void {
+    this.pending = { wave, index: 0, remaining: (sweeps * this.positions.length) / 3 };
+  }
+  public cancel(): void {
+    this.pending = null;
+  }
+  public advance(budget = 4): Float32Array | null {
+    if (!this.pending) {
+      return null;
+    }
+    const end = performance.now() + budget;
+    while (this.pending.remaining > 0) {
+      const batch = Math.min(64, this.pending.remaining);
+      for (let count = 0; count < batch; count++) {
+        this.move(this.pending.wave, this.pending.index);
+        this.pending.index = (this.pending.index + 3) % this.positions.length;
+      }
+      this.pending.remaining -= batch;
+      if (performance.now() >= end && this.pending.remaining > 0) {
+        return null;
+      }
+    }
+    this.pending = null;
+    return this.positions.slice();
+  }
+  private move(wavefunction: Wavefunction, i: number): void {
+    const old: Point3 = [this.positions[i] ?? 0, this.positions[i + 1] ?? 0, this.positions[i + 2] ?? 0];
+    const next = this.propose();
+    const previousDensity = wavefunction.density(...old, this.sample);
+    const targetDensity = wavefunction.density(...next, this.sample);
+    const denominator = previousDensity * this.proposalDensity(next);
+    const numerator = targetDensity * this.proposalDensity(old);
+    if (denominator === 0 || this.random.nextDouble() * denominator < numerator) {
+      this.positions.set(next, i);
+    }
+  }
   /** Target can change in time; recompute old densities so acceptance always uses the current state. */
   public update(wavefunction: Wavefunction, sweeps = 1): Float32Array {
     for (let sweep = 0; sweep < sweeps; sweep++) {
       for (let i = 0; i < this.positions.length; i += 3) {
-        const old: Point3 = [this.positions[i] ?? 0, this.positions[i + 1] ?? 0, this.positions[i + 2] ?? 0];
-        const next = this.propose();
-        const previousDensity = wavefunction.density(...old, this.sample);
-        const targetDensity = wavefunction.density(...next, this.sample);
-        const denominator = previousDensity * this.proposalDensity(next);
-        const numerator = targetDensity * this.proposalDensity(old);
-        if (denominator === 0 || this.random.nextDouble() * denominator < numerator) {
-          this.positions.set(next, i);
-        }
+        this.move(wavefunction, i);
       }
     }
     // A new identity makes the renderer upload the evolved cloud.

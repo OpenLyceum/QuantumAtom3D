@@ -73,7 +73,9 @@
       "probe": "Radio explorado",
       "probeHelp": "Mueve el cursor radial y resalta la esfera correspondiente en la vista 3D. Cero oculta la esfera.",
       "nodes": "Nodos 3D",
-      "angularTab": "Yₗₘ"
+      "angularTab": "Yₗₘ",
+      "surfacePending": "Calculando la isosuperficie…",
+      "samplingPending": "Muestreando puntos de probabilidad…"
     },
     "presets": {
       "title": "Estados predefinidos",
@@ -88,6 +90,12 @@
       "title": "Densidad de probabilidad angular",
       "description": "Sección polar en φ = {{phi}}°. El radio muestra la densidad angular normalizada a su máximo. Densidad por ángulo sólido, sin el factor de integración sin θ.",
       "phi": "Sección angular φ"
+    },
+    "mobile": {
+      "scroll": "Desplazar la página",
+      "help": "Use la barra, la rueda o deslice fuera de los controles. Flecha abajo baja; flecha arriba sube. El foco del teclado muestra los controles.",
+      "screen": "Pantalla",
+      "settings": "Ajustes de imagen"
     }
   },
   "a11y": {

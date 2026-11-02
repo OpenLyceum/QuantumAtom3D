@@ -73,7 +73,9 @@
       "probe": "Probe radius",
       "probeHelp": "Move the radial cursor and highlight the corresponding spherical shell in the 3D view. Zero hides the shell.",
       "nodes": "3D nodes",
-      "angularTab": "Yₗₘ"
+      "angularTab": "Yₗₘ",
+      "surfacePending": "Calculating isosurface…",
+      "samplingPending": "Sampling probability dots…"
     },
     "presets": {
       "title": "State presets",
@@ -88,6 +90,12 @@
       "title": "Angular probability density",
       "description": "Polar section at φ = {{phi}}°. Radius shows angular density, normalized to its peak. This is density per solid angle, without the sin θ integration weight.",
       "phi": "Angular section φ"
+    },
+    "mobile": {
+      "scroll": "Scroll page",
+      "help": "Use the scroll bar, wheel, or swipe outside controls. Down Arrow scrolls down; Up Arrow scrolls up. Keyboard focus brings controls into view.",
+      "screen": "Screen",
+      "settings": "Display settings"
     }
   },
   "a11y": {

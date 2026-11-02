@@ -63,6 +63,9 @@ export class TimeModel {
    * Call this from your model's step() method.
    */
   public step(dt: number): void {
+    if (!Number.isFinite(dt) || dt <= 0) {
+      return;
+    }
     if (this.isPlayingProperty.value) {
       this.timeProperty.value += dt;
     }
