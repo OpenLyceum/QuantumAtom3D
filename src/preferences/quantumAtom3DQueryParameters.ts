@@ -10,26 +10,32 @@
 
 import { logGlobal } from "scenerystack/phet-core";
 import { QueryStringMachine } from "scenerystack/query-string-machine";
-import { DEFAULT_PHASE_COLORMAP, PHASE_COLORMAP_VALUES } from "../QuantumAtom3DConstants.js";
+import {
+  DEFAULT_PHASE_COLORMAP,
+  INITIAL_L,
+  INITIAL_M,
+  INITIAL_N,
+  PHASE_COLORMAP_VALUES,
+} from "../QuantumAtom3DConstants.js";
 import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
 
 const quantumAtom3DQueryParameters = QueryStringMachine.getAll({
   /** Initial orbital state. Dependent quantum numbers are clamped to valid ranges. */
   n: {
     type: "number",
-    defaultValue: 2,
+    defaultValue: INITIAL_N,
     isValidValue: (v: number) => Number.isInteger(v) && v >= 1 && v <= 5,
     public: true,
   },
   l: {
     type: "number",
-    defaultValue: 1,
+    defaultValue: INITIAL_L,
     isValidValue: (v: number) => Number.isInteger(v) && v >= 0 && v <= 4,
     public: true,
   },
   m: {
     type: "number",
-    defaultValue: 0,
+    defaultValue: INITIAL_M,
     isValidValue: (v: number) => Number.isInteger(v) && Math.abs(v) <= 4,
     public: true,
   },

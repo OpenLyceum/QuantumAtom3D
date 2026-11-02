@@ -38,7 +38,7 @@ function encodeSrgb(linear: number): number {
 }
 
 /** OKLab → encoded sRGB (Björn Ottosson's matrices). */
-export function oklabToSrgb(lightness: number, a: number, b: number): Rgb {
+function oklabToSrgb(lightness: number, a: number, b: number): Rgb {
   const lPrime = lightness + 0.3963377774 * a + 0.2158037573 * b;
   const mPrime = lightness - 0.1055613458 * a - 0.0638541728 * b;
   const sPrime = lightness - 0.0894841775 * a - 1.291485548 * b;

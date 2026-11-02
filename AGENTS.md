@@ -32,7 +32,7 @@ identifier cannot start with a digit. Its title remains "3D Oscillator".
 | Special functions | `src/common/model/math/` — `specialFunctions.ts` (Laguerre, root finder), `sphericalHarmonics.ts` (Y_lm, P_l^m, Condon–Shortley) |
 | Hydrogen | `src/common/model/hydrogen/` — `HydrogenRadial.ts` (R_nl, nodes, peak, enclosing radius), `HydrogenExpectations.ts` (E_n, ⟨r⟩, ⟨r²⟩), `HydrogenicIons.ts` |
 | States | `src/common/model/orbital/` — `OrbitalTerm.ts`, `OrbitalCatalog.ts` (real orbitals as term lists), `Wavefunction.ts` (CPU evaluator), `NodalSurfaces.ts`, `SliceSampler.ts`, `SliceNodalCurves.ts`, `OrbitalSummary.ts`, `QuantumNumbersModel.ts` |
-| Shared views | `src/common/view/` — `SliceHeatmapNode.ts`, `RadialDistributionChartNode.ts`, `QuantumNumberControl.ts`, `OrbitalReadoutPanel.ts`, `ColormapLegendNode.ts`, `Colormaps.ts`, `formatters.ts` |
+| Shared views | `src/common/view/` — `SliceHeatmapNode.ts`, `RadialDistributionChartNode.ts`, `QuantumNumberControl.ts`, `OrbitalReadoutPanel.ts`, `ColormapLegendNode.ts`, `Colormaps.ts`, `formatters.ts`, `orbitalViewportChrome.ts` (container, pending notice, axes, orbit steps shared by both 3D viewports), `createLeftRightSpinner.ts` |
 | Oscillator / angular | `src/common/model/oscillator/`, `angular/` |
 | GPU engine | `src/common/gpu/` — `GpuContext.ts`, WGSL in `shaders/`, `WebGpuOrbitalRenderer.ts`, `CpuOrbitalRenderer.ts` |
 | Scenery/GPU boundary | `src/common/view/OrbitalViewportNode.ts` (one `Image` around the engine canvas) |
@@ -68,8 +68,8 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
 - Node overlays are analytic ray events; maintain CPU/WGSL parity when changing their intersections.
 - `Params` occupies 720 bytes. The dot pass composites foreground surfaces per fragment.
 - Give every pointer gesture in 3D a slider equivalent.
-- All five screens provide live summaries and keyboard help. Summary subclasses own and dispose their
-  derived text through `DisposableScreenSummaryContent`, which also releases the framework text nodes.
+- All five screens provide live summaries and keyboard help. Summary subclasses build their current-details
+  text and hand it to `DisposableScreenSummaryContent`, which disposes it and releases the framework text nodes.
 - The n, l, m spinners are exposed to assistive technology as sliders (`role="slider"`), which is
   how scenery's `NumberSpinner` works. Browser tests should query them by that role.
 

@@ -1,4 +1,4 @@
-import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
 import { atomicFieldToTesla, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
 import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
@@ -6,7 +6,6 @@ import { DisposableScreenSummaryContent } from "../../common/view/DisposableScre
 import { StringManager } from "../../i18n/StringManager.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
 export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
-  private readonly details: TReadOnlyProperty<string>;
   public constructor(model: ZeemanModel) {
     const s = StringManager.getInstance().getZeemanA11yStrings();
     const details = new DerivedProperty(
@@ -34,16 +33,6 @@ export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
         });
       },
     );
-    super({
-      playAreaContent: s.screenSummary.playAreaStringProperty,
-      controlAreaContent: s.screenSummary.controlAreaStringProperty,
-      interactionHintContent: s.screenSummary.interactionHintStringProperty,
-      currentDetailsContent: details,
-    });
-    this.details = details;
-  }
-  public override dispose(): void {
-    super.dispose();
-    this.details.dispose();
+    super(s.screenSummary, details);
   }
 }

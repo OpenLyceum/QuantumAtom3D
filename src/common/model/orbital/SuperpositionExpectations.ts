@@ -6,7 +6,7 @@ import type { OrbitalTerm } from "./OrbitalTerm.js";
 const radialCache = new Map<string, number>();
 
 /** ∫R_nl(r) R_n'l'(r) r³dr for Z=1; other Z scale as 1/Z. */
-export function radialPositionElement(a: OrbitalTerm, b: OrbitalTerm): number {
+function radialPositionElement(a: OrbitalTerm, b: OrbitalTerm): number {
   if (a.n === b.n && a.l === b.l) {
     return hydrogenMeanRadius(a.n, a.l, 1);
   }

@@ -50,7 +50,7 @@ export function zeemanLevels(n: number, z: number, field: number, mode: ZeemanMo
   return levels;
 }
 
-export function zeemanAllowed(upper: ZeemanLevel, lower: ZeemanLevel, mode: ZeemanMode): boolean {
+function zeemanAllowed(upper: ZeemanLevel, lower: ZeemanLevel, mode: ZeemanMode): boolean {
   return (
     Math.abs(upper.l - lower.l) === 1 &&
     Math.abs(upper.m - lower.m) <= 1 &&

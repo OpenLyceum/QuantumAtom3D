@@ -27,7 +27,7 @@ export function requestCanvasContext(canvas: HTMLCanvasElement): GPUCanvasContex
 }
 
 /** Whether this browser exposes the WebGPU entry point at all. */
-export function isWebGpuAvailable(): boolean {
+function isWebGpuAvailable(): boolean {
   return typeof navigator !== "undefined" && "gpu" in navigator && Boolean(navigator.gpu);
 }
 

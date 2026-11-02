@@ -3,17 +3,17 @@ import type { Range } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
-import { AquaRadioButtonGroup, Checkbox, HSlider, NumberSpinner } from "scenerystack/sun";
+import { AquaRadioButtonGroup, Checkbox, HSlider } from "scenerystack/sun";
 import { angularMagnitude, orbitalUncertaintyProduct } from "../../common/model/angular/VectorModel.js";
 import {
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-  FLAT_RECTANGULAR_BUTTON_OPTIONS,
   FLAT_RESET_ALL_BUTTON_OPTIONS,
 } from "../../common/QuantumAtom3DButtonOptions.js";
 import {
   QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
   QUANTUM_ATOM_3D_SLIDER_OPTIONS,
 } from "../../common/QuantumAtom3DControlOptions.js";
+import { createLeftRightSpinner } from "../../common/view/createLeftRightSpinner.js";
 import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
@@ -21,7 +21,6 @@ import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
 import { AngularDensityNode } from "./AngularDensityNode.js";
 import { AngularMomentumDiagramNode } from "./AngularMomentumDiagramNode.js";
 import { AngularMomentumScreenSummaryContent } from "./AngularMomentumScreenSummaryContent.js";
-export type AngularMomentumScreenViewOptions = ScreenViewOptions;
 export class AngularMomentumScreenView extends ResponsiveScreenView {
   public constructor(model: AngularMomentumModel, options?: ScreenViewOptions) {
     super({ ...options, screenSummaryContent: new AngularMomentumScreenSummaryContent(model) });
@@ -29,16 +28,7 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
     const label = (value: string | TReadOnlyProperty<string>, maxWidth = 420) =>
       new RichText(value, { font: new PhetFont(14), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
     const spinner = (property: NumberProperty, range: TReadOnlyProperty<Range>, name: TReadOnlyProperty<string>) =>
-      new NumberSpinner(property, range, {
-        arrowsPosition: "leftRight",
-        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
-        numberDisplayOptions: {
-          textOptions: { font: new PhetFont(15) },
-          minBackgroundWidth: 40,
-          numberFormatter: (value: number) => `${value}`,
-        },
-        accessibleName: name,
-      });
+      createLeftRightSpinner(property, range, name, { fontSize: 15 });
     const diagram = new AngularMomentumDiagramNode(model);
     diagram.left = this.layoutBounds.minX + 25;
     diagram.top = this.layoutBounds.minY + 45;

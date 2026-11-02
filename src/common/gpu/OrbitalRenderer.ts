@@ -11,7 +11,7 @@ import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesMo
 import type { CameraFrame } from "../view/OrbitCamera.js";
 import type { OrbitalScene } from "./OrbitalScene.js";
 
-export type OrbitalRendererBackend = "gpu" | "cpu";
+type OrbitalRendererBackend = "gpu" | "cpu";
 
 export type OrbitalRenderer = {
   /** A 2D canvas holding the latest finished frame. */

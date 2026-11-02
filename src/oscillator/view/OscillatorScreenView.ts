@@ -3,7 +3,7 @@ import type { Range } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
-import { AquaRadioButtonGroup, HSlider, NumberSpinner } from "scenerystack/sun";
+import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
 import {
   cartesianExpansion,
   cartesianStates,
@@ -11,11 +11,9 @@ import {
   oscillatorEnergy,
   sphericalStates,
 } from "../../common/model/oscillator/OscillatorStates.js";
-import {
-  FLAT_RECTANGULAR_BUTTON_OPTIONS,
-  FLAT_RESET_ALL_BUTTON_OPTIONS,
-} from "../../common/QuantumAtom3DButtonOptions.js";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
+import { createLeftRightSpinner } from "../../common/view/createLeftRightSpinner.js";
 import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
@@ -43,17 +41,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
       range: TReadOnlyProperty<Range>,
       name: TReadOnlyProperty<string>,
       offset = 0,
-    ) =>
-      new NumberSpinner(property, range, {
-        arrowsPosition: "leftRight",
-        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
-        numberDisplayOptions: {
-          textOptions: { font: new PhetFont(14) },
-          numberFormatter: (value) => `${value + offset}`,
-          minBackgroundWidth: 35,
-        },
-        accessibleName: name,
-      });
+    ) => createLeftRightSpinner(property, range, name, { offset, minBackgroundWidth: 35 });
     this.viewport = new OscillatorViewportNode(
       320,
       model,

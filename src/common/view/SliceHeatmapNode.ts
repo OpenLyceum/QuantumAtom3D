@@ -26,7 +26,7 @@ import { type SlicePlane, type SliceSamples, sampleSlice } from "../model/orbita
 import type { Wavefunction } from "../model/orbital/Wavefunction.js";
 import { densityColor, phaseColor, writePixel } from "./Colormaps.js";
 
-export type SliceColoringMode = "phase" | "density";
+type SliceColoringMode = "phase" | "density";
 
 export type SliceHeatmapNodeOptions = NodeOptions & {
   readonly wavefunctionProperty: TReadOnlyProperty<Wavefunction>;

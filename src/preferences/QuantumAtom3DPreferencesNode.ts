@@ -6,6 +6,7 @@
  * quantumAtom3DQueryParameters).
  */
 
+import type { Property, TReadOnlyProperty } from "scenerystack/axon";
 import { RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { AquaRadioButtonGroup, Checkbox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
@@ -14,7 +15,7 @@ import { StringManager } from "../i18n/StringManager.js";
 import QuantumAtom3DColors from "../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../QuantumAtom3DConstants.js";
 import QuantumAtom3DNamespace from "../QuantumAtom3DNamespace.js";
-import type { QuantumAtom3DPreferencesModel } from "./QuantumAtom3DPreferencesModel.js";
+import type { LengthUnit, QuantumAtom3DPreferencesModel, RenderQuality } from "./QuantumAtom3DPreferencesModel.js";
 
 export class QuantumAtom3DPreferencesNode extends VBox {
   public constructor(preferencesModel: QuantumAtom3DPreferencesModel, tandem?: Tandem, compact = false) {
@@ -62,31 +63,30 @@ export class QuantumAtom3DPreferencesNode extends VBox {
       },
     );
 
-    const lengthButtons = new AquaRadioButtonGroup(
+    // A row of choices whose labels are `prefStrings.<value>StringProperty`.
+    const createChoiceButtons = <T extends LengthUnit | RenderQuality>(
+      property: Property<T>,
+      values: readonly T[],
+      accessibleName: TReadOnlyProperty<string>,
+    ) =>
+      new AquaRadioButtonGroup(
+        property,
+        values.map((value) => ({
+          value,
+          createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
+          options: { accessibleName: prefStrings[`${value}StringProperty`] },
+        })),
+        { orientation: compact ? "vertical" : "horizontal", spacing: 12, accessibleName },
+      );
+    const lengthButtons = createChoiceButtons(
       preferencesModel.lengthUnitProperty,
-      (["a0", "pm"] as const).map((value) => ({
-        value,
-        createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
-        options: { accessibleName: prefStrings[`${value}StringProperty`] },
-      })),
-      {
-        orientation: compact ? "vertical" : "horizontal",
-        spacing: 12,
-        accessibleName: prefStrings.lengthUnitStringProperty,
-      },
+      ["a0", "pm"],
+      prefStrings.lengthUnitStringProperty,
     );
-    const qualityButtons = new AquaRadioButtonGroup(
+    const qualityButtons = createChoiceButtons(
       preferencesModel.qualityProperty,
-      (["auto", "low", "medium", "high"] as const).map((value) => ({
-        value,
-        createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
-        options: { accessibleName: prefStrings[`${value}StringProperty`] },
-      })),
-      {
-        orientation: compact ? "vertical" : "horizontal",
-        spacing: 12,
-        accessibleName: prefStrings.qualityStringProperty,
-      },
+      ["auto", "low", "medium", "high"],
+      prefStrings.qualityStringProperty,
     );
     const formulas = new Checkbox(
       preferencesModel.showFormulasProperty,

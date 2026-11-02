@@ -16,7 +16,7 @@ import { hydrogenRadial, hydrogenRadialCutoff } from "../hydrogen/HydrogenRadial
 import { OSCILLATOR_RADIAL_STATES, oscillatorRadial } from "../oscillator/OscillatorStates.js";
 
 /** Samples per row. */
-export const RADIAL_TABLE_SAMPLES = 1024;
+const RADIAL_TABLE_SAMPLES = 1024;
 
 /** Row of (n, l) in the table: rows for n = 1 come first, then n = 2, … */
 export function radialRowIndex(n: number, l: number): number {

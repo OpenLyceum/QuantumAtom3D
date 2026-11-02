@@ -38,7 +38,7 @@ export function associatedLegendrePolynomialPart(l: number, m: number, x: number
 }
 
 /** The normalization √((2l + 1)/(4π) · (l − |m|)!/(l + |m|)!) of Y_l,|m|. */
-export function sphericalHarmonicNorm(l: number, m: number): number {
+function sphericalHarmonicNorm(l: number, m: number): number {
   const absM = Math.abs(m);
   return Math.sqrt(((2 * l + 1) / (4 * Math.PI)) * (factorial(l - absM) / factorial(l + absM)));
 }

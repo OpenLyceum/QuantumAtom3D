@@ -38,7 +38,7 @@ import {
 } from "../../QuantumAtom3DConstants.js";
 
 /** How the cross-section is coloured: by the phase of ψ, or by |ψ|² alone. */
-export const SLICE_COLORING_VALUES = ["phase", "density"] as const;
+const SLICE_COLORING_VALUES = ["phase", "density"] as const;
 export type SliceColoring = (typeof SLICE_COLORING_VALUES)[number];
 
 export class OrbitalsModel implements TModel {

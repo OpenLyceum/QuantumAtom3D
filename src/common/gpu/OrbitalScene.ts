@@ -30,7 +30,7 @@ import { oscillatorRowIndex } from "../model/oscillator/OscillatorStates.js";
 import type { CameraFrame } from "../view/OrbitCamera.js";
 
 /** Most terms a scene can carry (the uniform block has room for exactly this many). */
-export const MAX_RENDER_TERMS = 16;
+const MAX_RENDER_TERMS = 16;
 
 /** Ray-march samples across the sphere's diameter. */
 export const RENDER_STEPS = 128;
@@ -41,7 +41,7 @@ export const VOLUME_OPACITY_GAIN = 4;
 /** Six vec4s, sixteen terms of two vec4s, then seven render/overlay vec4s (720 bytes). */
 export const PARAMS_BYTES = 13 * 16 + MAX_RENDER_TERMS * 2 * 16;
 
-export type OrbitalColoring = "phase" | "density";
+type OrbitalColoring = "phase" | "density";
 
 export type OrbitalScene = {
   readonly family?: "hydrogen" | "oscillator";

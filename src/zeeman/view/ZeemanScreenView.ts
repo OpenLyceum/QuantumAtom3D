@@ -2,16 +2,16 @@ import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { HBox, Line, Node, RichText, VBox } from "scenerystack/scenery";
 import { ArrowNode, PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
-import { AquaRadioButtonGroup, HSlider, NumberSpinner } from "scenerystack/sun";
+import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
 import { atomicFieldToTesla, atomicTimeToFs, hartreeToEv } from "../../common/model/AtomicUnits.js";
 import { orbitalVector } from "../../common/model/angular/VectorModel.js";
 import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
 import {
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
-  FLAT_RECTANGULAR_BUTTON_OPTIONS,
   FLAT_RESET_ALL_BUTTON_OPTIONS,
 } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
+import { createLeftRightSpinner } from "../../common/view/createLeftRightSpinner.js";
 import { orbitCameraFrame, projectToScreen } from "../../common/view/OrbitCamera.js";
 import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
@@ -84,17 +84,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
       range: TReadOnlyProperty<import("scenerystack/dot").Range>,
       name: TReadOnlyProperty<string>,
       offset = 0,
-    ) =>
-      new NumberSpinner(property, range, {
-        arrowsPosition: "leftRight",
-        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
-        numberDisplayOptions: {
-          textOptions: { font: new PhetFont(14) },
-          numberFormatter: (value) => `${value + offset}`,
-          minBackgroundWidth: 40,
-        },
-        accessibleName: name,
-      });
+    ) => createLeftRightSpinner(property, range, name, { offset });
     const capLabel = text(strings.capStringProperty);
     capLabel.lineWrap = 335;
     model.modeProperty.link((mode) => {

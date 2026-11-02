@@ -37,7 +37,7 @@ function polarQuadrature(): { nodes: number[]; weights: number[] } {
 const POLAR = polarQuadrature();
 const CHECK_INTERVAL = 256;
 const THRESHOLD_ITERATIONS = 26;
-export const SURFACE_WORK_BUDGET_MS = 4;
+const SURFACE_WORK_BUDGET_MS = 4;
 
 export class ProbabilitySurfaceTask {
   private readonly densities = new Float64Array(RADIAL_BINS * POLAR_BINS * AZIMUTH_BINS);

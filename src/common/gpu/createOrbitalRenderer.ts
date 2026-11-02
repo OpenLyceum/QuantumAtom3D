@@ -16,7 +16,7 @@ import { WebGpuOrbitalRenderer } from "./WebGpuOrbitalRenderer.js";
 import type { WebGpuContext } from "./WebGpuSupport.js";
 
 /** Square resolution of GPU frames, in device pixels. */
-export const GPU_RENDER_RESOLUTION = 512;
+const GPU_RENDER_RESOLUTION = 512;
 
 export function createOrbitalRenderer(): OrbitalRenderer {
   const { context } = getGpuInitializationResult();

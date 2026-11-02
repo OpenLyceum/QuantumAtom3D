@@ -24,7 +24,7 @@ export function sphericalStates(N: number): SphericalState[] {
   }
   return states;
 }
-export function hermite(n: number, x: number): number {
+function hermite(n: number, x: number): number {
   let a = 1;
   let b = 2 * x;
   if (n === 0) {
@@ -52,7 +52,7 @@ export function oscillatorRadial(nr: number, l: number, r: number): number {
     Math.exp((-r * r) / 2)
   );
 }
-export function cartesianPolynomial(state: CartesianState, x: number, y: number, z: number): number {
+function cartesianPolynomial(state: CartesianState, x: number, y: number, z: number): number {
   return state.reduce(
     (value, n, index) => (value * hermite(n, [x, y, z][index] ?? 0)) / Math.sqrt(2 ** n * factorial(n)),
     Math.PI ** -0.75,

@@ -6,24 +6,21 @@ import {
   type TReadOnlyProperty,
   type UnknownMultilink,
 } from "scenerystack/axon";
-import { Bounds2, type Vector2 } from "scenerystack/dot";
-import {
-  DragListener,
-  Image,
-  KeyboardListener,
-  Line,
-  Node,
-  type OneKeyStroke,
-  Rectangle,
-  Text,
-} from "scenerystack/scenery";
-import { PhetFont } from "scenerystack/scenery-phet";
+import type { Vector2 } from "scenerystack/dot";
+import { DragListener, Image, KeyboardListener, Node, type OneKeyStroke, Rectangle } from "scenerystack/scenery";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { createOrbitalRenderer } from "../gpu/createOrbitalRenderer.js";
 import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
-import { OrbitCamera, projectToScreen, type Vec3 } from "./OrbitCamera.js";
+import { OrbitCamera, projectToScreen } from "./OrbitCamera.js";
+import {
+  addOrientationAxes,
+  createPendingText,
+  DRAG_ORBIT_ANGLE,
+  KEYBOARD_ORBIT_ANGLE,
+  orbitalViewportOptions,
+} from "./orbitalViewportChrome.js";
 
 export class InteractiveOrbitalCanvas extends Node {
   public readonly samplingPendingProperty = new BooleanProperty(false);
@@ -37,17 +34,7 @@ export class InteractiveOrbitalCanvas extends Node {
   private readonly quality: TReadOnlyProperty<RenderQuality> | undefined;
   public constructor(size: number, zoom: NumberProperty, quality?: TReadOnlyProperty<RenderQuality>) {
     const strings = StringManager.getInstance().getOrbitalStrings().volume;
-    super({
-      tagName: "div",
-      ariaRole: "application",
-      focusable: true,
-      cursor: "grab",
-      accessibleName: strings.titleStringProperty,
-      accessibleNameBehavior: (_node, options, name) => ({ ...options, ariaLabel: name }),
-      accessibleHelpText: strings.helpStringProperty,
-      mouseArea: new Bounds2(0, 0, size, size),
-      touchArea: new Bounds2(0, 0, size, size),
-    });
+    super(orbitalViewportOptions(size));
     this.quality = quality;
     this.canvasImage = new Image(this.engine.canvas, { scale: size / this.engine.canvas.width, pickable: false });
     this.children = [
@@ -58,42 +45,9 @@ export class InteractiveOrbitalCanvas extends Node {
         pickable: false,
       }),
     ];
-    this.addChild(
-      new Text(strings.surfacePendingStringProperty, {
-        font: new PhetFont(12),
-        fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
-        left: 10,
-        top: 10,
-        maxWidth: size - 20,
-        visibleProperty: this.surfacePendingProperty,
-        tagName: "p",
-        accessibleParagraph: strings.surfacePendingStringProperty,
-      }),
-    );
-    this.addChild(
-      new Text(strings.samplingPendingStringProperty, {
-        font: new PhetFont(12),
-        fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
-        left: 10,
-        top: 10,
-        maxWidth: size - 20,
-        visibleProperty: this.samplingPendingProperty,
-        tagName: "p",
-        accessibleParagraph: strings.samplingPendingStringProperty,
-      }),
-    );
-    const axes = (["x", "y", "z"] as const).map((name, index) => {
-      const direction: Vec3 = [index === 0 ? 1 : 0, index === 1 ? 1 : 0, index === 2 ? 1 : 0];
-      const line = new Line(0, 0, 0, 0, { stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty, pickable: false });
-      const label = new Text(name, {
-        font: new PhetFont(12),
-        fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
-        pickable: false,
-      });
-      this.addChild(line);
-      this.addChild(label);
-      return { direction, line, label };
-    });
+    this.addChild(createPendingText(strings.surfacePendingStringProperty, this.surfacePendingProperty, size));
+    this.addChild(createPendingText(strings.samplingPendingStringProperty, this.samplingPendingProperty, size));
+    const axes = addOrientationAxes(this);
     this.cameraLink = Multilink.multilink([this.camera.yawProperty, this.camera.pitchProperty], () => {
       this.engine.setCamera(this.camera.frame);
       for (const { direction, line, label } of axes) {
@@ -111,7 +65,7 @@ export class InteractiveOrbitalCanvas extends Node {
       drag: (event) => {
         const point = this.globalToLocalPoint(event.pointer.point);
         if (previous) {
-          this.camera.orbit(-(point.x - previous.x) * 0.008, (point.y - previous.y) * 0.008);
+          this.camera.orbit(-(point.x - previous.x) * DRAG_ORBIT_ANGLE, (point.y - previous.y) * DRAG_ORBIT_ANGLE);
         }
         previous = point;
       },
@@ -127,9 +81,9 @@ export class InteractiveOrbitalCanvas extends Node {
       fire: (event, key) => {
         event?.preventDefault();
         if (key === "arrowLeft" || key === "arrowRight") {
-          this.camera.orbit(((key === "arrowLeft" ? -1 : 1) * Math.PI) / 36, 0);
+          this.camera.orbit((key === "arrowLeft" ? -1 : 1) * KEYBOARD_ORBIT_ANGLE, 0);
         } else if (key === "arrowUp" || key === "arrowDown") {
-          this.camera.orbit(0, ((key === "arrowDown" ? -1 : 1) * Math.PI) / 36);
+          this.camera.orbit(0, (key === "arrowDown" ? -1 : 1) * KEYBOARD_ORBIT_ANGLE);
         } else {
           zoom.value = zoom.range.constrainValue(zoom.value + (key === "minus" ? -1 : 1));
         }

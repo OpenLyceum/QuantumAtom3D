@@ -26,7 +26,7 @@ const SPINNER_DISPLAY_WIDTH = 40;
 const ROW_SPACING = 10;
 
 /** The visible name of state (n, l, m) in either basis, as RichText markup. */
-export function createStateLabelProperty(
+function createStateLabelProperty(
   quantumNumbers: QuantumNumbersModel,
   basisProperty: TReadOnlyProperty<OrbitalBasis>,
 ): TReadOnlyProperty<string> {

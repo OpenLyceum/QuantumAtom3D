@@ -4,7 +4,7 @@ import type { NodalSurfaceSet } from "./NodalSurfaces.js";
 export type Point3 = readonly [number, number, number];
 const EPSILON = 1e-10;
 
-export function quadraticRoots(a: number, b: number, c: number): number[] {
+function quadraticRoots(a: number, b: number, c: number): number[] {
   if (Math.abs(a) < EPSILON) {
     return Math.abs(b) < EPSILON ? [] : [-c / b];
   }
@@ -21,7 +21,7 @@ export function planeHit(origin: Point3, direction: Point3, normal: Point3, offs
   return Math.abs(denominator) < EPSILON ? null : (offset - dot(origin, normal)) / denominator;
 }
 
-export function dot(a: Point3, b: Point3): number {
+function dot(a: Point3, b: Point3): number {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 

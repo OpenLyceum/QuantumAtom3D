@@ -22,7 +22,7 @@ import { ORBITAL_RENDER_SHADER } from "./shaders/orbitalRender.js";
 import { requestCanvasContext, requestWebGpuContext, type WebGpuContext } from "./WebGpuSupport.js";
 
 /** Why the sim is not drawing on the GPU, when it is not. */
-export const GpuUnavailableReason = {
+const GpuUnavailableReason = {
   /** No `navigator.gpu`, or no adapter or device could be acquired. */
   NO_DEVICE: "noDevice",
   /** A shader failed to compile on this device. */
@@ -34,7 +34,7 @@ export const GpuUnavailableReason = {
   DEVICE_LOST: "deviceLost",
 } as const;
 
-export type GpuUnavailableReasonId = (typeof GpuUnavailableReason)[keyof typeof GpuUnavailableReason];
+type GpuUnavailableReasonId = (typeof GpuUnavailableReason)[keyof typeof GpuUnavailableReason];
 
 export type GpuInitializationResult = {
   readonly context: WebGpuContext | null;
@@ -75,6 +75,7 @@ export async function initializeGpuContext(forceCpu: boolean): Promise<GpuInitia
     } else {
       cached = { context, reason: null, diagnostics: [] };
       // Existing viewports see this on their next frame; future screens start on CPU.
+      // `device.lost` resolves (never rejects), so there is no rejection to handle.
       context.device.lost.then(() => demoteGpuContext(context));
       context.device.addEventListener("uncapturederror", (event) => {
         event.preventDefault();

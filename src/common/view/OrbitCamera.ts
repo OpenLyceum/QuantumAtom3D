@@ -29,7 +29,7 @@ export type CameraFrame = {
 };
 
 /** Pitch stays short of the poles, where yaw would stop meaning anything. */
-export const MAX_PITCH = (89 * Math.PI) / 180;
+const MAX_PITCH = (89 * Math.PI) / 180;
 
 /** Opening view: looking down 20° onto the xy-plane, with x toward the viewer's left. */
 const INITIAL_YAW = (30 * Math.PI) / 180;

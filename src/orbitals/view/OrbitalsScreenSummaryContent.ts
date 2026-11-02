@@ -24,8 +24,6 @@ import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel
 import type { OrbitalsModel } from "../model/OrbitalsModel.js";
 
 export class OrbitalsScreenSummaryContent extends DisposableScreenSummaryContent {
-  private readonly currentDetailsProperty: TReadOnlyProperty<string>;
-
   public constructor(model: OrbitalsModel, unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY) {
     const a11y = StringManager.getInstance().getOrbitalsA11yStrings();
 
@@ -75,17 +73,6 @@ export class OrbitalsScreenSummaryContent extends DisposableScreenSummaryContent
       },
     );
 
-    super({
-      playAreaContent: a11y.screenSummary.playAreaStringProperty,
-      controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: currentDetailsProperty,
-      interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
-    });
-    this.currentDetailsProperty = currentDetailsProperty;
-  }
-
-  public override dispose(): void {
-    super.dispose();
-    this.currentDetailsProperty.dispose();
+    super(a11y.screenSummary, currentDetailsProperty);
   }
 }

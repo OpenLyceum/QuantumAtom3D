@@ -9,7 +9,6 @@ import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
 
 export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryContent {
-  private readonly details: TReadOnlyProperty<string>;
   public constructor(
     model: SuperpositionModel,
     unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY,
@@ -32,16 +31,6 @@ export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryCo
           unit: lengthUnitSymbol(unit),
         }),
     );
-    super({
-      playAreaContent: strings.screenSummary.playAreaStringProperty,
-      controlAreaContent: strings.screenSummary.controlAreaStringProperty,
-      interactionHintContent: strings.screenSummary.interactionHintStringProperty,
-      currentDetailsContent: details,
-    });
-    this.details = details;
-  }
-  public override dispose(): void {
-    super.dispose();
-    this.details.dispose();
+    super(strings.screenSummary, details);
   }
 }
