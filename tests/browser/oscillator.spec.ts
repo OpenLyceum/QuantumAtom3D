@@ -101,6 +101,7 @@ for (const cpu of [true, false]) {
 for (const mode of ["fuzz", "fuzzBoard"]) {
   test(`Oscillator ${mode} smoke`, async ({ page }) => {
     await page.goto(`/?screens=5&forceCpu=true&ea&${mode}&randomSeed=731902`);
+    // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: seeded fuzz runs for a fixed duration by design.
     await page.waitForTimeout(10000);
   });
 }

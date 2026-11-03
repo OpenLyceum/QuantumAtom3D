@@ -37,6 +37,7 @@ test("Zeeman modes, field units/cap, polarization, series, precession and reset"
   await field.press("Home");
   expect(await page.evaluate(`${model}.fieldProperty.value`)).toBe(0);
   await page.getByRole("button", { name: "Play", exact: true }).press("Space");
+  // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: proving the paused clock stays still needs time to pass.
   await page.waitForTimeout(100);
   expect(await page.evaluate(`${model}.phaseProperty.value`)).toBe(0);
   await field.press("End");
@@ -50,6 +51,7 @@ test("Zeeman modes, field units/cap, polarization, series, precession and reset"
 for (const mode of ["fuzz", "fuzzBoard"]) {
   test(`Zeeman ${mode} smoke`, async ({ page }) => {
     await page.goto(`/?screens=4&forceCpu=true&ea&${mode}&randomSeed=731902`);
+    // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: seeded fuzz runs for a fixed duration by design.
     await page.waitForTimeout(10000);
   });
 }

@@ -119,6 +119,7 @@ test("all five screens survive randomized listener order and seeded pointer fuzz
   for (const index of [1, 2, 3, 4, 5]) {
     await page.goto(`/?screens=${index}&ea&listenerOrder=random&fuzz&fuzzRate=20&seed=731902&quality=low`);
     await page.getByRole("button", { name: "Reset All" }).waitFor();
+    // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: seeded fuzz runs for a fixed duration by design.
     await page.waitForTimeout(4000);
   }
 });

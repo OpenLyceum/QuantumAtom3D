@@ -46,6 +46,7 @@ test("orbital and coupled constraints, half-integer values, playback and reset",
 for (const mode of ["fuzz", "fuzzBoard"]) {
   test(`Angular Momentum ${mode} smoke`, async ({ page }) => {
     await page.goto(`/?screens=3&forceCpu=true&ea&${mode}&randomSeed=731902`);
+    // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: seeded fuzz runs for a fixed duration by design.
     await page.waitForTimeout(10000);
   });
 }

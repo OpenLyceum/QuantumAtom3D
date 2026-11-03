@@ -91,13 +91,30 @@ for (const forceCpu of [true, false]) {
     await page.goto(`/?screens=1&forceCpu=${forceCpu}&ea`);
     await page.getByRole("button", { name: "Reset All" }).waitFor();
     const readPixels = () => page.evaluate<string>(`(${screen.toString()})().view.viewport.engine.canvas.toDataURL()`);
+    const nextFrames = () =>
+      page.evaluate(
+        () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+      );
+    /** The canvas once two reads a couple of frames apart agree, i.e. rendering has settled. */
+    const settledPixels = async (): Promise<string> => {
+      let previous = await readPixels();
+      await expect
+        .poll(async () => {
+          await nextFrames();
+          const current = await readPixels();
+          const settled = current === previous;
+          previous = current;
+          return settled;
+        })
+        .toBe(true);
+      return previous;
+    };
     await page.getByRole("radio", { name: "Dots", exact: true }).press("Space");
     await expect.poll(() => page.evaluate(`(${screen.toString()})().model.renderModeProperty.value`)).toBe("dots");
-    await page.waitForTimeout(300);
-    const dots = await readPixels();
+    const dots = await settledPixels();
     await page.getByRole("radio", { name: "Isosurface", exact: true }).press("Space");
-    await page.waitForTimeout(1500);
-    const iso90 = await readPixels();
+    await expect.poll(readPixels).not.toBe(dots);
+    const iso90 = await settledPixels();
     expect(iso90).not.toBe(dots);
     await page.getByRole("radio", { name: "95%", exact: true }).press("Space");
     await expect.poll(readPixels).not.toBe(iso90);
@@ -141,7 +158,7 @@ for (const forceCpu of [true, false]) {
     await page.getByRole("slider", { name: "Offset", exact: true }).press("Home");
     expect(await page.evaluate(`(${screen.toString()})().model.sliceOffsetFractionProperty.value`)).toBe(-1);
     await page.getByRole("radio", { name: "Dots", exact: true }).press("Space");
-    await page.waitForTimeout(250);
+    await expect.poll(() => page.evaluate(`(${screen.toString()})().model.renderModeProperty.value`)).toBe("dots");
     await page.getByRole("button", { name: "Reset All" }).press("Space");
     expect(await page.evaluate(`(${screen.toString()})().model.cuttingPlaneVisibleProperty.value`)).toBe(false);
   });

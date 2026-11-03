@@ -22,6 +22,7 @@ test.beforeEach(({ page }) => {
 for (const mode of ["fuzz", "fuzzBoard"]) {
   test(`Superposition ${mode} smoke`, async ({ page }) => {
     await page.goto(`/?screens=2&forceCpu=true&ea&${mode}&randomSeed=731902`);
+    // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: seeded fuzz runs for a fixed duration by design.
     await page.waitForTimeout(10000);
   });
 }
@@ -39,6 +40,7 @@ for (const cpu of [true, false]) {
     await expect.poll(() => page.evaluate<number>(`${model}.timeProperty.value`)).toBeGreaterThan(0.4);
     await page.getByRole("button", { name: "Pause", exact: true }).press("Space");
     const time = await page.evaluate(`${model}.timeProperty.value`);
+    // biome-ignore lint/suspicious/noPlaywrightWaitForTimeout: proving the paused clock stays still needs time to pass.
     await page.waitForTimeout(100);
     expect(await page.evaluate(`${model}.timeProperty.value`)).toBe(time);
     await page.getByRole("slider", { name: "Terms", exact: true }).press("End");
