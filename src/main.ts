@@ -38,8 +38,18 @@ import QuantumAtom3DColors from "./QuantumAtom3DColors.js";
 import { SuperpositionScreen } from "./superposition/SuperpositionScreen.js";
 import { ZeemanScreen } from "./zeeman/ZeemanScreen.js";
 
-onReadyToLaunch(async () => {
-  await initializeGpuContext(quantumAtom3DQueryParameters.forceCpu);
+onReadyToLaunch(() => {
+  // onReadyToLaunch ignores the callback's return value, so an async callback's
+  // rejection would go unhandled; launch from an explicit promise chain instead.
+  initializeGpuContext(quantumAtom3DQueryParameters.forceCpu)
+    .then(launch)
+    .catch((error: unknown) => {
+      // biome-ignore lint/suspicious/noConsole: a failed launch leaves a blank page; surface why.
+      console.error("QuantumAtom3D failed to launch", error);
+    });
+});
+
+function launch(): void {
   const stringManager = StringManager.getInstance();
 
   // Simulation-specific preferences; initial values come from quantumAtom3DQueryParameters.
@@ -169,4 +179,4 @@ onReadyToLaunch(async () => {
     }
   });
   sim.start();
-});
+}
