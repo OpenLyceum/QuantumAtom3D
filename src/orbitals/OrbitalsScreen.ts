@@ -13,11 +13,11 @@ import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
+import { OrbitalsModel } from "../common/model/orbital/OrbitalsModel.js";
 import { createOrbitalsIcon } from "../common/QuantumAtom3DScreenIcons.js";
+import { OrbitalsKeyboardHelpContent } from "../common/view/OrbitalsKeyboardHelpContent.js";
 import type { QuantumAtom3DPreferencesModel } from "../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../QuantumAtom3DColors.js";
-import { OrbitalsModel } from "./model/OrbitalsModel.js";
-import { OrbitalsKeyboardHelpContent } from "./view/OrbitalsKeyboardHelpContent.js";
 import { OrbitalsScreenView } from "./view/OrbitalsScreenView.js";
 
 type SelfOptions = {

@@ -10,6 +10,7 @@ import type { TReadOnlyProperty } from "scenerystack/axon";
 import { HBox, RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { AquaRadioButtonGroup, Checkbox, HSlider } from "scenerystack/sun";
+import type { OrbitalsModel } from "../../common/model/orbital/OrbitalsModel.js";
 import { SLICE_PLANE_VALUES, type SlicePlane } from "../../common/model/orbital/SliceSampler.js";
 import {
   QUANTUM_ATOM_3D_CHECKBOX_OPTIONS,
@@ -18,7 +19,6 @@ import {
 import { QuantumAtom3DPanel } from "../../common/QuantumAtom3DPanel.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import type { OrbitalsModel } from "../model/OrbitalsModel.js";
 
 const LABEL_FONT = new PhetFont(13);
 const PLANE_FONT = new PhetFont({ size: 14, style: "italic" });

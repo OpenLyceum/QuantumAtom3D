@@ -3,11 +3,11 @@ import type { TReadOnlyProperty } from "scenerystack/axon";
 import { HBox, RichText } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { VerticalAquaRadioButtonGroup } from "scenerystack/sun";
-import { ColormapLegendNode } from "../../common/view/ColormapLegendNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
-import type { OrbitalsModel, SliceColoring } from "../model/OrbitalsModel.js";
+import type { OrbitalsModel, SliceColoring } from "../model/orbital/OrbitalsModel.js";
+import { ColormapLegendNode } from "./ColormapLegendNode.js";
 
 export class OrbitalColorControl extends HBox {
   public constructor(

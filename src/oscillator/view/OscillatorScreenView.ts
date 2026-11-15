@@ -14,9 +14,9 @@ import {
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/QuantumAtom3DButtonOptions.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../../common/QuantumAtom3DControlOptions.js";
 import { createLeftRightSpinner } from "../../common/view/createLeftRightSpinner.js";
+import { OrbitalColorControl } from "../../common/view/OrbitalColorControl.js";
 import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
-import { OrbitalColorControl } from "../../orbitals/view/OrbitalColorControl.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";

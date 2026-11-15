@@ -10,6 +10,7 @@ import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { StringUtils } from "scenerystack/phetcommon";
 import { hydrogenicIonSymbol } from "../../common/model/hydrogen/HydrogenicIons.js";
 import { realOrbitalSubscript, spectroscopicLetter } from "../../common/model/orbital/OrbitalCatalog.js";
+import type { OrbitalsModel } from "../../common/model/orbital/OrbitalsModel.js";
 import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
 import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
 import {
@@ -21,7 +22,6 @@ import {
 } from "../../common/view/formatters.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
-import type { OrbitalsModel } from "../model/OrbitalsModel.js";
 
 export class OrbitalsScreenSummaryContent extends DisposableScreenSummaryContent {
   public constructor(model: OrbitalsModel, unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY) {

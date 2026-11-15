@@ -14,6 +14,7 @@ import { Checkbox, RectangularPushButton, VerticalAquaRadioButtonGroup } from "s
 import { hydrogenicIonSymbol } from "../../common/model/hydrogen/HydrogenicIons.js";
 import type { OrbitalBasis } from "../../common/model/orbital/OrbitalCatalog.js";
 import { ORBITAL_PRESETS } from "../../common/model/orbital/OrbitalPresets.js";
+import type { OrbitalsModel } from "../../common/model/orbital/OrbitalsModel.js";
 import {
   FLAT_PANEL_PUSH_BUTTON_OPTIONS,
   FLAT_RECTANGULAR_BUTTON_OPTIONS,
@@ -28,7 +29,6 @@ import { QuantumNumberControl } from "../../common/view/QuantumNumberControl.js"
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { MAX_NUCLEAR_CHARGE, MIN_NUCLEAR_CHARGE } from "../../QuantumAtom3DConstants.js";
-import type { OrbitalsModel } from "../model/OrbitalsModel.js";
 
 const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
 const LABEL_FONT = new PhetFont(13);

@@ -15,8 +15,8 @@ import {
   TextKeyNode,
   TwoColumnKeyboardHelpContent,
 } from "scenerystack/scenery-phet";
-import { OrbitalHotkeyData } from "../../common/view/OrbitalHotkeyData.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
 
 export class OrbitalsKeyboardHelpContent extends TwoColumnKeyboardHelpContent {
   public constructor() {

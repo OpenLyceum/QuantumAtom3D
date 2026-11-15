@@ -20,13 +20,7 @@ import {
 import { Range } from "scenerystack/dot";
 import type { TModel } from "scenerystack/joist";
 import type { Tandem } from "scenerystack/tandem";
-import { hydrogenEnclosingRadius } from "../../common/model/hydrogen/HydrogenRadial.js";
-import { ORBITAL_BASIS_VALUES, type OrbitalBasis, orbitalTerms } from "../../common/model/orbital/OrbitalCatalog.js";
-import { computeOrbitalSummary, type OrbitalSummary } from "../../common/model/orbital/OrbitalSummary.js";
-import { QuantumNumbersModel } from "../../common/model/orbital/QuantumNumbersModel.js";
-import { SLICE_PLANE_VALUES, type SlicePlane } from "../../common/model/orbital/SliceSampler.js";
-import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
-import query from "../../preferences/quantumAtom3DQueryParameters.js";
+import query from "../../../preferences/quantumAtom3DQueryParameters.js";
 import {
   MAX_N,
   MAX_NUCLEAR_CHARGE,
@@ -35,7 +29,13 @@ import {
   MIN_ZOOM_LEVEL,
   VIEW_ENCLOSED_FRACTION,
   ZOOM_STEP_FACTOR,
-} from "../../QuantumAtom3DConstants.js";
+} from "../../../QuantumAtom3DConstants.js";
+import { hydrogenEnclosingRadius } from "../hydrogen/HydrogenRadial.js";
+import { ORBITAL_BASIS_VALUES, type OrbitalBasis, orbitalTerms } from "./OrbitalCatalog.js";
+import { computeOrbitalSummary, type OrbitalSummary } from "./OrbitalSummary.js";
+import { QuantumNumbersModel } from "./QuantumNumbersModel.js";
+import { SLICE_PLANE_VALUES, type SlicePlane } from "./SliceSampler.js";
+import { Wavefunction } from "./Wavefunction.js";
 
 /** How the cross-section is coloured: by the phase of ψ, or by |ψ|² alone. */
 const SLICE_COLORING_VALUES = ["phase", "density"] as const;

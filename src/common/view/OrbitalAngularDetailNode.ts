@@ -13,10 +13,10 @@ import { Circle, Line, Node, Path, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { HSlider } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
-import type { OrbitalsModel } from "../../orbitals/model/OrbitalsModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { sphericalHarmonicTheta } from "../model/math/sphericalHarmonics.js";
 import { orbitalTerms } from "../model/orbital/OrbitalCatalog.js";
+import type { OrbitalsModel } from "../model/orbital/OrbitalsModel.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../QuantumAtom3DControlOptions.js";
 
 const SIZE = 230;
