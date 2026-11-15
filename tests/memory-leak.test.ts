@@ -15,12 +15,12 @@ import { AngularDensityNode } from "../src/angular-momentum/view/AngularDensityN
 import { AngularMomentumDiagramNode } from "../src/angular-momentum/view/AngularMomentumDiagramNode.js";
 import { AngularMomentumScreenSummaryContent } from "../src/angular-momentum/view/AngularMomentumScreenSummaryContent.js";
 import { CpuOrbitalRenderer } from "../src/common/gpu/CpuOrbitalRenderer.js";
+import { OrbitalsModel } from "../src/common/model/orbital/OrbitalsModel.js";
 import { QuantumNumbersModel } from "../src/common/model/orbital/QuantumNumbersModel.js";
 import { TimeModel } from "../src/common/TimeModel.js";
 import { OrbitalAngularDetailNode } from "../src/common/view/OrbitalAngularDetailNode.js";
 import { OrbitalViewportNode } from "../src/common/view/OrbitalViewportNode.js";
 import { OrbitCamera } from "../src/common/view/OrbitCamera.js";
-import { OrbitalsModel } from "../src/orbitals/model/OrbitalsModel.js";
 import { OrbitalsScreenSummaryContent } from "../src/orbitals/view/OrbitalsScreenSummaryContent.js";
 import { OscillatorModel } from "../src/oscillator/model/OscillatorModel.js";
 import { BasisOverlapNode } from "../src/oscillator/view/BasisOverlapNode.js";

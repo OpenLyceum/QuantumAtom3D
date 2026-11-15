@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import type { OrbitalsModel } from "../../src/orbitals/model/OrbitalsModel.js";
+import type { OrbitalsModel } from "../../src/common/model/orbital/OrbitalsModel.js";
 import type { OrbitalsScreenView } from "../../src/orbitals/view/OrbitalsScreenView.js";
 
 // Optional Windows Chrome path allows a real GPU check when WSL cannot present WebGPU.
