@@ -2,7 +2,10 @@ import { realOrbitalTerms } from "./OrbitalCatalog.js";
 import type { OrbitalTerm } from "./OrbitalTerm.js";
 import { normalizeTerms } from "./SuperpositionState.js";
 
-/** One normalized sp^k hybrid in the direction of a unit vector, k=1,2,3. */
+/**
+ * One normalized sp^k hybrid in the direction of a unit vector, k=1,2,3.
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export function hybridTerms(k: number, direction: readonly [number, number, number]): OrbitalTerm[] {
   const terms: OrbitalTerm[] = [{ n: 2, l: 0, m: 0, re: 1 / Math.sqrt(k + 1), im: 0 }];
   for (const [index, m] of [1, -1, 0].entries()) {

@@ -30,7 +30,10 @@ export type NodalSurfaceSet = {
   readonly azimuthalNodeAngles: readonly number[];
 };
 
-/** Polar angles of the l − |m| conical nodes of Y_lm, in increasing θ. */
+/**
+ * Polar angles of the l − |m| conical nodes of Y_lm, in increasing θ.
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export function polarNodeAngles(l: number, m: number): number[] {
   // Nudge the scan off ±1, where the sin^|m| factor (not a cone) would vanish.
   const EDGE = 1e-9;
@@ -38,7 +41,10 @@ export function polarNodeAngles(l: number, m: number): number[] {
   return roots.map((x) => Math.acos(x)).sort((a, b) => a - b);
 }
 
-/** Azimuths of the |m| nodal planes of the real orbital labelled m, in [0, π). */
+/**
+ * Azimuths of the |m| nodal planes of the real orbital labelled m, in [0, π).
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export function azimuthalNodeAngles(m: number): number[] {
   const mu = Math.abs(m);
   const angles: number[] = [];

@@ -20,7 +20,10 @@ import type { OrbitalRenderer } from "./OrbitalRenderer.js";
 import type { OrbitalScene } from "./OrbitalScene.js";
 import { paintPointCloud } from "./PointCloudPainter.js";
 
-/** Square resolutions rendered in turn, coarse to fine. */
+/**
+ * Square resolutions rendered in turn, coarse to fine.
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export const CPU_RESOLUTIONS = [32, 64, 128, 256] as const;
 
 /** Wall-clock budget per animation frame, in milliseconds. */

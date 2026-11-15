@@ -18,6 +18,7 @@ import { evolveTerms, normalizeTerms } from "../../common/model/orbital/Superpos
 import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
 import { TimeModel } from "../../common/TimeModel.js";
 
+/** @internal Exported for unit tests; not part of the application API. */
 export class CoefficientRow {
   public readonly quantumNumbers = new QuantumNumbersModel({ maxN: 5, initialN: 1, initialL: 0, initialM: 0 });
   public readonly magnitudeProperty = new NumberProperty(0, { range: new Range(0, 1) });

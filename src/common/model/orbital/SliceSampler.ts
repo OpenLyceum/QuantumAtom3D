@@ -30,7 +30,10 @@ export type SliceSamples = {
   readonly maxDensity: number;
 };
 
-/** Maps in-plane coordinates (u, v) and the normal offset to (x, y, z). */
+/**
+ * Maps in-plane coordinates (u, v) and the normal offset to (x, y, z).
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export function slicePoint(plane: SlicePlane, u: number, v: number, offset: number): readonly [number, number, number] {
   if (plane === "xy") {
     return [u, v, offset];

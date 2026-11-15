@@ -21,12 +21,18 @@ export type ZeemanTransition = {
   readonly polarization: Polarization;
 };
 
-/** LS coupling with g_L=1 and g_S=2, excluding the electron anomalous magnetic moment. */
+/**
+ * LS coupling with g_L=1 and g_S=2, excluding the electron anomalous magnetic moment.
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export function landeG(l: number, j: number, s = 0.5): number {
   return 1 + (j * (j + 1) + s * (s + 1) - l * (l + 1)) / (2 * j * (j + 1));
 }
 
-/** Dirac-Coulomb binding energy with rest energy removed, evaluated without subtracting nearly equal numbers. */
+/**
+ * Dirac-Coulomb binding energy with rest energy removed, evaluated without subtracting nearly equal numbers.
+ * @internal Exported for unit tests; not part of the application API.
+ */
 export function diracEnergy(n: number, j: number, z: number): number {
   const za = z * ALPHA;
   const k = j + 0.5;

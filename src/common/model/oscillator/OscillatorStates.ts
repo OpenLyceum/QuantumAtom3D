@@ -58,6 +58,7 @@ function cartesianPolynomial(state: CartesianState, x: number, y: number, z: num
     Math.PI ** -0.75,
   );
 }
+/** @internal Exported for unit tests; not part of the application API. */
 export function cartesianWavefunction(state: CartesianState, x: number, y: number, z: number): number {
   return cartesianPolynomial(state, x, y, z) * Math.exp(-(x * x + y * y + z * z) / 2);
 }

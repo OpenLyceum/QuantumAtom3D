@@ -27,6 +27,7 @@ export function eigenstateTerm(n: number, l: number, m: number): OrbitalTerm {
 /**
  * Σ|c_k|² over the terms. The basis states are orthonormal, so this is ⟨ψ|ψ⟩
  * whenever no two terms share the same (n, l, m).
+ * @internal Exported for unit tests; not part of the application API.
  */
 export function termsNormSquared(terms: readonly OrbitalTerm[]): number {
   let sum = 0;

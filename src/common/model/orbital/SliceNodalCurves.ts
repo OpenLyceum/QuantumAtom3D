@@ -24,6 +24,7 @@ const CURVE_SAMPLES = 96;
 /** Below this, an angle or offset counts as exactly zero. */
 const EPSILON = 1e-9;
 
+/** @internal Exported for unit tests; not part of the application API. */
 export type SlicePoint = readonly [number, number];
 export type SliceCurve = readonly SlicePoint[];
 
