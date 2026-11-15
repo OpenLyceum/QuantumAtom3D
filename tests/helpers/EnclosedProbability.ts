@@ -1,6 +1,6 @@
 /** A density threshold encloses the highest-density cells containing the requested probability. */
-import type { ComplexSample } from "../math/sphericalHarmonics.js";
-import type { Wavefunction } from "./Wavefunction.js";
+import type { ComplexSample } from "../../src/common/model/math/sphericalHarmonics.js";
+import type { Wavefunction } from "../../src/common/model/orbital/Wavefunction.js";
 
 export type DensityGrid = {
   readonly densities: Float64Array;

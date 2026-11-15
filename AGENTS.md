@@ -111,7 +111,7 @@ only under root `tests/`, mirroring `src/`.
 - `ResponsiveScreenView` owns portrait grouping, clipping, scrolling and focus reveal. Give every
   top-level content node exactly one portrait section; preserve desktop PDOM order for restoration.
 - Surface requests use `ProbabilitySurfaceTask` and `ProgressiveSurface`: weighted spherical
-  cubature plus a cooperative threshold search. Keep the uniform Cartesian grid as a reference.
+  cubature plus a cooperative threshold search. Keep the uniform Cartesian grid in `tests/helpers/EnclosedProbability.ts` as a test reference.
 - Views advance jobs only while their screen steps. Supersede paused requests on state changes;
   never publish an older request over the newest paused state. Show a localized status while pending.
 - `MetropolisSampler.begin/advance` must retain the exact synchronous `update` seeded sequence.

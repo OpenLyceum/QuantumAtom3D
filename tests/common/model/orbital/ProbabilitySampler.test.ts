@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildDensityGrid,
-  enclosedProbabilityLevel,
-} from "../../../../src/common/model/orbital/EnclosedProbability.js";
 import { orbitalTerms } from "../../../../src/common/model/orbital/OrbitalCatalog.js";
 import { sampleEigenstate } from "../../../../src/common/model/orbital/ProbabilitySampler.js";
 import { Wavefunction } from "../../../../src/common/model/orbital/Wavefunction.js";
+import { buildDensityGrid, enclosedProbabilityLevel } from "../../../helpers/EnclosedProbability.js";
 
 describe("probability point samples", () => {
   it.each([

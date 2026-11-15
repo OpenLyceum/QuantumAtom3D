@@ -179,6 +179,7 @@ test("GPU volume and isosurface pixels match the CPU reference", async ({ page }
   test.skip(!status.available, `WebGPU presentation unavailable: ${status.reason}`);
   const result = await page.evaluate(async () => {
     const load = (file: string) => import(`/src/${file}.ts`);
+    const referencePath = "/tests/helpers/EnclosedProbability.ts";
     const [
       { getGpuInitializationResult },
       { WebGpuOrbitalRenderer },
@@ -200,7 +201,7 @@ test("GPU volume and isosurface pixels match the CPU reference", async ({ page }
       load("common/model/orbital/PeakDensity"),
       load("common/view/OrbitCamera"),
       load("common/view/Colormaps"),
-      load("common/model/orbital/EnclosedProbability"),
+      import(referencePath),
       load("common/model/hydrogen/HydrogenRadial"),
       load("common/model/orbital/NodalSurfaces"),
     ]);
