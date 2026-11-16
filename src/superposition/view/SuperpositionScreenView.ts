@@ -38,7 +38,7 @@ type Options = ScreenViewOptions & {
   preferences?: QuantumAtom3DPreferencesModel;
   phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
 };
-const FONT = new PhetFont(SUPERPOSITION_SCREEN_VIEW_SETTINGS.FONT_FONT_SIZE);
+const FONT = new PhetFont(SUPERPOSITION_SCREEN_VIEW_SETTINGS.FONT_SIZE);
 const SIZE: number = SUPERPOSITION_SCREEN_VIEW_SETTINGS.SIZE;
 export class SuperpositionScreenView extends ResponsiveScreenView {
   public readonly viewport: SuperpositionViewportNode;

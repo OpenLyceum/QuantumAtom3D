@@ -67,7 +67,7 @@ export class OrbitalAngularDetailNode extends VBox {
       }),
       plot,
       new RichText("ψ = Rₙₗ(r) ∑ₘ cₘ Yₗₘ(θ,φ)", {
-        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PHET_FONT_FONT_SIZE),
+        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.FONT_SIZE),
         fill: QuantumAtom3DColors.textColorProperty,
         ...(formulas && { visibleProperty: formulas }),
         maxWidth: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_MAX_WIDTH,
@@ -83,7 +83,7 @@ export class OrbitalAngularDetailNode extends VBox {
         accessibleName: strings.phiStringProperty,
       }),
       new RichText(this.description, {
-        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PHET_FONT_FONT_SIZE_SEGMENT_2),
+        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.FONT_SIZE_SEGMENT_2),
         fill: QuantumAtom3DColors.textColorProperty,
         lineWrap: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_LINE_WRAP,
         tagName: "p",

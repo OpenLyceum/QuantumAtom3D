@@ -1,4 +1,4 @@
-import { QUANTUM_ATOM3_D_PANEL_SETTINGS } from "../QuantumAtom3DConstants.js";
+import { QUANTUM_ATOM_3D_PANEL_SETTINGS } from "../QuantumAtom3DConstants.js";
 /**
  * QuantumAtom3DPanel.ts
  *
@@ -41,8 +41,8 @@ export class QuantumAtom3DPanel extends Panel {
         fill: QuantumAtom3DColors.panelBackgroundColorProperty,
         stroke: QuantumAtom3DColors.panelBorderColorProperty,
         cornerRadius: PANEL_CORNER_RADIUS,
-        xMargin: QUANTUM_ATOM3_D_PANEL_SETTINGS.OPTIONS_X_MARGIN,
-        yMargin: QUANTUM_ATOM3_D_PANEL_SETTINGS.OPTIONS_Y_MARGIN,
+        xMargin: QUANTUM_ATOM_3D_PANEL_SETTINGS.OPTIONS_X_MARGIN,
+        yMargin: QUANTUM_ATOM_3D_PANEL_SETTINGS.OPTIONS_Y_MARGIN,
       },
       providedOptions,
     );

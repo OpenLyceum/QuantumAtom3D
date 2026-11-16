@@ -164,7 +164,7 @@ export class OrbitalViewportNode extends Node {
         },
       ),
       Multilink.multilink([model.probeFractionProperty], (fraction) => {
-        probeShell.radius = Math.max(ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_RADIUS, (fraction * size) / 2);
+        probeShell.radius = Math.max(ORBITAL_VIEWPORT_NODE_SETTINGS.EPSILON_RADIUS, (fraction * size) / 2);
         probeShell.visible = fraction > 0;
       }),
       Multilink.multilink(

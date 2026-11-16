@@ -166,7 +166,7 @@ export const ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS = {
 } as const;
 
 /** Settings for common/QuantumAtom3DControlOptions.ts. Layout lengths are in px; counts and ratios are dimensionless. */
-export const QUANTUM_ATOM3_D_CONTROL_OPTIONS_SETTINGS = {
+export const QUANTUM_ATOM_3D_CONTROL_OPTIONS_SETTINGS = {
   SLIDER_THUMB_SIZE_WIDTH: 12,
   SLIDER_THUMB_SIZE_HEIGHT: 22,
   STANDALONE_SLIDER_TRACK_SIZE_WIDTH: 150,
@@ -174,22 +174,22 @@ export const QUANTUM_ATOM3_D_CONTROL_OPTIONS_SETTINGS = {
   NUMBER_CONTROL_SLIDER_TRACK_SIZE_WIDTH: 110,
   NUMBER_CONTROL_SLIDER_TRACK_SIZE_HEIGHT: 3,
   CHECKBOX_BOX_WIDTH: 16,
-  /** Quantum atom 3 d number control options scale (dimensionless). */
-  QUANTUM_ATOM_3_D_NUMBER_CONTROL_OPTIONS_SCALE: 0.75,
-  QUANTUM_ATOM_3_D_NUMBER_CONTROL_OPTIONS_SLIDER_PADDING: 4,
-  QUANTUM_ATOM_3_D_NUMBER_CONTROL_OPTIONS_ARROW_BUTTON_SPACING: 3,
-  QUANTUM_ATOM_3_D_NUMBER_CONTROL_OPTIONS_VERTICAL_SPACING: 4,
-  QUANTUM_ATOM_3_D_CHECKBOX_OPTIONS_SPACING: 4,
+  /** NumberControl arrow-button scale (dimensionless). */
+  NUMBER_CONTROL_OPTIONS_SCALE: 0.75,
+  NUMBER_CONTROL_OPTIONS_SLIDER_PADDING: 4,
+  NUMBER_CONTROL_OPTIONS_ARROW_BUTTON_SPACING: 3,
+  NUMBER_CONTROL_OPTIONS_VERTICAL_SPACING: 4,
+  CHECKBOX_OPTIONS_SPACING: 4,
 } as const;
 
 /** Settings for common/QuantumAtom3DPanel.ts. Layout lengths are in px; counts and ratios are dimensionless. */
-export const QUANTUM_ATOM3_D_PANEL_SETTINGS = {
+export const QUANTUM_ATOM_3D_PANEL_SETTINGS = {
   OPTIONS_X_MARGIN: 12,
   OPTIONS_Y_MARGIN: 10,
 } as const;
 
 /** Settings for common/QuantumAtom3DScreenIcons.ts. Layout lengths are in px; counts and ratios are dimensionless. */
-export const QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS = {
+export const QUANTUM_ATOM_3D_SCREEN_ICONS_SETTINGS = {
   CREATE_SUPERPOSITION_ICON_RADIUS_SEGMENT_2: 69, // px
   CREATE_SUPERPOSITION_ICON_CENTER_X_VARIANT_2: 337, // px
   CREATE_SUPERPOSITION_ICON_OPACITY_VARIANT_2: 0.85, // dimensionless
@@ -249,7 +249,7 @@ export const QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS = {
 export const CPU_ORBITAL_RENDERER_SETTINGS = {
   /** Wall-clock budget per animation frame, in milliseconds. */
   CPU_FRAME_BUDGET_MS: 12,
-  /** Wall-clock budget per animation frame, in milliseconds. */
+  /** Full 8-bit channel scale for packing RGBA bytes. */
   BYTE: 255,
 } as const;
 
@@ -277,13 +277,13 @@ export const ORBITAL_SCENE_SETTINGS = {
 
 /** Settings for common/gpu/RenderQualityController.ts. */
 export const RENDER_QUALITY_CONTROLLER_SETTINGS = {
-  /** Hysteresis on completed GPU frame latency, excluding idle gaps. */
+  /** Frame latency (ms) above which a frame counts as slow. */
   SLOW_FRAME_MS: 40,
-  /** Hysteresis on completed GPU frame latency, excluding idle gaps. */
+  /** Frame latency (ms) below which a frame counts as fast. */
   FAST_FRAME_MS: 18,
-  /** Hysteresis on completed GPU frame latency, excluding idle gaps. */
+  /** Consecutive slow frames before stepping quality down. */
   SLOW_FRAME_COUNT: 6,
-  /** Hysteresis on completed GPU frame latency, excluding idle gaps. */
+  /** Consecutive fast frames before stepping quality up. */
   FAST_FRAME_COUNT: 48,
 } as const;
 
@@ -424,7 +424,7 @@ export const COLORMAPS_SETTINGS = {
   UNIFORM_HUE_AT_ZERO_PHASE: 0.5,
   /** Entries in the precomputed uniform wheel. */
   UNIFORM_TABLE_SIZE: 720,
-  /** Nine evenly spaced samples of matplotlib's "inferno". */
+  /** Full 8-bit channel scale for packing RGBA bytes. */
   BYTE: 255,
   /** Entries per colour lookup table handed to the 3D renderers. */
   COLOR_LUT_SIZE: 256,
@@ -441,8 +441,8 @@ export const INTERACTIVE_ORBITAL_CANVAS_SETTINGS = {
 
 /** Settings for common/view/OrbitalAngularDetailNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS = {
-  PHET_FONT_FONT_SIZE: 13, // px
-  PHET_FONT_FONT_SIZE_SEGMENT_2: 12, // px
+  FONT_SIZE: 13, // px
+  FONT_SIZE_SEGMENT_2: 12, // px
 
   PLOT_LINE_DASH_DASH: 4, // px
   PLOT_LEFT_OFFSET: 5, // px
@@ -489,7 +489,8 @@ export const ORBITAL_READOUT_PANEL_SETTINGS = {
 export const ORBITAL_VIEWPORT_NODE_SETTINGS = {
   PROBE_SHELL_LINE_DASH_DASH: 4, // px
   CONSTRUCTOR_PROBE_SHELL_LINE_DASH_DASH: 3, // px
-  CONSTRUCTOR_RADIUS: 0.01, // px
+  /** Floor for Math.max so the probe shell never collapses to a zero radius. */
+  EPSILON_RADIUS: 0.01,
   CONSTRUCTOR_CENTER_X_OFFSET: 10, // px
   CONSTRUCTOR_CENTER_Y_OFFSET: 10, // px
   AXIS_LENGTH: 28,
@@ -709,7 +710,7 @@ export const OSCILLATOR_SCREEN_VIEW_SETTINGS = {
 } as const;
 
 /** Settings for preferences/QuantumAtom3DPreferencesNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
-export const QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS = {
+export const QUANTUM_ATOM_3D_PREFERENCES_NODE_SETTINGS = {
   CREATE_ITEM_TEXT_LINE_WRAP: 260, // px
 
   HEADER_FONT_SIZE: 18,
@@ -790,7 +791,7 @@ export const SUPERPOSITION_SCREEN_VIEW_SETTINGS = {
   MIXER_TOP_OFFSET: 20, // px
   STATUS_DECIMAL_PLACES: 3, // digits
 
-  FONT_FONT_SIZE: 13,
+  FONT_SIZE: 13,
   SIZE: 340,
   DEFAULT_MAX_WIDTH: 180,
   DEFAULT_WIDTH: 110,
@@ -960,8 +961,8 @@ export const OSCILLATOR_DOMAIN = {
 } as const;
 
 /** Component dimensions in px; ratios and control steps are dimensionless; precision counts digits. */
-export const QUANTUM_ATOM3_D_QUERY_PARAMETERS_SETTINGS = {
-  QUANTUM_ATOM3_D_QUERY_PARAMETERS_DEFAULT_VALUE: 173, // dimensionless
+export const QUANTUM_ATOM_3D_QUERY_PARAMETERS_SETTINGS = {
+  SEED_DEFAULT_VALUE: 173, // dimensionless
 } as const;
 
 /** Component dimensions in px; ratios and control steps are dimensionless; precision counts digits. */
