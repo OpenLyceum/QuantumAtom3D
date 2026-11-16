@@ -75,6 +75,7 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
 
 ## Compliance carve-outs
 
+- `.github/workflows/ci.yml`: `unused-mode: advisory` until both Knip default and production baselines are reviewed and cleared ([Baton/doc/knip.md](https://github.com/OpenLyceum/Baton/blob/main/doc/knip.md)).
 - **Hardcoded colors** in `src/common/view/Colormaps.ts` and `ColormapLegendNode.ts`: these are data
   colours computed from ψ (the phase wheels and the inferno density ramp). They must not follow the
   colour profile, or the legend would stop matching the heatmap. Theme chrome around them still comes
