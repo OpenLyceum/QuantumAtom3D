@@ -57,11 +57,11 @@ export class OscillatorScreenView extends ResponsiveScreenView {
       options.preferences?.qualityProperty,
     );
     const viewport = this.viewport;
-    viewport.left = this.layoutBounds.minX + OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
-    viewport.top = this.layoutBounds.minY + OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+    viewport.left = this.layoutBounds.minX + OSCILLATOR_SCREEN_VIEW_SETTINGS.LEFT_OFFSET;
+    viewport.top = this.layoutBounds.minY + OSCILLATOR_SCREEN_VIEW_SETTINGS.TOP_OFFSET;
     const title = text(strings.unitsStringProperty, OSCILLATOR_SCREEN_VIEW_SETTINGS.UNITS_TEXT_MAX_WIDTH);
     title.left = viewport.left;
-    title.bottom = viewport.top - OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
+    title.bottom = viewport.top - OSCILLATOR_SCREEN_VIEW_SETTINGS.BOTTOM_OFFSET;
     const cameraRows = (
       [
         [orbital.volume.yawStringProperty, viewport.camera.yawProperty],
@@ -136,7 +136,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
       spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONTROLS_SPACING,
       children: [
         new HBox({
-          spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_CONTROLS_SPACING,
+          spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONTROL_COLUMN_SPACING,
           children: [
             text(strings.shellStringProperty),
             spinner(model.shellProperty, model.shellProperty.rangeProperty, strings.shellStringProperty),
@@ -204,7 +204,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
     ladder.left = right + 390;
     ladder.top = this.layoutBounds.minY + 275;
     ladder.maxWidth = OSCILLATOR_SCREEN_VIEW_SETTINGS.MAX_WIDTH_MAX_WIDTH;
-    ladder.lineWrap = OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LINE_WRAP;
+    ladder.lineWrap = OSCILLATOR_SCREEN_VIEW_SETTINGS.LINE_WRAP;
     const note = text(strings.noteStringProperty, OSCILLATOR_SCREEN_VIEW_SETTINGS.NOTE_TEXT_MAX_WIDTH);
     note.left = viewport.left;
     note.bottom = this.layoutBounds.maxY - 15;

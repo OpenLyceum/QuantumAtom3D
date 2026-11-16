@@ -78,7 +78,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
       options.preferences?.qualityProperty,
     );
     this.viewport.left = this.layoutBounds.minX + SCREEN_VIEW_MARGIN;
-    this.viewport.top = this.layoutBounds.minY + SUPERPOSITION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+    this.viewport.top = this.layoutBounds.minY + SUPERPOSITION_SCREEN_VIEW_SETTINGS.TOP_OFFSET;
     const viewport = this.viewport;
     const timeText = new DerivedProperty(
       [model.timeProperty, model.expectationsProperty, strings.timeStringProperty, unitProperty],
@@ -87,7 +87,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     );
     const timeLabel = text(timeText, SIZE);
     timeLabel.left = viewport.left;
-    timeLabel.bottom = viewport.top - SUPERPOSITION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
+    timeLabel.bottom = viewport.top - SUPERPOSITION_SCREEN_VIEW_SETTINGS.BOTTOM_OFFSET;
     const timeControls = new TimeControlNode(model.timer.isPlayingProperty, {
       playPauseStepButtonOptions: {
         ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
@@ -121,7 +121,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
       top: viewport.bottom + SUPERPOSITION_SCREEN_VIEW_SETTINGS.BELOW_TOP_OFFSET,
       children: [
         new HBox({
-          spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BELOW_SPACING,
+          spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.BELOW_PANEL_SPACING,
           children: [
             timeControls,
             text(strings.speedStringProperty),

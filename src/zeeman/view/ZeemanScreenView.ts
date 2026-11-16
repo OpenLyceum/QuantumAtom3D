@@ -38,10 +38,10 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         maxWidth,
       });
     const title = text(strings.diagramStringProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.DIAGRAM_TEXT_MAX_WIDTH);
-    title.left = this.layoutBounds.minX + ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
-    title.top = this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+    title.left = this.layoutBounds.minX + ZEEMAN_SCREEN_VIEW_SETTINGS.LEFT_OFFSET;
+    title.top = this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.TOP_OFFSET;
     const subtitle = text(strings.centredStringProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.CENTRED_TEXT_MAX_WIDTH);
-    subtitle.lineWrap = ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LINE_WRAP;
+    subtitle.lineWrap = ZEEMAN_SCREEN_VIEW_SETTINGS.LINE_WRAP;
     subtitle.left = title.left;
     subtitle.top = title.bottom + 5;
     const diagram = new ZeemanDiagramNode(model);
@@ -61,9 +61,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     });
     model.capProperty.link((cap) => {
       fieldSlider.pdomMapPDOMValue = (value) =>
-        Number(
-          atomicFieldToTesla(cap * value).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SIGNIFICANT_FIGURES),
-        );
+        Number(atomicFieldToTesla(cap * value).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.SIGNIFICANT_FIGURES));
     });
     const fieldControl = new VBox({
       align: "left",
@@ -126,7 +124,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         modes,
         lines,
         new HBox({
-          spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_CONTROLS_SPACING,
+          spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROL_COLUMN_SPACING,
           children: [
             text(strings.chargeStringProperty),
             spinner(
@@ -141,7 +139,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         text(strings.viewStringProperty),
         directions,
         new HBox({
-          spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_CONTROLS_SPACING,
+          spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROL_COLUMN_SPACING,
           children: [
             text(strings.selectedStringProperty),
             spinner(model.selectedIndexProperty, model.selectedRangeProperty, strings.selectedStringProperty, 1),
@@ -156,7 +154,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
       (levels, index, mode) => {
         const level = levels[index];
         return level
-          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${level.g.toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.SELECTED_DECIMAL_PLACES)}, E=${hartreeToEv(level.energy).toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SELECTED_DECIMAL_PLACES)} eV`
+          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${level.g.toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.SELECTED_DECIMAL_PLACES)}, E=${hartreeToEv(level.energy).toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.ENERGY_DECIMAL_PLACES)} eV`
           : "";
       },
     );
@@ -247,7 +245,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     playback.centerY = precession.y;
     const note = text(strings.noteStringProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.NOTE_TEXT_MAX_WIDTH);
     note.left = title.left;
-    note.bottom = this.layoutBounds.maxY - ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
+    note.bottom = this.layoutBounds.maxY - ZEEMAN_SCREEN_VIEW_SETTINGS.BOTTOM_OFFSET;
     const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {

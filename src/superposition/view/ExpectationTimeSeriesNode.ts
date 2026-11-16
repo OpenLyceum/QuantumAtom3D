@@ -135,7 +135,7 @@ export class ExpectationTimeSeriesNode extends Node {
         zDot.center = new Vector2(chart.modelToViewX(atomicTimeToFs(time)), chart.modelToViewY(values.z));
         rPlot.setDataSet(samples.map((s) => new Vector2(atomicTimeToFs(s.t), s.r)));
         zPlot.setDataSet(samples.map((s) => new Vector2(atomicTimeToFs(s.t), s.z)));
-        timeLabel.string = `${axis}: ${atomicTimeToFs(start).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.CONSTRUCTOR_DECIMAL_PLACES)} – ${atomicTimeToFs(end).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.CONSTRUCTOR_DECIMAL_PLACES)}`;
+        timeLabel.string = `${axis}: ${atomicTimeToFs(start).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.DECIMAL_PLACES)} – ${atomicTimeToFs(end).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.DECIMAL_PLACES)}`;
       },
     );
   }

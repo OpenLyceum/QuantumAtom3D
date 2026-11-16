@@ -184,11 +184,11 @@ export class OrbitalsControlPanel extends QuantumAtom3DPanel {
         }),
         text(strings.presets.titleStringProperty, TITLE_FONT),
         new HBox({
-          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_CONTENT_SPACING,
+          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.SECTION_CONTENT_SPACING,
           children: presetButtons.slice(0, 3),
         }),
         new HBox({
-          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_CONTENT_SPACING,
+          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.SECTION_CONTENT_SPACING,
           children: presetButtons.slice(3),
         }),
       ],

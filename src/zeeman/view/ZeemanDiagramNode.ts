@@ -89,7 +89,7 @@ export class ZeemanDiagramNode extends Node {
                     font: new PhetFont(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_FONT_SIZE_SEGMENT_2),
                     fill: QuantumAtom3DColors.textColorProperty,
                     centerX: p.x,
-                    top: centreY - ZEEMAN_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_DRAW_BAND_TOP_OFFSET,
+                    top: centreY - ZEEMAN_DIAGRAM_NODE_SETTINGS.BAND_LABEL_TOP_OFFSET,
                   },
                 ),
               );

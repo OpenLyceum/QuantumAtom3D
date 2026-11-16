@@ -37,7 +37,7 @@ export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
               ? Math.max(...wavelengths).toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
               : "—",
           state: selected
-            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${selected.g.toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.CONSTRUCTOR_DETAILS_DECIMAL_PLACES)}` : ""}`
+            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${selected.g.toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.G_FACTOR_DECIMAL_PLACES)}` : ""}`
             : "—",
         });
       },

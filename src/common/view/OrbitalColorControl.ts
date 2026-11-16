@@ -52,7 +52,7 @@ export class OrbitalColorControl extends HBox {
     });
 
     super({
-      spacing: ORBITAL_COLOR_CONTROL_SETTINGS.CONSTRUCTOR_SPACING,
+      spacing: ORBITAL_COLOR_CONTROL_SETTINGS.SPACING,
       align: "center",
       children: [coloringRadioButtons, legend],
     });

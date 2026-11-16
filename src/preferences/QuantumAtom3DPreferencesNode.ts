@@ -100,7 +100,7 @@ export class QuantumAtom3DPreferencesNode extends VBox {
     );
     super({
       align: "left",
-      spacing: QUANTUM_ATOM_3D_PREFERENCES_NODE_SETTINGS.CONSTRUCTOR_SPACING,
+      spacing: QUANTUM_ATOM_3D_PREFERENCES_NODE_SETTINGS.SPACING,
       children: [
         header,
         colormapLabel,

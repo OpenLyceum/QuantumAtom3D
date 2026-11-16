@@ -74,7 +74,7 @@ export class OrbitalViewportNode extends Node {
       stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
       lineDash: [
         ORBITAL_VIEWPORT_NODE_SETTINGS.PROBE_SHELL_LINE_DASH_DASH,
-        ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_PROBE_SHELL_LINE_DASH_DASH,
+        ORBITAL_VIEWPORT_NODE_SETTINGS.PROBE_SHELL_LINE_DASH_GAP,
       ],
       pickable: false,
     });
@@ -94,7 +94,7 @@ export class OrbitalViewportNode extends Node {
     this.addChild(
       new Rectangle(0, 0, size, size, {
         stroke: QuantumAtom3DColors.sliceFrameColorProperty,
-        lineWidth: ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_LINE_WIDTH,
+        lineWidth: ORBITAL_VIEWPORT_NODE_SETTINGS.LINE_WIDTH,
         pickable: false,
       }),
     );
@@ -192,8 +192,8 @@ export class OrbitalViewportNode extends Node {
           const originX = size - 48;
           const originY = size - 48;
           line.setLine(originX, originY, originX + x * AXIS_LENGTH, originY - y * AXIS_LENGTH);
-          label.centerX = originX + x * (AXIS_LENGTH + ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_CENTER_X_OFFSET);
-          label.centerY = originY - y * (AXIS_LENGTH + ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_CENTER_Y_OFFSET);
+          label.centerX = originX + x * (AXIS_LENGTH + ORBITAL_VIEWPORT_NODE_SETTINGS.CENTER_X_OFFSET);
+          label.centerY = originY - y * (AXIS_LENGTH + ORBITAL_VIEWPORT_NODE_SETTINGS.CENTER_Y_OFFSET);
         }
       }),
     ];

@@ -88,31 +88,31 @@ export const ANGULAR_MOMENTUM_MODEL_SETTINGS = {
 
 /** Settings for angular-momentum/view/AngularDensityNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const ANGULAR_DENSITY_NODE_SETTINGS = {
-  CONSTRUCTOR_LINE_DASH_DASH: 4, // px
+  LINE_DASH_DASH: 4, // px
   CURVE_LINE_WIDTH: 2,
-  CONSTRUCTOR_RADIUS: 90,
-  CONSTRUCTOR_CENTER_X: 100,
-  CONSTRUCTOR_CENTER_Y: 100,
-  CONSTRUCTOR_START_X: 100,
-  CONSTRUCTOR_START_Y: 5,
-  CONSTRUCTOR_END_X: 100,
-  CONSTRUCTOR_END_Y: 195,
-  CONSTRUCTOR_FONT_SIZE: 12,
-  CONSTRUCTOR_LEFT: 105,
+  RADIUS: 90,
+  CENTER_X: 100,
+  CENTER_Y: 100,
+  START_X: 100,
+  START_Y: 5,
+  END_X: 100,
+  END_Y: 195,
+  FONT_SIZE: 12,
+  LEFT: 105,
 } as const;
 
 /** Settings for angular-momentum/view/AngularMomentumDiagramNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS = {
   SPIN_LABEL_MIDPOINT_X_OFFSET: 22,
   CONE_LINE_DASH_DASH: 5, // px
-  CONSTRUCTOR_CONE_LINE_DASH_DASH: 4, // px
+  CONE_LINE_DASH_GAP: 4, // px
   INNER_CONE_LINE_DASH_DASH: 3, // px
-  CONSTRUCTOR_INNER_CONE_LINE_DASH_DASH: 4, // px
+  INNER_CONE_LINE_DASH_GAP: 4, // px
   POINT_X_OFFSET: 210, // px
   POINT_Y_OFFSET: 205, // px
-  CONSTRUCTOR_TOP_OFFSET: 20, // px
-  CONSTRUCTOR_LINE_WIDTH: 3, // px
-  CONSTRUCTOR_LEFT_OFFSET: 8, // px
+  TOP_OFFSET: 20, // px
+  LINE_WIDTH: 3, // px
+  LEFT_OFFSET: 8, // px
 
   AXIS_START_X: 210,
   AXIS_START_Y: 340,
@@ -125,8 +125,8 @@ export const ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS = {
   ARROWS_HEAD_WIDTH: 12,
   ARROWS_HEAD_HEIGHT: 12,
   LABELS_FONT_SIZE: 17,
-  CONSTRUCTOR_WIDTH: 420,
-  CONSTRUCTOR_HEIGHT: 370,
+  WIDTH: 420,
+  HEIGHT: 370,
   STARTS_X: 210,
   STARTS_Y: 205,
   LINK_START_X: 330,
@@ -150,9 +150,9 @@ export const ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS = {
   PHASE_TOP_OFFSET: 20, // px
   RESET_RIGHT_OFFSET: 20, // px
   RESET_BOTTOM_OFFSET: 20, // px
-  CONSTRUCTOR_TOP_OFFSET: 15, // px
-  CONSTRUCTOR_LEFT_OFFSET: 15, // px
-  CONSTRUCTOR_BOTTOM_OFFSET: 20, // px
+  TOP_OFFSET: 15, // px
+  LEFT_OFFSET: 15, // px
+  BOTTOM_OFFSET: 20, // px
 
   DEFAULT_MAX_WIDTH: 420,
   LABEL_FONT_SIZE: 14,
@@ -432,10 +432,10 @@ export const COLORMAPS_SETTINGS = {
 
 /** Settings for common/view/InteractiveOrbitalCanvas.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const INTERACTIVE_ORBITAL_CANVAS_SETTINGS = {
-  CONSTRUCTOR_CENTER_X_OFFSET: 45, // px
-  CONSTRUCTOR_CENTER_X_FACTOR: 35, // px
-  CONSTRUCTOR_CENTER_Y_OFFSET: 45, // px
-  CONSTRUCTOR_CENTER_Y_FACTOR: 35, // px
+  CENTER_X_OFFSET: 45, // px
+  CENTER_X_FACTOR: 35, // px
+  CENTER_Y_OFFSET: 45, // px
+  CENTER_Y_FACTOR: 35, // px
   CHILDREN_LINE_WIDTH: 1.5,
 } as const;
 
@@ -446,8 +446,8 @@ export const ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS = {
 
   PLOT_LINE_DASH_DASH: 4, // px
   PLOT_LEFT_OFFSET: 5, // px
-  CONSTRUCTOR_MAX_WIDTH: 260, // px
-  CONSTRUCTOR_LINE_WRAP: 260, // px
+  MAX_WIDTH: 260, // px
+  LINE_WRAP: 260, // px
   SIZE: 230,
   RADIUS: 100,
   SAMPLES: 360,
@@ -455,7 +455,7 @@ export const ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS = {
   PHI_RANGE_MAX: 360,
   CURVE_LINE_WIDTH: 2,
   PLOT_FONT_SIZE: 12,
-  CONSTRUCTOR_SPACING: 12,
+  SPACING: 12,
   CHILDREN_FONT_SIZE: 14,
   CHILDREN_MAX_WIDTH: 275,
   CHILDREN_WIDTH: 220,
@@ -470,7 +470,7 @@ export const ORBITAL_COLOR_CONTROL_SETTINGS = {
   LABEL_MAX_WIDTH: 150,
   COLORING_RADIO_BUTTONS_SPACING: 8,
   COLORING_RADIO_BUTTONS_RADIUS: 7,
-  CONSTRUCTOR_SPACING: 24,
+  SPACING: 24,
 } as const;
 
 /** Settings for common/view/OrbitalReadoutPanel.ts. Layout lengths are in px; counts and ratios are dimensionless. */
@@ -488,14 +488,14 @@ export const ORBITAL_READOUT_PANEL_SETTINGS = {
 /** Settings for common/view/OrbitalViewportNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const ORBITAL_VIEWPORT_NODE_SETTINGS = {
   PROBE_SHELL_LINE_DASH_DASH: 4, // px
-  CONSTRUCTOR_PROBE_SHELL_LINE_DASH_DASH: 3, // px
+  PROBE_SHELL_LINE_DASH_GAP: 3, // px
   /** Floor for Math.max so the probe shell never collapses to a zero radius. */
   EPSILON_RADIUS: 0.01,
-  CONSTRUCTOR_CENTER_X_OFFSET: 10, // px
-  CONSTRUCTOR_CENTER_Y_OFFSET: 10, // px
+  CENTER_X_OFFSET: 10, // px
+  CENTER_Y_OFFSET: 10, // px
   AXIS_LENGTH: 28,
   PLANE_HANDLE_RADIUS: 7,
-  CONSTRUCTOR_LINE_WIDTH: 1.5,
+  LINE_WIDTH: 1.5,
 } as const;
 
 /** Settings for common/view/ProgressiveSurface.ts. Layout lengths are in px; counts and ratios are dimensionless. */
@@ -594,7 +594,7 @@ export const ORBITAL_VIEWPORT_CHROME_SETTINGS = {
 
 /** Settings for orbitals/view/OrbitalsControlPanel.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const ORBITALS_CONTROL_PANEL_SETTINGS = {
-  CONSTRUCTOR_CONTENT_SPACING: 6, // px
+  SECTION_CONTENT_SPACING: 6, // px
 
   TITLE_FONT_SIZE: 14,
   LABEL_FONT_SIZE: 13,
@@ -665,8 +665,8 @@ export const OSCILLATOR_MODEL_SETTINGS = {
 
 /** Settings for oscillator/view/BasisOverlapNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const BASIS_OVERLAP_NODE_SETTINGS = {
-  CONSTRUCTOR_CENTER_Y_OFFSET: 45, // px
-  CONSTRUCTOR_CENTER_X_OFFSET: 70, // px
+  CENTER_Y_OFFSET: 45, // px
+  CENTER_X_OFFSET: 70, // px
 
   CELL: 19,
   ROWS_FONT_SIZE: 10,
@@ -686,14 +686,14 @@ export const OSCILLATOR_SCREEN_VIEW_SETTINGS = {
   LADDER_MAX_WIDTH: 500, // px
   NOTE_TEXT_MAX_WIDTH: 920, // px
 
-  CONSTRUCTOR_LEFT_OFFSET: 25, // px
-  CONSTRUCTOR_TOP_OFFSET: 50, // px
-  CONSTRUCTOR_BOTTOM_OFFSET: 10, // px
+  LEFT_OFFSET: 25, // px
+  TOP_OFFSET: 50, // px
+  BOTTOM_OFFSET: 10, // px
   BELOW_TOP_OFFSET: 10, // px
-  CONSTRUCTOR_CONTROLS_SPACING: 15, // px
+  CONTROL_COLUMN_SPACING: 15, // px
   CONTROLS_TOP_OFFSET: 20, // px
   COEFFICIENT_DECIMAL_PLACES: 4, // digits
-  CONSTRUCTOR_LINE_WRAP: 140, // px
+  LINE_WRAP: 140, // px
   RESET_RIGHT_OFFSET: 18, // px
   RESET_BOTTOM_OFFSET: 18, // px
 
@@ -719,7 +719,7 @@ export const QUANTUM_ATOM_3D_PREFERENCES_NODE_SETTINGS = {
   COLORMAP_RADIO_BUTTONS_SPACING: 8,
   COLORMAP_RADIO_BUTTONS_RADIUS: 6,
   CREATE_CHOICE_BUTTONS_SPACING: 12,
-  CONSTRUCTOR_SPACING: 12,
+  SPACING: 12,
 } as const;
 
 /** Settings for superposition/model/SuperpositionModel.ts. */
@@ -749,7 +749,7 @@ export const SUPERPOSITION_MODEL_SETTINGS = {
 /** Settings for superposition/view/ExpectationTimeSeriesNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
 export const EXPECTATION_TIME_SERIES_NODE_SETTINGS = {
   TIME_LABEL_TOP_OFFSET: 5, // px
-  CONSTRUCTOR_DECIMAL_PLACES: 3, // digits
+  DECIMAL_PLACES: 3, // digits
 
   /** Chart range max (in the source module’s documented units). */
   CHART_RANGE_MAX: 5,
@@ -783,11 +783,11 @@ export const SUPERPOSITION_SCREEN_VIEW_SETTINGS = {
   STATUS_LABEL_MAX_WIDTH: 500, // px
   NORMALIZATION_TEXT_MAX_WIDTH: 510, // px
 
-  CONSTRUCTOR_TOP_OFFSET: 35, // px
+  TOP_OFFSET: 35, // px
   TIME_TEXT_DECIMAL_PLACES: 3, // digits
-  CONSTRUCTOR_BOTTOM_OFFSET: 8, // px
+  BOTTOM_OFFSET: 8, // px
   BELOW_TOP_OFFSET: 10, // px
-  CONSTRUCTOR_BELOW_SPACING: 16, // px
+  BELOW_PANEL_SPACING: 16, // px
   MIXER_TOP_OFFSET: 20, // px
   STATUS_DECIMAL_PLACES: 3, // digits
 
@@ -829,7 +829,7 @@ export const ZEEMAN_DIAGRAM_NODE_SETTINGS = {
   POSITION_X_FACTOR: 112, // dimensionless
   DRAW_BAND_TOP_OFFSET: 105, // px
   DRAW_BAND_DECIMAL_PLACES: 6, // digits
-  CONSTRUCTOR_DRAW_BAND_TOP_OFFSET: 88, // px
+  BAND_LABEL_TOP_OFFSET: 88, // px
   DRAW_BAND_LINE_WIDTH: 3, // px
   DRAW_BAND_LEFT_OFFSET: 20, // px
 
@@ -845,20 +845,20 @@ export const ZEEMAN_SCREEN_VIEW_SETTINGS = {
   PERIOD_LABEL_MAX_WIDTH: 335, // px
   NOTE_TEXT_MAX_WIDTH: 920, // px
 
-  CONSTRUCTOR_LEFT_OFFSET: 25, // px
-  CONSTRUCTOR_TOP_OFFSET: 15, // px
-  CONSTRUCTOR_LINE_WRAP: 560, // px
+  LEFT_OFFSET: 25, // px
+  TOP_OFFSET: 15, // px
+  LINE_WRAP: 560, // px
   FIELD_VALUE_SIGNIFICANT_FIGURES: 4, // digits
-  CONSTRUCTOR_SIGNIFICANT_FIGURES: 8, // digits
-  CONSTRUCTOR_CONTROLS_SPACING: 10, // px
+  SIGNIFICANT_FIGURES: 8, // digits
+  CONTROL_COLUMN_SPACING: 10, // px
   CONTROLS_LEFT_OFFSET: 365, // px
   CONTROLS_TOP_OFFSET: 20, // px
   SELECTED_DECIMAL_PLACES: 3, // digits
-  CONSTRUCTOR_SELECTED_DECIMAL_PLACES: 8, // digits
+  ENERGY_DECIMAL_PLACES: 8, // digits
   PERIOD_SIGNIFICANT_FIGURES: 4, // digits
   PRECESSION_X_OFFSET: 70, // px
   PRECESSION_Y_OFFSET: 525, // px
-  CONSTRUCTOR_BOTTOM_OFFSET: 12, // px
+  BOTTOM_OFFSET: 12, // px
   RESET_RIGHT_OFFSET: 18, // px
   RESET_BOTTOM_OFFSET: 18, // px
 
@@ -914,7 +914,7 @@ export const SUPERPOSITION_NUMERICS = {
 export const ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS = {
   DETAILS_SIGNIFICANT_FIGURES: 4, // digits
   DETAILS_DECIMAL_PLACES: 6, // digits
-  CONSTRUCTOR_DETAILS_DECIMAL_PLACES: 4, // digits
+  G_FACTOR_DECIMAL_PLACES: 4, // digits
 } as const;
 
 /** Layout lengths in px; precision values count digits; factors are dimensionless. */

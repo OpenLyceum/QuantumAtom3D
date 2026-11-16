@@ -55,7 +55,7 @@ export class OrbitalAngularDetailNode extends VBox {
         curve,
       ],
     });
-    super({ spacing: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_SPACING, align: "left" });
+    super({ spacing: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.SPACING, align: "left" });
     this.description = new DerivedProperty([this.phiProperty, strings.descriptionStringProperty], (phi, pattern) =>
       StringUtils.fillIn(pattern, { phi: Math.round(phi) }),
     );
@@ -70,7 +70,7 @@ export class OrbitalAngularDetailNode extends VBox {
         font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.FONT_SIZE),
         fill: QuantumAtom3DColors.textColorProperty,
         ...(formulas && { visibleProperty: formulas }),
-        maxWidth: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_MAX_WIDTH,
+        maxWidth: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.MAX_WIDTH,
       }),
       new HSlider(this.phiProperty, this.phiProperty.range, {
         ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
@@ -85,7 +85,7 @@ export class OrbitalAngularDetailNode extends VBox {
       new RichText(this.description, {
         font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.FONT_SIZE_SEGMENT_2),
         fill: QuantumAtom3DColors.textColorProperty,
-        lineWrap: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_LINE_WRAP,
+        lineWrap: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.LINE_WRAP,
         tagName: "p",
         accessibleParagraph: this.description,
       }),

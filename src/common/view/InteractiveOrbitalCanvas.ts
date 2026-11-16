@@ -56,12 +56,12 @@ export class InteractiveOrbitalCanvas extends Node {
         line.setLine(size - 45, size - 45, size - 45 + 25 * x, size - 45 - 25 * y);
         label.centerX =
           size -
-          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_X_OFFSET +
-          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_X_FACTOR * x;
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CENTER_X_OFFSET +
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CENTER_X_FACTOR * x;
         label.centerY =
           size -
-          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_Y_OFFSET -
-          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_Y_FACTOR * y;
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CENTER_Y_OFFSET -
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CENTER_Y_FACTOR * y;
       }
     });
     let previous: Vector2 | null = null;

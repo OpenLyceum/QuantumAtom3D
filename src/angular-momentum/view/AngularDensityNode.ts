@@ -17,27 +17,24 @@ export class AngularDensityNode extends Node {
     });
     super({
       children: [
-        new Circle(ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_RADIUS, {
-          centerX: ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_CENTER_X,
-          centerY: ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_CENTER_Y,
+        new Circle(ANGULAR_DENSITY_NODE_SETTINGS.RADIUS, {
+          centerX: ANGULAR_DENSITY_NODE_SETTINGS.CENTER_X,
+          centerY: ANGULAR_DENSITY_NODE_SETTINGS.CENTER_Y,
           stroke: QuantumAtom3DColors.chartGridColorProperty,
-          lineDash: [
-            ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_LINE_DASH_DASH,
-            ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_LINE_DASH_DASH,
-          ],
+          lineDash: [ANGULAR_DENSITY_NODE_SETTINGS.LINE_DASH_DASH, ANGULAR_DENSITY_NODE_SETTINGS.LINE_DASH_DASH],
         }),
         new Line(
-          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_START_X,
-          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_START_Y,
-          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_END_X,
-          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_END_Y,
+          ANGULAR_DENSITY_NODE_SETTINGS.START_X,
+          ANGULAR_DENSITY_NODE_SETTINGS.START_Y,
+          ANGULAR_DENSITY_NODE_SETTINGS.END_X,
+          ANGULAR_DENSITY_NODE_SETTINGS.END_Y,
           { stroke: QuantumAtom3DColors.chartGridColorProperty },
         ),
         curve,
         new Text("z", {
-          font: new PhetFont(ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_FONT_SIZE),
+          font: new PhetFont(ANGULAR_DENSITY_NODE_SETTINGS.FONT_SIZE),
           fill: QuantumAtom3DColors.textColorProperty,
-          left: ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_LEFT,
+          left: ANGULAR_DENSITY_NODE_SETTINGS.LEFT,
           top: 0,
         }),
       ],

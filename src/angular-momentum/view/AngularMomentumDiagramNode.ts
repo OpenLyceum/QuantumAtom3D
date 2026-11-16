@@ -34,14 +34,14 @@ export class AngularMomentumDiagramNode extends Node {
       stroke: QuantumAtom3DColors.nodeMarkerColorProperty,
       lineDash: [
         ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONE_LINE_DASH_DASH,
-        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_CONE_LINE_DASH_DASH,
+        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONE_LINE_DASH_GAP,
       ],
     });
     const innerCone = new Path(null, {
       stroke: QuantumAtom3DColors.radialCurveColorProperty,
       lineDash: [
         ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.INNER_CONE_LINE_DASH_DASH,
-        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_INNER_CONE_LINE_DASH_DASH,
+        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.INNER_CONE_LINE_DASH_GAP,
       ],
     });
     const axis = new Line(
@@ -85,8 +85,8 @@ export class AngularMomentumDiagramNode extends Node {
         new Rectangle(
           0,
           0,
-          ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_WIDTH,
-          ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_HEIGHT,
+          ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.WIDTH,
+          ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.HEIGHT,
           {
             fill: QuantumAtom3DColors.chartBackgroundColorProperty,
             stroke: QuantumAtom3DColors.sliceFrameColorProperty,
@@ -145,11 +145,11 @@ export class AngularMomentumDiagramNode extends Node {
             label.left =
               index === 1 && start
                 ? (start.x + end.x) / 2 - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.SPIN_LABEL_MIDPOINT_X_OFFSET
-                : end.x + ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
+                : end.x + ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LEFT_OFFSET;
             label.top =
               index === 1 && start
-                ? (start.y + end.y) / 2 - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_TOP_OFFSET
-                : end.y - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+                ? (start.y + end.y) / 2 - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.TOP_OFFSET
+                : end.y - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.TOP_OFFSET;
           }
           if (visible && start) {
             arrow.setTailAndTip(start.x, start.y, end.x, end.y);
@@ -180,7 +180,7 @@ export class AngularMomentumDiagramNode extends Node {
                   value === selected
                     ? QuantumAtom3DColors.meanRadiusColorProperty
                     : QuantumAtom3DColors.chartGridColorProperty,
-                lineWidth: value === selected ? ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_LINE_WIDTH : 1,
+                lineWidth: value === selected ? ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LINE_WIDTH : 1,
               },
             ),
           );

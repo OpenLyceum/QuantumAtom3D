@@ -96,13 +96,13 @@ export class BasisOverlapNode extends Node {
           label.visible = i < size;
           label.string = cart[i]?.join(",") ?? "";
           label.right = BASIS_OVERLAP_NODE_SETTINGS.RIGHT_RIGHT;
-          label.centerY = BASIS_OVERLAP_NODE_SETTINGS.CONSTRUCTOR_CENTER_Y_OFFSET + (i + 0.5) * CELL;
+          label.centerY = BASIS_OVERLAP_NODE_SETTINGS.CENTER_Y_OFFSET + (i + 0.5) * CELL;
         });
         columns.forEach((label, j) => {
           const s = sphere[j];
           label.visible = !!s;
           label.string = s ? `${s.nr},${s.l},${s.m}` : "";
-          label.centerX = BASIS_OVERLAP_NODE_SETTINGS.CONSTRUCTOR_CENTER_X_OFFSET + (j + 0.5) * CELL;
+          label.centerX = BASIS_OVERLAP_NODE_SETTINGS.CENTER_X_OFFSET + (j + 0.5) * CELL;
           label.bottom = BASIS_OVERLAP_NODE_SETTINGS.BOTTOM_BOTTOM;
         });
       }),

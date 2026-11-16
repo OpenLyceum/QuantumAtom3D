@@ -54,7 +54,7 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
     );
     const readout = label(readouts);
     readout.left = diagram.left;
-    readout.top = diagram.bottom + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+    readout.top = diagram.bottom + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.TOP_OFFSET;
     const mControl = new HBox({
       spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.M_CONTROL_SPACING,
       children: [
@@ -140,7 +140,7 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
       top: readout.bottom + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.PHASE_TOP_OFFSET,
     });
     const density = new AngularDensityNode(model);
-    density.left = controls.left + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
+    density.left = controls.left + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.LEFT_OFFSET;
     density.top = this.layoutBounds.minY + 315;
     const densityTitle = label(
       strings.densityStringProperty,
@@ -156,7 +156,7 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
     densityHelp.top = density.bottom + 8;
     const note = label(strings.noteStringProperty, ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.NOTE_LABEL_MAX_WIDTH);
     note.left = diagram.left;
-    note.bottom = this.layoutBounds.maxY - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
+    note.bottom = this.layoutBounds.maxY - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.BOTTOM_OFFSET;
     const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
