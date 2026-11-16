@@ -37,3 +37,32 @@ export function evolveTerms(terms: readonly OrbitalTerm[], nuclearCharge: number
 export function dipoleAllowed(a: OrbitalTerm, b: OrbitalTerm): boolean {
   return Math.abs(a.l - b.l) === 1 && Math.abs(a.m - b.m) <= 1;
 }
+
+/** Leading-pair beat note: energy gap and Bohr period in Hartree atomic units. */
+export type SuperpositionDynamics =
+  | { kind: "empty" }
+  | { kind: "stationary" }
+  | { kind: "degenerate" }
+  | { kind: "beating"; energyGap: number; period: number; isDipoleAllowed: boolean };
+
+/** Classify the leading coefficient pair for the status readout. */
+export function superpositionDynamics(terms: readonly OrbitalTerm[], nuclearCharge: number): SuperpositionDynamics {
+  const a = terms[0];
+  const b = terms[1];
+  if (!a) {
+    return { kind: "empty" };
+  }
+  if (!b || terms.every((term) => term.n === a.n)) {
+    return { kind: "stationary" };
+  }
+  const energyGap = Math.abs(hydrogenEnergy(a.n, nuclearCharge) - hydrogenEnergy(b.n, nuclearCharge));
+  if (energyGap === 0) {
+    return { kind: "degenerate" };
+  }
+  return {
+    kind: "beating",
+    energyGap,
+    period: (2 * Math.PI) / energyGap,
+    isDipoleAllowed: dipoleAllowed(a, b),
+  };
+}

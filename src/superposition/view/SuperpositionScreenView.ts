@@ -6,9 +6,7 @@ import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-
 import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider, NumberSpinner, RectangularPushButton } from "scenerystack/sun";
 import { atomicTimeToFs, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
-import { hydrogenEnergy } from "../../common/model/hydrogen/HydrogenExpectations.js";
 import { SUPERPOSITION_PRESETS, type SuperpositionPreset } from "../../common/model/orbital/SuperpositionPresets.js";
-import { dipoleAllowed } from "../../common/model/orbital/SuperpositionState.js";
 import {
   FLAT_PANEL_PUSH_BUTTON_OPTIONS,
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
@@ -289,29 +287,25 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     });
     const status = new DerivedProperty(
       [
-        model.termsProperty,
-        model.nuclearChargeProperty,
+        model.dynamicsProperty,
         strings.emptyStringProperty,
         strings.stationaryStringProperty,
         strings.pairStringProperty,
         strings.allowedStringProperty,
         strings.forbiddenStringProperty,
       ],
-      (terms, charge, empty, stationary, pair, allowed, forbidden) => {
-        const a = terms[0];
-        const b = terms[1];
-        if (!a) {
+      (dynamics, empty, stationary, pair, allowed, forbidden) => {
+        if (dynamics.kind === "empty") {
           return empty;
         }
-        if (!b || terms.every((term) => term.n === a.n)) {
+        if (dynamics.kind === "stationary") {
           return stationary;
         }
-        const gap = Math.abs(hydrogenEnergy(a.n, charge) - hydrogenEnergy(b.n, charge));
-        if (gap === 0) {
+        if (dynamics.kind === "degenerate") {
           return `${pair}: ΔE = 0`;
         }
-        const period = atomicTimeToFs((2 * Math.PI) / gap);
-        return `${pair}: T = ${period.toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} fs, f = ${(1 / period).toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} PHz, λ = ${wavelengthNmForEnergy(gap).toFixed(1)} nm<br>${dipoleAllowed(a, b) ? allowed : forbidden}`;
+        const period = atomicTimeToFs(dynamics.period);
+        return `${pair}: T = ${period.toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} fs, f = ${(1 / period).toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} PHz, λ = ${wavelengthNmForEnergy(dynamics.energyGap).toFixed(1)} nm<br>${dynamics.isDipoleAllowed ? allowed : forbidden}`;
       },
     );
     const statusLabel = text(status, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_LABEL_MAX_WIDTH);

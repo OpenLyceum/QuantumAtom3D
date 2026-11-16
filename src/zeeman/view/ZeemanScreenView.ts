@@ -4,7 +4,6 @@ import { ArrowNode, PhetFont, ResetAllButton, TimeControlNode } from "scenerysta
 import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider } from "scenerystack/sun";
 import { atomicFieldToTesla, atomicTimeToFs, hartreeToEv } from "../../common/model/AtomicUnits.js";
-import { orbitalVector } from "../../common/model/angular/VectorModel.js";
 import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
 import {
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
@@ -21,6 +20,10 @@ import type { ZeemanModel } from "../model/ZeemanModel.js";
 import { polarizationColor, ZeemanDiagramNode } from "./ZeemanDiagramNode.js";
 import { ZeemanScreenSummaryContent } from "./ZeemanScreenSummaryContent.js";
 import { ZeemanSpectrumNode } from "./ZeemanSpectrumNode.js";
+
+/** Layout scale (px) applied to the model's unit-length precession vector. */
+const PRECESSION_ARROW_SCALE = 45;
+
 export class ZeemanScreenView extends ResponsiveScreenView {
   public constructor(model: ZeemanModel, options?: ScreenViewOptions) {
     super({ ...options, screenSummaryContent: new ZeemanScreenSummaryContent(model) });
@@ -185,23 +188,15 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     legend.left = title.left;
     legend.top = spectrum.bottom + 6;
     const period = new DerivedProperty(
-      [
-        model.upperLevelsProperty,
-        model.selectedIndexProperty,
-        model.fieldProperty,
-        strings.periodStringProperty,
-        strings.offStringProperty,
-      ],
-      (levels, index, field, label, off) => {
-        const level = levels[index];
-        if (!level || field === 0) {
+      [model.larmorStatusProperty, strings.periodStringProperty, strings.offStringProperty],
+      (status, label, off) => {
+        if (status.kind === "off") {
           return off;
         }
-        const q = model.modeProperty.value === "normal" ? level.l : level.j;
-        if (q === 0) {
+        if (status.kind === "zeroQ") {
           return `${label}: — (L=0)`;
         }
-        return `${label}: ${atomicTimeToFs((4 * Math.PI) / (level.g * field)).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_SIGNIFICANT_FIGURES)} fs`;
+        return `${label}: ${atomicTimeToFs(status.period).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_SIGNIFICANT_FIGURES)} fs`;
       },
     );
     const periodLabel = text(period, ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_LABEL_MAX_WIDTH);
@@ -229,30 +224,22 @@ export class ZeemanScreenView extends ResponsiveScreenView {
       y: this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.PRECESSION_Y_OFFSET,
     });
     const update = () => {
-      const level = model.upperLevelsProperty.value[model.selectedIndexProperty.value];
-      if (!level) {
+      const vector = model.precessionVectorProperty.value;
+      arrow.visible = vector !== null;
+      if (!vector) {
         return;
       }
-      const q = model.modeProperty.value === "normal" ? level.l : level.j;
-      arrow.visible = q > 0;
-      const [x, y] = projectToScreen(orbitCameraFrame(0.3, 0.2), orbitalVector(q, level.m, model.phaseProperty.value));
-      const scale = 45 / Math.max(1, Math.sqrt(q * (q + 1)));
-      if (q > 0) {
-        arrow.setTailAndTip(0, 0, x * scale, -y * scale);
-      }
+      const [x, y] = projectToScreen(orbitCameraFrame(0.3, 0.2), vector);
+      const scale = PRECESSION_ARROW_SCALE * model.precessionScaleProperty.value;
+      arrow.setTailAndTip(0, 0, x * scale, -y * scale);
     };
-    model.phaseProperty.link(update);
-    model.upperLevelsProperty.link(update);
-    model.selectedIndexProperty.link(update);
+    model.precessionVectorProperty.link(update);
     const playback = new TimeControlNode(model.timer.isPlayingProperty, {
       playPauseStepButtonOptions: {
         ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
         stepForwardButtonOptions: {
           ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS.stepForwardButtonOptions,
-          listener: () => {
-            model.phaseProperty.value =
-              (model.phaseProperty.value + 0.05 * model.fieldFractionProperty.value) % (2 * Math.PI);
-          },
+          listener: () => model.advancePhase(),
         },
       },
     });

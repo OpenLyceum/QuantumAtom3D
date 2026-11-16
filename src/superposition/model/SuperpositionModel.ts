@@ -14,7 +14,7 @@ import type { OrbitalTerm } from "../../common/model/orbital/OrbitalTerm.js";
 import { QuantumNumbersModel } from "../../common/model/orbital/QuantumNumbersModel.js";
 import { positionExpectations } from "../../common/model/orbital/SuperpositionExpectations.js";
 import { SUPERPOSITION_PRESETS, type SuperpositionPreset } from "../../common/model/orbital/SuperpositionPresets.js";
-import { evolveTerms, normalizeTerms } from "../../common/model/orbital/SuperpositionState.js";
+import { evolveTerms, normalizeTerms, superpositionDynamics } from "../../common/model/orbital/SuperpositionState.js";
 import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
 import { TimeModel } from "../../common/TimeModel.js";
 import { SUPERPOSITION_MODEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
@@ -91,6 +91,10 @@ export class SuperpositionModel implements TModel {
       ) /
       Math.SQRT2 ** zoom,
   );
+  public readonly dynamicsProperty = new DerivedProperty(
+    [this.termsProperty, this.nuclearChargeProperty],
+    superpositionDynamics,
+  );
   private readonly links: UnknownMultilink[] = [];
   private changingPreset = false;
   private disposed = false;
@@ -164,6 +168,7 @@ export class SuperpositionModel implements TModel {
     for (const link of this.links) {
       link.dispose();
     }
+    this.dynamicsProperty.dispose();
     this.expectationsProperty.dispose();
     this.wavefunctionProperty.dispose();
     this.viewHalfWidthProperty.dispose();

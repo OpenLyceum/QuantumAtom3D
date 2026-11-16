@@ -815,6 +815,10 @@ export const ZEEMAN_MODEL_SETTINGS = {
   NUCLEAR_CHARGE_RANGE_MAX: 6,
   /** Field fraction default (dimensionless). */
   FIELD_FRACTION_DEFAULT: 0.5,
+  /** Schematic Larmor phase advance rate at full field fraction (rad/s). */
+  PRECESSION_RATE: 2,
+  /** Phase advance on step-forward at full field fraction (rad). */
+  STEP_PHASE: 0.05,
 } as const;
 
 /** Settings for zeeman/view/ZeemanDiagramNode.ts. Layout lengths are in px; counts and ratios are dimensionless. */
