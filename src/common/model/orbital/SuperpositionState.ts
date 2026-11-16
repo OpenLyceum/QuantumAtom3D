@@ -34,7 +34,7 @@ export function evolveTerms(terms: readonly OrbitalTerm[], nuclearCharge: number
 }
 
 /** Electric dipole selection rule for some polarization; z polarization additionally needs Δm=0. */
-export function dipoleAllowed(a: OrbitalTerm, b: OrbitalTerm): boolean {
+function dipoleAllowed(a: OrbitalTerm, b: OrbitalTerm): boolean {
   return Math.abs(a.l - b.l) === 1 && Math.abs(a.m - b.m) <= 1;
 }
 

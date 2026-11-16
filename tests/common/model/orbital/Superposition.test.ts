@@ -4,7 +4,11 @@ import { MetropolisSampler } from "../../../../src/common/model/orbital/Metropol
 import type { OrbitalTerm } from "../../../../src/common/model/orbital/OrbitalTerm.js";
 import { positionExpectations } from "../../../../src/common/model/orbital/SuperpositionExpectations.js";
 import { hybridTerms, SUPERPOSITION_PRESETS } from "../../../../src/common/model/orbital/SuperpositionPresets.js";
-import { dipoleAllowed, evolveTerms, normalizeTerms } from "../../../../src/common/model/orbital/SuperpositionState.js";
+import {
+  evolveTerms,
+  normalizeTerms,
+  superpositionDynamics,
+} from "../../../../src/common/model/orbital/SuperpositionState.js";
 import { Wavefunction } from "../../../../src/common/model/orbital/Wavefunction.js";
 import { SuperpositionModel } from "../../../../src/superposition/model/SuperpositionModel.js";
 
@@ -83,8 +87,10 @@ describe("coherent hydrogenic states", () => {
     expect(result.r).toBeCloseTo(3.75 - 64 / (81 * Math.sqrt(2)), 7);
     expect(result.z).toBe(0);
     expect(positionExpectations(SUPERPOSITION_PRESETS.breathing, 6).r).toBeCloseTo(result.r / 6, 10);
-    const [a, b] = SUPERPOSITION_PRESETS.breathing;
-    expect(a && b && dipoleAllowed(a, b)).toBe(false);
+    expect(superpositionDynamics(SUPERPOSITION_PRESETS.breathing, 1)).toMatchObject({
+      kind: "beating",
+      isDipoleAllowed: false,
+    });
   });
   it("playback pauses, single-step advances, and reset restores the dipole state", () => {
     const model = new SuperpositionModel();
