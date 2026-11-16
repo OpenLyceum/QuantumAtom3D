@@ -9,9 +9,10 @@ import {
   sphericalStates,
 } from "../../common/model/oscillator/OscillatorStates.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { BASIS_OVERLAP_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
 
-const CELL = 19;
+const CELL: number = BASIS_OVERLAP_NODE_SETTINGS.CELL;
 const MAX_STATES = oscillatorDegeneracy(4);
 const matrices = new Map<number, Float64Array>();
 function matrix(N: number): Float64Array {
@@ -44,21 +45,29 @@ export class BasisOverlapNode extends Node {
     );
     const rows = Array.from(
       { length: MAX_STATES },
-      () => new Text("", { font: new PhetFont(10), fill: QuantumAtom3DColors.textColorProperty }),
+      () =>
+        new Text("", {
+          font: new PhetFont(BASIS_OVERLAP_NODE_SETTINGS.ROWS_FONT_SIZE),
+          fill: QuantumAtom3DColors.textColorProperty,
+        }),
     );
     const columns = Array.from(
       { length: MAX_STATES },
       () =>
-        new Text("", { font: new PhetFont(9), fill: QuantumAtom3DColors.textColorProperty, rotation: -Math.PI / 2 }),
+        new Text("", {
+          font: new PhetFont(BASIS_OVERLAP_NODE_SETTINGS.COLUMNS_FONT_SIZE),
+          fill: QuantumAtom3DColors.textColorProperty,
+          rotation: -Math.PI / 2,
+        }),
     );
     const selectedRow = new Rectangle(0, 0, 1, 1, {
       stroke: QuantumAtom3DColors.meanRadiusColorProperty,
-      lineWidth: 1.5,
+      lineWidth: BASIS_OVERLAP_NODE_SETTINGS.SELECTED_ROW_LINE_WIDTH,
       pickable: false,
     });
     const selectedColumn = new Rectangle(0, 0, 1, 1, {
       stroke: QuantumAtom3DColors.radialCurveColorProperty,
-      lineWidth: 1.5,
+      lineWidth: BASIS_OVERLAP_NODE_SETTINGS.SELECTED_COLUMN_LINE_WIDTH,
       pickable: false,
     });
     super({
@@ -86,15 +95,15 @@ export class BasisOverlapNode extends Node {
         rows.forEach((label, i) => {
           label.visible = i < size;
           label.string = cart[i]?.join(",") ?? "";
-          label.right = 60;
-          label.centerY = 45 + (i + 0.5) * CELL;
+          label.right = BASIS_OVERLAP_NODE_SETTINGS.RIGHT_RIGHT;
+          label.centerY = BASIS_OVERLAP_NODE_SETTINGS.CONSTRUCTOR_CENTER_Y_OFFSET + (i + 0.5) * CELL;
         });
         columns.forEach((label, j) => {
           const s = sphere[j];
           label.visible = !!s;
           label.string = s ? `${s.nr},${s.l},${s.m}` : "";
-          label.centerX = 70 + (j + 0.5) * CELL;
-          label.bottom = 35;
+          label.centerX = BASIS_OVERLAP_NODE_SETTINGS.CONSTRUCTOR_CENTER_X_OFFSET + (j + 0.5) * CELL;
+          label.bottom = BASIS_OVERLAP_NODE_SETTINGS.BOTTOM_BOTTOM;
         });
       }),
       Multilink.multilink(

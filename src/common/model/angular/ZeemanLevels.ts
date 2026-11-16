@@ -1,3 +1,4 @@
+import { ZEEMAN_LEVELS_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /** Fine-structure-only hydrogenic Zeeman model, in Hartree atomic units. Hyperfine and Lamb shifts omitted. */
 import { FINE_STRUCTURE_CONSTANT as ALPHA } from "../AtomicUnits.js";
 import { hydrogenEnergy } from "../hydrogen/HydrogenExpectations.js";
@@ -111,11 +112,14 @@ export function weakFieldCap(upperN: number, lowerN: number, z: number): number 
       }
     }
   }
-  return (0.1 * gap) / moment;
+  return (ZEEMAN_LEVELS_SETTINGS.MAX_FINE_STRUCTURE_FRACTION * gap) / moment;
 }
 
 /** Coincident transitions are one spectral position; no oscillator-strength model is implied. */
-export function distinctPhotonEnergies(transitions: readonly ZeemanTransition[], tolerance = 1e-12): number[] {
+export function distinctPhotonEnergies(
+  transitions: readonly ZeemanTransition[],
+  tolerance: number = ZEEMAN_LEVELS_SETTINGS.DEFAULT_TOLERANCE,
+): number[] {
   const energies = transitions.map((transition) => transition.photonEnergy).sort((a, b) => a - b);
   return energies.filter((value, index) => index === 0 || Math.abs(value - (energies[index - 1] ?? value)) > tolerance);
 }

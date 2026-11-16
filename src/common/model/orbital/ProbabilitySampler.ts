@@ -1,10 +1,11 @@
 /** Seeded inverse-CDF sampling of separable hydrogenic eigenstates and real orbitals. */
 import { Random } from "scenerystack/dot";
+import { PROBABILITY_SAMPLER_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 import { hydrogenRadialCutoff, hydrogenRadialDistribution } from "../hydrogen/HydrogenRadial.js";
 import { sphericalHarmonicTheta } from "../math/sphericalHarmonics.js";
 import type { OrbitalBasis } from "./OrbitalCatalog.js";
 
-const CDF_BINS = 4096;
+const CDF_BINS: number = PROBABILITY_SAMPLER_SETTINGS.CDF_BINS;
 
 /** Piecewise-linear density integrated by trapezoids; invert its piecewise-linear CDF. */
 export class InverseCdf {

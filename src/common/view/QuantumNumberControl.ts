@@ -1,3 +1,4 @@
+import { QUANTUM_NUMBER_CONTROL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * QuantumNumberControl.ts
  *
@@ -18,12 +19,12 @@ import type { QuantumNumbersModel } from "../model/orbital/QuantumNumbersModel.j
 import { FLAT_RECTANGULAR_BUTTON_OPTIONS } from "../QuantumAtom3DButtonOptions.js";
 import { formatSigned } from "./formatters.js";
 
-const LABEL_FONT = new PhetFont({ size: 16, style: "italic" });
-const SPINNER_FONT = new PhetFont(15);
-const STATE_FONT = new PhetFont({ size: 18, weight: "bold" });
-const SPINNER_SPACING = 14;
-const SPINNER_DISPLAY_WIDTH = 40;
-const ROW_SPACING = 10;
+const LABEL_FONT = new PhetFont({ size: QUANTUM_NUMBER_CONTROL_SETTINGS.LABEL_FONT_SIZE, style: "italic" });
+const SPINNER_FONT = new PhetFont(QUANTUM_NUMBER_CONTROL_SETTINGS.SPINNER_FONT_SIZE);
+const STATE_FONT = new PhetFont({ size: QUANTUM_NUMBER_CONTROL_SETTINGS.STATE_FONT_SIZE, weight: "bold" });
+const SPINNER_SPACING: number = QUANTUM_NUMBER_CONTROL_SETTINGS.SPINNER_SPACING;
+const SPINNER_DISPLAY_WIDTH: number = QUANTUM_NUMBER_CONTROL_SETTINGS.SPINNER_DISPLAY_WIDTH;
+const ROW_SPACING: number = QUANTUM_NUMBER_CONTROL_SETTINGS.ROW_SPACING;
 
 /** The visible name of state (n, l, m) in either basis, as RichText markup. */
 function createStateLabelProperty(
@@ -73,7 +74,7 @@ export class QuantumNumberControl extends VBox {
       accessibleHelpText: TReadOnlyProperty<string>,
     ) =>
       new VBox({
-        spacing: 2,
+        spacing: QUANTUM_NUMBER_CONTROL_SETTINGS.CREATE_SPINNER_SPACING,
         children: [
           new Text(label, { font: LABEL_FONT, fill: QuantumAtom3DColors.textColorProperty }),
           new NumberSpinner(property, rangeProperty, {
@@ -96,7 +97,7 @@ export class QuantumNumberControl extends VBox {
     const stateLabel = new RichText(stateLabelProperty, {
       font: STATE_FONT,
       fill: QuantumAtom3DColors.accentColorProperty,
-      maxWidth: 220,
+      maxWidth: QUANTUM_NUMBER_CONTROL_SETTINGS.STATE_LABEL_MAX_WIDTH,
     });
 
     super({

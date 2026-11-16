@@ -1,3 +1,4 @@
+import { ANGULAR_NUMERICS } from "../../../QuantumAtom3DConstants.js";
 /** Quantum vector-model geometry in units of hbar; precession angles are schematic. */
 export type AngularVector = readonly [number, number, number];
 export const angularMagnitude = (q: number): number => Math.sqrt(q * (q + 1));
@@ -53,5 +54,5 @@ export function coupledAngularWeights(l: number, j: number, mj: number): readonl
   return [
     { m: mj - 0.5, weight: upWeight },
     { m: mj + 0.5, weight: 1 - upWeight },
-  ].filter(({ m, weight }) => Math.abs(m) <= l && weight > 1e-14);
+  ].filter(({ m, weight }) => Math.abs(m) <= l && weight > ANGULAR_NUMERICS.MIN_WEIGHT);
 }

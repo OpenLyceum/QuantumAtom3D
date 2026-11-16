@@ -3,8 +3,12 @@ import { BooleanProperty, DerivedProperty, NumberProperty, Property, StringUnion
 import { Range } from "scenerystack/dot";
 import { coupledVectors, orbitalVector } from "../../common/model/angular/VectorModel.js";
 import { TimeModel } from "../../common/TimeModel.js";
+import { ANGULAR_MOMENTUM_MODEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 export class AngularMomentumModel {
-  public readonly lProperty = new NumberProperty(1, { range: new Range(0, 4), numberType: "Integer" });
+  public readonly lProperty = new NumberProperty(1, {
+    range: new Range(0, ANGULAR_MOMENTUM_MODEL_SETTINGS.L_RANGE_MAX),
+    numberType: "Integer",
+  });
   public readonly mProperty = new NumberProperty(0, { numberType: "Integer" });
   public readonly mRangeProperty = new Property(new Range(-1, 1));
   public readonly spinProperty = new BooleanProperty(false);
@@ -14,8 +18,10 @@ export class AngularMomentumModel {
   public readonly jProperty = new DerivedProperty([this.lProperty, this.branchProperty], (l, branch) =>
     l === 0 ? 0.5 : l + (branch === "upper" ? 0.5 : -0.5),
   );
-  public readonly mjProperty = new NumberProperty(0.5);
-  public readonly mjRangeProperty = new Property(new Range(-1.5, 1.5));
+  public readonly mjProperty = new NumberProperty(ANGULAR_MOMENTUM_MODEL_SETTINGS.MJ_DEFAULT);
+  public readonly mjRangeProperty = new Property(
+    new Range(ANGULAR_MOMENTUM_MODEL_SETTINGS.MJ_RANGE_MIN, ANGULAR_MOMENTUM_MODEL_SETTINGS.MJ_RANGE_MAX),
+  );
   public readonly phaseProperty = new NumberProperty(0, { range: new Range(0, 2 * Math.PI) });
   public readonly timer = new TimeModel();
   public readonly vectorsProperty = new DerivedProperty(
@@ -40,7 +46,8 @@ export class AngularMomentumModel {
       return;
     }
     if (this.timer.isPlayingProperty.value) {
-      this.phaseProperty.value = (this.phaseProperty.value + Math.max(0, dt) * 0.7) % (2 * Math.PI);
+      this.phaseProperty.value =
+        (this.phaseProperty.value + Math.max(0, dt) * ANGULAR_MOMENTUM_MODEL_SETTINGS.PRECESSION_RATE) % (2 * Math.PI);
     }
     this.timer.step(dt);
   }

@@ -5,6 +5,7 @@ import { PhetFont } from "scenerystack/scenery-phet";
 import { wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
 import { zeemanLevels, zeemanTransitions } from "../../common/model/angular/ZeemanLevels.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ZEEMAN_SPECTRUM_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
 import { polarizationColor } from "./ZeemanDiagramNode.js";
 export class ZeemanSpectrumNode extends Node {
@@ -36,13 +37,17 @@ export class ZeemanSpectrumNode extends Node {
         const padding = (max - min) * 0.1;
         const low = min - padding;
         const high = max + padding;
-        layer.addChild(new Line(0, 70, width, 70, { stroke: QuantumAtom3DColors.textColorProperty }));
+        layer.addChild(
+          new Line(0, ZEEMAN_SPECTRUM_NODE_SETTINGS.LINK_START_Y, width, ZEEMAN_SPECTRUM_NODE_SETTINGS.LINK_END_Y, {
+            stroke: QuantumAtom3DColors.textColorProperty,
+          }),
+        );
         const seen = new Set<string>();
         for (const transition of transitions) {
           const wavelength = wavelengthNmForEnergy(transition.photonEnergy);
           const x = (width * (wavelength - low)) / (high - low);
           const row = transition.polarization === "pi" ? 0 : transition.polarization === "sigmaPlus" ? 1 : 2;
-          const key = `${row},${wavelength.toFixed(9)}`;
+          const key = `${row},${wavelength.toFixed(ZEEMAN_SPECTRUM_NODE_SETTINGS.KEY_DECIMAL_PLACES)}`;
           if (seen.has(key)) {
             continue;
           }
@@ -50,7 +55,7 @@ export class ZeemanSpectrumNode extends Node {
           layer.addChild(
             new Line(x, 8 + row * 20, x, 23 + row * 20, {
               stroke: polarizationColor(transition.polarization),
-              lineWidth: 2,
+              lineWidth: ZEEMAN_SPECTRUM_NODE_SETTINGS.LINK_LINE_WIDTH,
             }),
           );
         }
@@ -61,10 +66,10 @@ export class ZeemanSpectrumNode extends Node {
         ]) {
           layer.addChild(
             new Text(`${value?.toFixed(6)}`, {
-              font: new PhetFont(10),
+              font: new PhetFont(ZEEMAN_SPECTRUM_NODE_SETTINGS.LINK_FONT_SIZE),
               fill: QuantumAtom3DColors.textColorProperty,
               centerX: x ?? 0,
-              top: 76,
+              top: ZEEMAN_SPECTRUM_NODE_SETTINGS.LINK_TOP,
             }),
           );
         }

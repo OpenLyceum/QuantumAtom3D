@@ -14,62 +14,78 @@ import { PhetFont } from "scenerystack/scenery-phet";
 import { HSlider } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import { sphericalHarmonicTheta } from "../model/math/sphericalHarmonics.js";
 import { orbitalTerms } from "../model/orbital/OrbitalCatalog.js";
 import type { OrbitalsModel } from "../model/orbital/OrbitalsModel.js";
 import { QUANTUM_ATOM_3D_SLIDER_OPTIONS } from "../QuantumAtom3DControlOptions.js";
 
-const SIZE = 230;
-const RADIUS = 100;
-const SAMPLES = 360;
+const SIZE: number = ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.SIZE;
+const RADIUS: number = ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.RADIUS;
+const SAMPLES: number = ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.SAMPLES;
 export class OrbitalAngularDetailNode extends VBox {
   private readonly link: UnknownMultilink;
   private readonly description: TReadOnlyProperty<string>;
-  public readonly phiProperty = new NumberProperty(0, { range: new Range(0, 360) });
+  public readonly phiProperty = new NumberProperty(0, {
+    range: new Range(0, ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PHI_RANGE_MAX),
+  });
   public constructor(model: OrbitalsModel, formulas?: TReadOnlyProperty<boolean>) {
     const strings = StringManager.getInstance().getOrbitalStrings().angularDetail;
-    const curve = new Path(null, { stroke: QuantumAtom3DColors.radialCurveColorProperty, lineWidth: 2 });
+    const curve = new Path(null, {
+      stroke: QuantumAtom3DColors.radialCurveColorProperty,
+      lineWidth: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CURVE_LINE_WIDTH,
+    });
     const plot = new Node({
       children: [
         new Circle(RADIUS, {
           centerX: SIZE / 2,
           centerY: SIZE / 2,
           stroke: QuantumAtom3DColors.chartGridColorProperty,
-          lineDash: [4, 4],
+          lineDash: [
+            ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PLOT_LINE_DASH_DASH,
+            ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PLOT_LINE_DASH_DASH,
+          ],
         }),
         new Line(SIZE / 2, 0, SIZE / 2, SIZE, { stroke: QuantumAtom3DColors.chartGridColorProperty }),
-        new RichText("z", { font: new PhetFont(12), fill: QuantumAtom3DColors.textColorProperty, left: SIZE / 2 + 5 }),
+        new RichText("z", {
+          font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PLOT_FONT_SIZE),
+          fill: QuantumAtom3DColors.textColorProperty,
+          left: SIZE / 2 + ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PLOT_LEFT_OFFSET,
+        }),
         curve,
       ],
     });
-    super({ spacing: 12, align: "left" });
+    super({ spacing: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_SPACING, align: "left" });
     this.description = new DerivedProperty([this.phiProperty, strings.descriptionStringProperty], (phi, pattern) =>
       StringUtils.fillIn(pattern, { phi: Math.round(phi) }),
     );
     this.children = [
       new RichText(strings.titleStringProperty, {
-        font: new PhetFont(14),
+        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CHILDREN_FONT_SIZE),
         fill: QuantumAtom3DColors.textColorProperty,
-        maxWidth: 275,
+        maxWidth: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CHILDREN_MAX_WIDTH,
       }),
       plot,
       new RichText("ψ = Rₙₗ(r) ∑ₘ cₘ Yₗₘ(θ,φ)", {
-        font: new PhetFont(13),
+        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PHET_FONT_FONT_SIZE),
         fill: QuantumAtom3DColors.textColorProperty,
         ...(formulas && { visibleProperty: formulas }),
-        maxWidth: 260,
+        maxWidth: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_MAX_WIDTH,
       }),
       new HSlider(this.phiProperty, this.phiProperty.range, {
         ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
-        trackSize: new Dimension2(220, 3),
-        keyboardStep: 5,
+        trackSize: new Dimension2(
+          ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CHILDREN_WIDTH,
+          ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CHILDREN_HEIGHT,
+        ),
+        keyboardStep: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CHILDREN_KEYBOARD_STEP,
         shiftKeyboardStep: 1,
         accessibleName: strings.phiStringProperty,
       }),
       new RichText(this.description, {
-        font: new PhetFont(12),
+        font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PHET_FONT_FONT_SIZE_SEGMENT_2),
         fill: QuantumAtom3DColors.textColorProperty,
-        lineWrap: 260,
+        lineWrap: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.CONSTRUCTOR_LINE_WRAP,
         tagName: "p",
         accessibleParagraph: this.description,
       }),

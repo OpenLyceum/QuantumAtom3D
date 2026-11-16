@@ -1,3 +1,4 @@
+import { ORBITAL_SCENE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * OrbitalScene.ts
  *
@@ -30,13 +31,13 @@ import { oscillatorRowIndex } from "../model/oscillator/OscillatorStates.js";
 import type { CameraFrame } from "../view/OrbitCamera.js";
 
 /** Most terms a scene can carry (the uniform block has room for exactly this many). */
-const MAX_RENDER_TERMS = 16;
+const MAX_RENDER_TERMS: number = ORBITAL_SCENE_SETTINGS.MAX_RENDER_TERMS;
 
 /** Ray-march samples across the sphere's diameter. */
-export const RENDER_STEPS = 128;
+export const RENDER_STEPS: number = ORBITAL_SCENE_SETTINGS.RENDER_STEPS;
 
 /** Optical depth per unit amplitude across one sphere radius. */
-export const VOLUME_OPACITY_GAIN = 4;
+export const VOLUME_OPACITY_GAIN: number = ORBITAL_SCENE_SETTINGS.VOLUME_OPACITY_GAIN;
 
 /** Six vec4s, sixteen terms of two vec4s, then seven render/overlay vec4s (720 bytes). */
 export const PARAMS_BYTES = 13 * 16 + MAX_RENDER_TERMS * 2 * 16;

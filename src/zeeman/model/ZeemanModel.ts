@@ -9,6 +9,7 @@ import {
   zeemanTransitions,
 } from "../../common/model/angular/ZeemanLevels.js";
 import { TimeModel } from "../../common/TimeModel.js";
+import { ZEEMAN_MODEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 export class ZeemanModel {
   public readonly modeProperty = new StringUnionProperty<ZeemanMode>("normal", {
     validValues: ["normal", "anomalous"],
@@ -19,8 +20,13 @@ export class ZeemanModel {
   public readonly directionProperty = new StringUnionProperty<"perpendicular" | "along">("perpendicular", {
     validValues: ["perpendicular", "along"],
   });
-  public readonly nuclearChargeProperty = new NumberProperty(1, { range: new Range(1, 6), numberType: "Integer" });
-  public readonly fieldFractionProperty = new NumberProperty(0.5, { range: new Range(0, 1) });
+  public readonly nuclearChargeProperty = new NumberProperty(1, {
+    range: new Range(1, ZEEMAN_MODEL_SETTINGS.NUCLEAR_CHARGE_RANGE_MAX),
+    numberType: "Integer",
+  });
+  public readonly fieldFractionProperty = new NumberProperty(ZEEMAN_MODEL_SETTINGS.FIELD_FRACTION_DEFAULT, {
+    range: new Range(0, 1),
+  });
   public readonly selectedIndexProperty = new NumberProperty(1, { numberType: "Integer" });
   public readonly timer = new TimeModel();
   public readonly phaseProperty = new NumberProperty(0);

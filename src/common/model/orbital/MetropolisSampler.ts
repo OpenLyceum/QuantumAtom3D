@@ -1,5 +1,6 @@
 /** Independence Metropolis-Hastings with the incoherent eigenstate mixture as proposal density. */
 import { Random } from "scenerystack/dot";
+import { METROPOLIS_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 import type { OrbitalTerm } from "./OrbitalTerm.js";
 import { EigenstateSampler } from "./ProbabilitySampler.js";
 import type { Point3 } from "./RaySurfaces.js";
@@ -48,13 +49,13 @@ export class MetropolisSampler {
   public cancel(): void {
     this.pending = null;
   }
-  public advance(budget = 4): Float32Array | null {
+  public advance(budget: number = METROPOLIS_SETTINGS.DEFAULT_WORK_BUDGET_MS): Float32Array | null {
     if (!this.pending) {
       return null;
     }
     const end = performance.now() + budget;
     while (this.pending.remaining > 0) {
-      const batch = Math.min(64, this.pending.remaining);
+      const batch = Math.min(METROPOLIS_SETTINGS.BATCH_SIZE, this.pending.remaining);
       for (let count = 0; count < batch; count++) {
         this.move(this.pending.wave, this.pending.index);
         this.pending.index = (this.pending.index + 3) % this.positions.length;

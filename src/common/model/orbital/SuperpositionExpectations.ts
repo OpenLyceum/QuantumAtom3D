@@ -1,3 +1,4 @@
+import { EXPECTATION_NUMERICS } from "../../../QuantumAtom3DConstants.js";
 /** Radial matrix elements by independent Simpson quadrature, with analytic angular selection rules. */
 import { hydrogenMeanRadius } from "../hydrogen/HydrogenExpectations.js";
 import { hydrogenRadial, hydrogenRadialCutoff } from "../hydrogen/HydrogenRadial.js";
@@ -15,7 +16,7 @@ function radialPositionElement(a: OrbitalTerm, b: OrbitalTerm): number {
   if (cached !== undefined) {
     return cached;
   }
-  const intervals = 4096;
+  const intervals: number = EXPECTATION_NUMERICS.RADIAL_INTERVALS;
   const limit = Math.max(hydrogenRadialCutoff(a.n, 1), hydrogenRadialCutoff(b.n, 1));
   const step = limit / intervals;
   let sum = 0;

@@ -1,3 +1,4 @@
+import { FORMATTERS_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * formatters.ts
  *
@@ -11,8 +12,8 @@ import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel
 import { bohrToPm, hartreeToEv } from "../model/AtomicUnits.js";
 
 /** Digits after the point for lengths in a0 and energies in eV. */
-const LENGTH_DECIMALS = 2;
-const ENERGY_DECIMALS = 3;
+const LENGTH_DECIMALS: number = FORMATTERS_SETTINGS.LENGTH_DECIMALS;
+const ENERGY_DECIMALS: number = FORMATTERS_SETTINGS.ENERGY_DECIMALS;
 const ANGLE_DECIMALS = 1;
 
 /** Typographic minus, so negative readouts line up with the labels' "−". */

@@ -35,6 +35,7 @@ import { QuantumAtom3DPreferencesModel } from "./preferences/QuantumAtom3DPrefer
 import { QuantumAtom3DPreferencesNode } from "./preferences/QuantumAtom3DPreferencesNode.js";
 import quantumAtom3DQueryParameters from "./preferences/quantumAtom3DQueryParameters.js";
 import QuantumAtom3DColors from "./QuantumAtom3DColors.js";
+import { MAIN_SETTINGS } from "./QuantumAtom3DConstants.js";
 import { SuperpositionScreen } from "./superposition/SuperpositionScreen.js";
 import { ZeemanScreen } from "./zeeman/ZeemanScreen.js";
 
@@ -141,9 +142,9 @@ function launch(): void {
       });
       const label = (text: import("scenerystack/axon").TReadOnlyProperty<string>) =>
         new RichText(text, {
-          font: new PhetFont(13),
+          font: new PhetFont(MAIN_SETTINGS.LABEL_FONT_SIZE),
           fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
-          maxWidth: 165,
+          maxWidth: MAIN_SETTINGS.LABEL_MAX_WIDTH,
         });
       const selector = new ComboBox(
         selected,
@@ -175,7 +176,7 @@ function launch(): void {
           mobileSettings.show();
         },
       });
-      screen.view.setPortraitTools(new HBox({ spacing: 12, children: [selector, settings] }));
+      screen.view.setPortraitTools(new HBox({ spacing: MAIN_SETTINGS.LAUNCH_SPACING, children: [selector, settings] }));
     }
   });
   sim.start();

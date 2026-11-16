@@ -1,3 +1,4 @@
+import { RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * RadialDistributionChartNode.ts
  *
@@ -29,25 +30,25 @@ import { DEFAULT_LENGTH_UNIT_PROPERTY } from "./DisplayDefaults.js";
 import { formatLength, lengthUnitSymbol } from "./formatters.js";
 
 /** Samples along r for the curve. */
-const CURVE_SAMPLES = 300;
+const CURVE_SAMPLES: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.CURVE_SAMPLES;
 
 /** Headroom above the curve's peak. */
-const Y_HEADROOM = 1.1;
+const Y_HEADROOM: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.Y_HEADROOM;
 
 /** Roughly how many labelled ticks the r axis gets. */
-const TARGET_TICKS = 5;
+const TARGET_TICKS: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.TARGET_TICKS;
 
-const LABEL_FONT = new PhetFont(12);
-const TITLE_FONT = new PhetFont(14);
-const CURVE_LINE_WIDTH = 2;
-const MARKER_LINE_WIDTH = 1.5;
+const LABEL_FONT = new PhetFont(RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.LABEL_FONT_SIZE);
+const TITLE_FONT = new PhetFont(RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.TITLE_FONT_SIZE);
+const CURVE_LINE_WIDTH: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.CURVE_LINE_WIDTH;
+const MARKER_LINE_WIDTH: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.MARKER_LINE_WIDTH;
 const MARKER_DASH = [5, 4];
-const NODE_DOT_RADIUS = 3;
-const TICK_LABEL_SPACING = 4;
-const TITLE_SPACING = 6;
+const NODE_DOT_RADIUS: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.NODE_DOT_RADIUS;
+const TICK_LABEL_SPACING: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.TICK_LABEL_SPACING;
+const TITLE_SPACING: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.TITLE_SPACING;
 
 /** Below the tick labels. */
-const AXIS_LABEL_OFFSET = 22;
+const AXIS_LABEL_OFFSET: number = RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.AXIS_LABEL_OFFSET;
 
 /** A 1–2–5 tick step giving about `target` steps across `span`. */
 function niceStep(span: number, target: number): number {
@@ -144,7 +145,10 @@ export class RadialDistributionChartNode extends Node {
     if (probeFractionProperty) {
       const cursor = new Line(0, 0, 0, height, {
         stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
-        lineDash: [3, 3],
+        lineDash: [
+          RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.CURSOR_LINE_DASH_DASH,
+          RADIAL_DISTRIBUTION_CHART_NODE_SETTINGS.CURSOR_LINE_DASH_DASH,
+        ],
         pickable: false,
       });
       plotLayer.addChild(cursor);

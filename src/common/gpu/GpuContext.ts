@@ -1,3 +1,4 @@
+import { GPU_CONTEXT_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * GpuContext.ts
  *
@@ -97,7 +98,7 @@ export function demoteGpuContext(context: WebGpuContext): void {
 }
 
 /** Edge length of the throwaway canvas used by the presentation check. */
-const PRESENTATION_PROBE_SIZE = 4;
+const PRESENTATION_PROBE_SIZE: number = GPU_CONTEXT_SETTINGS.PRESENTATION_PROBE_SIZE;
 
 /** Clears a tiny WebGPU canvas to red, draws it into a 2D canvas, and checks that the red arrived. */
 function canPresentToCanvas(device: GPUDevice, format: GPUTextureFormat): boolean {

@@ -17,6 +17,7 @@ import { SUPERPOSITION_PRESETS, type SuperpositionPreset } from "../../common/mo
 import { evolveTerms, normalizeTerms } from "../../common/model/orbital/SuperpositionState.js";
 import { Wavefunction } from "../../common/model/orbital/Wavefunction.js";
 import { TimeModel } from "../../common/TimeModel.js";
+import { SUPERPOSITION_MODEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 
 /** @internal Exported for unit tests; not part of the application API. */
 export class CoefficientRow {
@@ -49,9 +50,17 @@ export class SuperpositionModel implements TModel {
   public readonly timer = new TimeModel();
   /** Physical time in hbar/E_h. Playback speed is atomic time units per wall-clock second. */
   public readonly timeProperty = new NumberProperty(0);
-  public readonly speedProperty = new NumberProperty(4, { range: new Range(0.25, 12) });
-  public readonly nuclearChargeProperty = new NumberProperty(1, { range: new Range(1, 6), numberType: "Integer" });
-  public readonly termCountProperty = new NumberProperty(2, { range: new Range(1, 6), numberType: "Integer" });
+  public readonly speedProperty = new NumberProperty(SUPERPOSITION_MODEL_SETTINGS.SPEED_DEFAULT, {
+    range: new Range(SUPERPOSITION_MODEL_SETTINGS.SPEED_RANGE_MIN, SUPERPOSITION_MODEL_SETTINGS.SPEED_RANGE_MAX),
+  });
+  public readonly nuclearChargeProperty = new NumberProperty(1, {
+    range: new Range(1, SUPERPOSITION_MODEL_SETTINGS.NUCLEAR_CHARGE_RANGE_MAX),
+    numberType: "Integer",
+  });
+  public readonly termCountProperty = new NumberProperty(SUPERPOSITION_MODEL_SETTINGS.TERM_COUNT_DEFAULT, {
+    range: new Range(1, SUPERPOSITION_MODEL_SETTINGS.TERM_COUNT_RANGE_MAX),
+    numberType: "Integer",
+  });
   public readonly rows = Array.from({ length: 6 }, () => new CoefficientRow());
   public readonly termsProperty = new Property<readonly OrbitalTerm[]>(SUPERPOSITION_PRESETS.dipole);
   public readonly renderModeProperty = new StringUnionProperty<"volume" | "dots" | "isosurface">("volume", {
@@ -60,7 +69,10 @@ export class SuperpositionModel implements TModel {
   public readonly coloringProperty = new StringUnionProperty<"phase" | "density">("phase", {
     validValues: ["phase", "density"],
   });
-  public readonly zoomProperty = new NumberProperty(0, { range: new Range(-2, 3), numberType: "Integer" });
+  public readonly zoomProperty = new NumberProperty(0, {
+    range: new Range(SUPERPOSITION_MODEL_SETTINGS.ZOOM_RANGE_MIN, SUPERPOSITION_MODEL_SETTINGS.ZOOM_RANGE_MAX),
+    numberType: "Integer",
+  });
   public readonly wavefunctionProperty = new DerivedProperty(
     [this.termsProperty, this.nuclearChargeProperty, this.timeProperty],
     (terms, z, time) => new Wavefunction(evolveTerms(terms, z, time), z),
@@ -71,7 +83,13 @@ export class SuperpositionModel implements TModel {
   public readonly viewHalfWidthProperty = new DerivedProperty(
     [this.termsProperty, this.zoomProperty],
     (terms, zoom) =>
-      Math.max(5, ...terms.map((term) => hydrogenEnclosingRadius(term.n, term.l, 1, 0.995))) / Math.SQRT2 ** zoom,
+      Math.max(
+        SUPERPOSITION_MODEL_SETTINGS.MIN_VIEW_HALF_WIDTH,
+        ...terms.map((term) =>
+          hydrogenEnclosingRadius(term.n, term.l, 1, SUPERPOSITION_MODEL_SETTINGS.VIEW_ENCLOSED_PROBABILITY),
+        ),
+      ) /
+      Math.SQRT2 ** zoom,
   );
   private readonly links: UnknownMultilink[] = [];
   private changingPreset = false;

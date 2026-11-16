@@ -11,6 +11,7 @@ import {
 } from "../../common/model/angular/VectorModel.js";
 import { orbitCameraFrame, projectToScreen } from "../../common/view/OrbitCamera.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
 
 function projectedCurve(project: (angle: number) => { x: number; y: number }): Shape {
@@ -29,14 +30,32 @@ export class AngularMomentumDiagramNode extends Node {
   private readonly link: UnknownMultilink;
   public constructor(model: AngularMomentumModel) {
     const frame = orbitCameraFrame(0.65, 0.3);
-    const cone = new Path(null, { stroke: QuantumAtom3DColors.nodeMarkerColorProperty, lineDash: [5, 4] });
-    const innerCone = new Path(null, { stroke: QuantumAtom3DColors.radialCurveColorProperty, lineDash: [3, 4] });
-    const axis = new Line(210, 340, 210, 20, { stroke: QuantumAtom3DColors.textColorProperty });
+    const cone = new Path(null, {
+      stroke: QuantumAtom3DColors.nodeMarkerColorProperty,
+      lineDash: [
+        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONE_LINE_DASH_DASH,
+        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_CONE_LINE_DASH_DASH,
+      ],
+    });
+    const innerCone = new Path(null, {
+      stroke: QuantumAtom3DColors.radialCurveColorProperty,
+      lineDash: [
+        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.INNER_CONE_LINE_DASH_DASH,
+        ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_INNER_CONE_LINE_DASH_DASH,
+      ],
+    });
+    const axis = new Line(
+      ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_START_X,
+      ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_START_Y,
+      ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_END_X,
+      ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_END_Y,
+      { stroke: QuantumAtom3DColors.textColorProperty },
+    );
     const axisLabel = new Text("z", {
-      font: new PhetFont(15),
+      font: new PhetFont(ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_LABEL_FONT_SIZE),
       fill: QuantumAtom3DColors.textColorProperty,
-      left: 218,
-      top: 20,
+      left: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_LABEL_LEFT,
+      top: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.AXIS_LABEL_TOP,
     });
     const colors = [
       QuantumAtom3DColors.radialCurveColorProperty,
@@ -44,22 +63,35 @@ export class AngularMomentumDiagramNode extends Node {
       QuantumAtom3DColors.textColorProperty,
     ];
     const arrows = colors.map(
-      (fill) => new ArrowNode(0, 0, 1, 1, { fill, stroke: null, tailWidth: 3, headWidth: 12, headHeight: 12 }),
+      (fill) =>
+        new ArrowNode(0, 0, 1, 1, {
+          fill,
+          stroke: null,
+          tailWidth: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.ARROWS_TAIL_WIDTH,
+          headWidth: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.ARROWS_HEAD_WIDTH,
+          headHeight: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.ARROWS_HEAD_HEIGHT,
+        }),
     );
     const labels = ["L", "S", "J"].map(
       (name, index) =>
         new Text(name, {
-          font: new PhetFont({ size: 17, weight: "bold" }),
+          font: new PhetFont({ size: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LABELS_FONT_SIZE, weight: "bold" }),
           fill: colors[index] ?? QuantumAtom3DColors.textColorProperty,
         }),
     );
     const ladder = new Node();
     super({
       children: [
-        new Rectangle(0, 0, 420, 370, {
-          fill: QuantumAtom3DColors.chartBackgroundColorProperty,
-          stroke: QuantumAtom3DColors.sliceFrameColorProperty,
-        }),
+        new Rectangle(
+          0,
+          0,
+          ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_WIDTH,
+          ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_HEIGHT,
+          {
+            fill: QuantumAtom3DColors.chartBackgroundColorProperty,
+            stroke: QuantumAtom3DColors.sliceFrameColorProperty,
+          },
+        ),
         axis,
         axisLabel,
         cone,
@@ -86,14 +118,21 @@ export class AngularMomentumDiagramNode extends Node {
         const scale = 140 / Math.max(1, angularMagnitude(spin ? j : l), angularMagnitude(l));
         const point = (v: AngularVector) => {
           const [x, y] = projectToScreen(frame, v);
-          return { x: 210 + x * scale, y: 205 - y * scale };
+          return {
+            x: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.POINT_X_OFFSET + x * scale,
+            y: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.POINT_Y_OFFSET - y * scale,
+          };
         };
         cone.shape = projectedCurve((angle) => point(orbitalVector(spin ? j : l, spin ? mj : m, angle)));
         innerCone.shape = spin
           ? projectedCurve((angle) => point(coupledVectors(l, j, mj, phase, angle).orbital))
           : new Shape();
         const ends = [vectors.orbital, vectors.total, vectors.total];
-        const starts = [{ x: 210, y: 205 }, point(vectors.orbital), { x: 210, y: 205 }];
+        const starts = [
+          { x: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.STARTS_X, y: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.STARTS_Y },
+          point(vectors.orbital),
+          { x: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.STARTS_X, y: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.STARTS_Y },
+        ];
         arrows.forEach((arrow, index) => {
           const end = point(ends[index] ?? vectors.orbital);
           const start = starts[index] ?? starts[0];
@@ -103,8 +142,14 @@ export class AngularMomentumDiagramNode extends Node {
           const label = labels[index];
           if (label) {
             label.visible = visible;
-            label.left = index === 1 && start ? (start.x + end.x) / 2 - 22 : end.x + 8;
-            label.top = index === 1 && start ? (start.y + end.y) / 2 - 20 : end.y - 20;
+            label.left =
+              index === 1 && start
+                ? (start.x + end.x) / 2 - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.SPIN_LABEL_MIDPOINT_X_OFFSET
+                : end.x + ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
+            label.top =
+              index === 1 && start
+                ? (start.y + end.y) / 2 - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_TOP_OFFSET
+                : end.y - ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
           }
           if (visible && start) {
             arrow.setTailAndTip(start.x, start.y, end.x, end.y);
@@ -125,19 +170,25 @@ export class AngularMomentumDiagramNode extends Node {
         for (let value = -quantum; value <= quantum; value++) {
           const y = 205 - value * scale * frame.up[2];
           ladder.addChild(
-            new Line(330, y, 355, y, {
-              stroke:
-                value === selected
-                  ? QuantumAtom3DColors.meanRadiusColorProperty
-                  : QuantumAtom3DColors.chartGridColorProperty,
-              lineWidth: value === selected ? 3 : 1,
-            }),
+            new Line(
+              ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LINK_START_X,
+              y,
+              ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LINK_END_X,
+              y,
+              {
+                stroke:
+                  value === selected
+                    ? QuantumAtom3DColors.meanRadiusColorProperty
+                    : QuantumAtom3DColors.chartGridColorProperty,
+                lineWidth: value === selected ? ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_LINE_WIDTH : 1,
+              },
+            ),
           );
           ladder.addChild(
             new Text(`${value}`, {
-              font: new PhetFont(12),
+              font: new PhetFont(ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LINK_FONT_SIZE),
               fill: QuantumAtom3DColors.textColorProperty,
-              left: 360,
+              left: ANGULAR_MOMENTUM_DIAGRAM_NODE_SETTINGS.LINK_LEFT,
               centerY: y,
             }),
           );

@@ -1,3 +1,4 @@
+import { CREATE_ORBITAL_RENDERER_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * createOrbitalRenderer.ts
  *
@@ -16,7 +17,7 @@ import { WebGpuOrbitalRenderer } from "./WebGpuOrbitalRenderer.js";
 import type { WebGpuContext } from "./WebGpuSupport.js";
 
 /** Square resolution of GPU frames, in device pixels. */
-const GPU_RENDER_RESOLUTION = 512;
+const GPU_RENDER_RESOLUTION: number = CREATE_ORBITAL_RENDERER_SETTINGS.GPU_RENDER_RESOLUTION;
 
 export function createOrbitalRenderer(): OrbitalRenderer {
   const { context } = getGpuInitializationResult();

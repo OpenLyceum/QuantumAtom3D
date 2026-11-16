@@ -1,3 +1,4 @@
+import { QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS } from "../QuantumAtom3DConstants.js";
 /**
  * QuantumAtom3DPreferencesNode.ts
  *
@@ -25,20 +26,20 @@ export class QuantumAtom3DPreferencesNode extends VBox {
     // colors (readable on white in both default and projector profiles), not textColorProperty
     // (which is near-white in default mode and would be invisible on the white dialog).
     const header = new Text(prefStrings.titleStringProperty, {
-      font: new PhetFont({ size: 18, weight: "bold" }),
+      font: new PhetFont({ size: QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.HEADER_FONT_SIZE, weight: "bold" }),
       fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
     });
 
     const colormapLabel = new Text(prefStrings.phaseColormapStringProperty, {
-      font: new PhetFont(14),
+      font: new PhetFont(QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.COLORMAP_LABEL_FONT_SIZE),
       fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
     });
 
     const createItemText = (stringProperty: typeof prefStrings.phaseColormapHsvStringProperty): RichText =>
       new RichText(stringProperty, {
-        font: new PhetFont(14),
+        font: new PhetFont(QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.CREATE_ITEM_TEXT_FONT_SIZE),
         fill: QuantumAtom3DColors.controlSurfaceTextColorProperty,
-        ...(compact && { lineWrap: 260 }),
+        ...(compact && { lineWrap: QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.CREATE_ITEM_TEXT_LINE_WRAP }),
       });
 
     const colormapRadioButtons = new VerticalAquaRadioButtonGroup<PhaseColormap>(
@@ -57,8 +58,8 @@ export class QuantumAtom3DPreferencesNode extends VBox {
       ],
       {
         accessibleName: prefStrings.phaseColormapStringProperty,
-        spacing: 8,
-        radioButtonOptions: { radius: 6 },
+        spacing: QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.COLORMAP_RADIO_BUTTONS_SPACING,
+        radioButtonOptions: { radius: QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.COLORMAP_RADIO_BUTTONS_RADIUS },
         ...(tandem && { tandem: tandem.createTandem("phaseColormapRadioButtonGroup") }),
       },
     );
@@ -76,7 +77,11 @@ export class QuantumAtom3DPreferencesNode extends VBox {
           createNode: () => createItemText(prefStrings[`${value}StringProperty`]),
           options: { accessibleName: prefStrings[`${value}StringProperty`] },
         })),
-        { orientation: compact ? "vertical" : "horizontal", spacing: 12, accessibleName },
+        {
+          orientation: compact ? "vertical" : "horizontal",
+          spacing: QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.CREATE_CHOICE_BUTTONS_SPACING,
+          accessibleName,
+        },
       );
     const lengthButtons = createChoiceButtons(
       preferencesModel.lengthUnitProperty,
@@ -95,7 +100,7 @@ export class QuantumAtom3DPreferencesNode extends VBox {
     );
     super({
       align: "left",
-      spacing: 12,
+      spacing: QUANTUM_ATOM3_D_PREFERENCES_NODE_SETTINGS.CONSTRUCTOR_SPACING,
       children: [
         header,
         colormapLabel,

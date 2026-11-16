@@ -1,3 +1,4 @@
+import { QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS } from "../QuantumAtom3DConstants.js";
 /** Screen-specific Scenery motifs; theme properties keep the navigation icons readable in both profiles. */
 
 import { Shape } from "scenerystack/kite";
@@ -21,52 +22,145 @@ function icon(...nodes: Node[]): ScreenIcon {
   );
 }
 function axis(): Line {
-  return new Line(274, 40, 274, 333, { stroke: Colors.nodeMarkerColorProperty, lineWidth: 3 });
+  return new Line(
+    QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.AXIS_START_X,
+    QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.AXIS_START_Y,
+    QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.AXIS_END_X,
+    QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.AXIS_END_Y,
+    { stroke: Colors.nodeMarkerColorProperty, lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.AXIS_LINE_WIDTH },
+  );
 }
 function lobe(x: number, y: number, positive: boolean, rotation = 0): Path {
-  return new Path(Shape.ellipse(50, 67.5, 0), {
-    fill: positive ? BLUE : ORANGE,
-    rotation,
-    centerX: x,
-    centerY: y,
-    opacity: 0.85,
-  });
+  return new Path(
+    Shape.ellipse(
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.LOBE_CENTER_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.LOBE_CENTER_Y,
+      0,
+    ),
+    {
+      fill: positive ? BLUE : ORANGE,
+      rotation,
+      centerX: x,
+      centerY: y,
+      opacity: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.LOBE_OPACITY,
+    },
+  );
 }
 export function createOrbitalsIcon(): ScreenIcon {
   return icon(axis(), lobe(274, 112, true), lobe(274, 261, false));
 }
 export function createSuperpositionIcon(): ScreenIcon {
   return icon(
-    new Circle(96, { centerX: 230, centerY: 187, fill: BLUE, opacity: 0.75 }),
-    new Circle(69, { centerX: 337, centerY: 187, fill: ORANGE, opacity: 0.85 }),
-    new ArrowNode(151, 305, 397, 305, {
-      fill: Colors.textColorProperty,
-      stroke: null,
-      tailWidth: 4,
-      headWidth: 22,
-      headHeight: 24,
+    new Circle(QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_RADIUS, {
+      centerX: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_CENTER_X,
+      centerY: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_CENTER_Y,
+      fill: BLUE,
+      opacity: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_OPACITY,
     }),
+    new Circle(QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_RADIUS_SEGMENT_2, {
+      centerX: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_CENTER_X_VARIANT_2,
+      centerY: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_CENTER_Y,
+      fill: ORANGE,
+      opacity: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_OPACITY_VARIANT_2,
+    }),
+    new ArrowNode(
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_START_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_START_Y,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_END_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_END_Y,
+      {
+        fill: Colors.textColorProperty,
+        stroke: null,
+        tailWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_TAIL_WIDTH,
+        headWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_HEAD_WIDTH,
+        headHeight: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_SUPERPOSITION_ICON_HEAD_HEIGHT,
+      },
+    ),
   );
 }
 export function createAngularMomentumIcon(): ScreenIcon {
   return icon(
     axis(),
-    new Path(Shape.ellipse(110, 32.5, 0), { centerX: 274, centerY: 97, stroke: BLUE, lineWidth: 5 }),
-    new Line(274, 285, 164, 97, { stroke: BLUE, lineWidth: 3, lineDash: [8, 6] }),
-    new ArrowNode(274, 285, 384, 97, { fill: ORANGE, stroke: null, tailWidth: 8, headWidth: 26, headHeight: 30 }),
+    new Path(
+      Shape.ellipse(
+        QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_CENTER_X,
+        QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_CENTER_Y,
+        0,
+      ),
+      {
+        centerX: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_CENTER_X_VARIANT_2,
+        centerY: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_CENTER_Y_VARIANT_2,
+        stroke: BLUE,
+        lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_LINE_WIDTH,
+      },
+    ),
+    new Line(
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_START_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_START_Y,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_END_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_END_Y,
+      {
+        stroke: BLUE,
+        lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_LINE_WIDTH_VARIANT_2,
+        lineDash: [
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.ANGULAR_MOMENTUM_DASH_LENGTH,
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_LINE_DASH_DASH,
+        ],
+      },
+    ),
+    new ArrowNode(
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_START_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_START_Y,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_START_X_ARROW_NODE_END_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_END_Y,
+      {
+        fill: ORANGE,
+        stroke: null,
+        tailWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_TAIL_WIDTH,
+        headWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_HEAD_WIDTH,
+        headHeight: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ANGULAR_MOMENTUM_ICON_HEAD_HEIGHT,
+      },
+    ),
   );
 }
 export function createZeemanIcon(): ScreenIcon {
   return icon(
-    new Line(90, 187, 210, 187, { stroke: Colors.textColorProperty, lineWidth: 7 }),
+    new Line(
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_START_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_START_Y,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_END_X,
+      QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_END_Y,
+      {
+        stroke: Colors.textColorProperty,
+        lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_LINE_WIDTH,
+      },
+    ),
     ...[85, 187, 289].map(
       (y, i) =>
-        new Line(330, y, 465, y, {
-          stroke: i === 1 ? Colors.textColorProperty : i === 0 ? BLUE : ORANGE,
-          lineWidth: 7,
-        }),
+        new Line(
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_START_X_SEGMENT_2,
+          y,
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_END_X_SEGMENT_2,
+          y,
+          {
+            stroke: i === 1 ? Colors.textColorProperty : i === 0 ? BLUE : ORANGE,
+            lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_LINE_WIDTH,
+          },
+        ),
     ),
-    ...[85, 187, 289].map((y) => new Line(210, 187, 330, y, { stroke: Colors.nodeMarkerColorProperty, lineWidth: 3 })),
+    ...[85, 187, 289].map(
+      (y) =>
+        new Line(
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_START_X_SEGMENT_3,
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_START_Y,
+          QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_END_X_SEGMENT_3,
+          y,
+          {
+            stroke: Colors.nodeMarkerColorProperty,
+            lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_ZEEMAN_ICON_LINE_WIDTH_VARIANT_2,
+          },
+        ),
+    ),
   );
 }
 export function createOscillatorIcon(): ScreenIcon {
@@ -77,7 +171,10 @@ export function createOscillatorIcon(): ScreenIcon {
       Array.from(
         { length: count },
         (_, i) =>
-          new Line(320 + i * 36, 320 - count * 63, 345 + i * 36, 320 - count * 63, { stroke: BLUE, lineWidth: 7 }),
+          new Line(320 + i * 36, 320 - count * 63, 345 + i * 36, 320 - count * 63, {
+            stroke: BLUE,
+            lineWidth: QUANTUM_ATOM3_D_SCREEN_ICONS_SETTINGS.CREATE_OSCILLATOR_ICON_LINE_WIDTH,
+          }),
       ),
     ),
   );

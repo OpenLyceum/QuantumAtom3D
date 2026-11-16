@@ -16,6 +16,7 @@ import { orbitCameraFrame, projectToScreen } from "../../common/view/OrbitCamera
 import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ZEEMAN_SCREEN_VIEW_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
 import { polarizationColor, ZeemanDiagramNode } from "./ZeemanDiagramNode.js";
 import { ZeemanScreenSummaryContent } from "./ZeemanScreenSummaryContent.js";
@@ -24,13 +25,20 @@ export class ZeemanScreenView extends ResponsiveScreenView {
   public constructor(model: ZeemanModel, options?: ScreenViewOptions) {
     super({ ...options, screenSummaryContent: new ZeemanScreenSummaryContent(model) });
     const strings = StringManager.getInstance().getZeemanStrings();
-    const text = (value: string | TReadOnlyProperty<string>, maxWidth = 335) =>
-      new RichText(value, { font: new PhetFont(13), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
-    const title = text(strings.diagramStringProperty, 560);
-    title.left = this.layoutBounds.minX + 25;
-    title.top = this.layoutBounds.minY + 15;
-    const subtitle = text(strings.centredStringProperty, 560);
-    subtitle.lineWrap = 560;
+    const text = (
+      value: string | TReadOnlyProperty<string>,
+      maxWidth: number = ZEEMAN_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ) =>
+      new RichText(value, {
+        font: new PhetFont(ZEEMAN_SCREEN_VIEW_SETTINGS.TEXT_FONT_SIZE),
+        fill: QuantumAtom3DColors.textColorProperty,
+        maxWidth,
+      });
+    const title = text(strings.diagramStringProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.DIAGRAM_TEXT_MAX_WIDTH);
+    title.left = this.layoutBounds.minX + ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
+    title.top = this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+    const subtitle = text(strings.centredStringProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.CENTRED_TEXT_MAX_WIDTH);
+    subtitle.lineWrap = ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LINE_WRAP;
     subtitle.left = title.left;
     subtitle.top = title.bottom + 5;
     const diagram = new ZeemanDiagramNode(model);
@@ -39,19 +47,26 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     const fieldValue = new DerivedProperty(
       [model.fieldProperty, model.capProperty, strings.fieldStringProperty],
       (field, cap, label) =>
-        `${label}: ${atomicFieldToTesla(field).toPrecision(4)} T / ${atomicFieldToTesla(cap).toPrecision(4)} T`,
+        `${label}: ${atomicFieldToTesla(field).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_VALUE_SIGNIFICANT_FIGURES)} T / ${atomicFieldToTesla(cap).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_VALUE_SIGNIFICANT_FIGURES)} T`,
     );
     const fieldSlider = new HSlider(model.fieldFractionProperty, model.fieldFractionProperty.range, {
       ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
       accessibleName: strings.fieldStringProperty,
       accessibleHelpText: strings.capHelpStringProperty,
-      keyboardStep: 0.01,
-      shiftKeyboardStep: 0.001,
+      keyboardStep: ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_SLIDER_KEYBOARD_STEP,
+      shiftKeyboardStep: ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_SLIDER_SHIFT_KEYBOARD_STEP,
     });
     model.capProperty.link((cap) => {
-      fieldSlider.pdomMapPDOMValue = (value) => Number(atomicFieldToTesla(cap * value).toPrecision(8));
+      fieldSlider.pdomMapPDOMValue = (value) =>
+        Number(
+          atomicFieldToTesla(cap * value).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SIGNIFICANT_FIGURES),
+        );
     });
-    const fieldControl = new VBox({ align: "left", spacing: 8, children: [text(fieldValue), fieldSlider] });
+    const fieldControl = new VBox({
+      align: "left",
+      spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_CONTROL_SPACING,
+      children: [text(fieldValue), fieldSlider],
+    });
     const modes = new AquaRadioButtonGroup(
       model.modeProperty,
       (["normal", "anomalous"] as const).map((value) => ({
@@ -59,7 +74,11 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         createNode: () => text(strings[`${value}StringProperty`]),
         options: { accessibleName: strings[`${value}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 14, radioButtonOptions: { radius: 7 } },
+      {
+        orientation: "horizontal",
+        spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.MODES_SPACING,
+        radioButtonOptions: { radius: ZEEMAN_SCREEN_VIEW_SETTINGS.MODES_RADIUS },
+      },
     );
     const lines = new AquaRadioButtonGroup(
       model.lineProperty,
@@ -68,7 +87,11 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         createNode: () => text(value === "halpha" ? "Hα (3 → 2)" : "Lyα (2 → 1)"),
         options: { accessibleName: value === "halpha" ? "Hα (3 → 2)" : "Lyα (2 → 1)" },
       })),
-      { orientation: "horizontal", spacing: 14, radioButtonOptions: { radius: 7 } },
+      {
+        orientation: "horizontal",
+        spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.LINES_SPACING,
+        radioButtonOptions: { radius: ZEEMAN_SCREEN_VIEW_SETTINGS.LINES_RADIUS },
+      },
     );
     const directions = new AquaRadioButtonGroup(
       model.directionProperty,
@@ -77,7 +100,10 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         createNode: () => text(strings[`${value}StringProperty`]),
         options: { accessibleName: strings[`${value}StringProperty`] },
       })),
-      { spacing: 8, radioButtonOptions: { radius: 7 } },
+      {
+        spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.DIRECTIONS_SPACING,
+        radioButtonOptions: { radius: ZEEMAN_SCREEN_VIEW_SETTINGS.DIRECTIONS_RADIUS },
+      },
     );
     const spinner = (
       property: typeof model.nuclearChargeProperty,
@@ -92,12 +118,12 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     });
     const controls = new VBox({
       align: "left",
-      spacing: 14,
+      spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROLS_SPACING,
       children: [
         modes,
         lines,
         new HBox({
-          spacing: 10,
+          spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_CONTROLS_SPACING,
           children: [
             text(strings.chargeStringProperty),
             spinner(
@@ -112,22 +138,22 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         text(strings.viewStringProperty),
         directions,
         new HBox({
-          spacing: 10,
+          spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_CONTROLS_SPACING,
           children: [
             text(strings.selectedStringProperty),
             spinner(model.selectedIndexProperty, model.selectedRangeProperty, strings.selectedStringProperty, 1),
           ],
         }),
       ],
-      left: this.layoutBounds.maxX - 365,
-      top: this.layoutBounds.minY + 20,
+      left: this.layoutBounds.maxX - ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROLS_LEFT_OFFSET,
+      top: this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROLS_TOP_OFFSET,
     });
     const selected = new DerivedProperty(
       [model.upperLevelsProperty, model.selectedIndexProperty, model.modeProperty],
       (levels, index, mode) => {
         const level = levels[index];
         return level
-          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${level.g.toFixed(3)}, E=${hartreeToEv(level.energy).toFixed(8)} eV`
+          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${level.g.toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.SELECTED_DECIMAL_PLACES)}, E=${hartreeToEv(level.energy).toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_SELECTED_DECIMAL_PLACES)} eV`
           : "";
       },
     );
@@ -139,7 +165,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         [model.transitionsProperty, strings.spectrumStringProperty],
         (transitions, label) => `${label}: ${distinctPhotonEnergies(transitions).length}`,
       ),
-      550,
+      ZEEMAN_SCREEN_VIEW_SETTINGS.SPECTRUM_TITLE_MAX_WIDTH,
     );
     spectrumTitle.left = title.left;
     spectrumTitle.top = this.layoutBounds.minY + 465;
@@ -147,11 +173,11 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     spectrum.left = title.left + 20;
     spectrum.top = spectrumTitle.bottom + 8;
     const legend = new HBox({
-      spacing: 25,
+      spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.LEGEND_SPACING,
       children: (["pi", "sigmaPlus", "sigmaMinus"] as const).map(
         (value, index) =>
           new RichText(["π (Δm=0)", "σ⁺ (Δm=+1)", "σ⁻ (Δm=−1)"][index] ?? "", {
-            font: new PhetFont(12),
+            font: new PhetFont(ZEEMAN_SCREEN_VIEW_SETTINGS.LEGEND_FONT_SIZE),
             fill: polarizationColor(value),
           }),
       ),
@@ -175,21 +201,33 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         if (q === 0) {
           return `${label}: — (L=0)`;
         }
-        return `${label}: ${atomicTimeToFs((4 * Math.PI) / (level.g * field)).toPrecision(4)} fs`;
+        return `${label}: ${atomicTimeToFs((4 * Math.PI) / (level.g * field)).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_SIGNIFICANT_FIGURES)} fs`;
       },
     );
-    const periodLabel = text(period, 335);
+    const periodLabel = text(period, ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_LABEL_MAX_WIDTH);
     periodLabel.left = controls.left;
     periodLabel.top = this.layoutBounds.minY + 435;
-    const axis = new Line(0, 50, 0, -50, { stroke: QuantumAtom3DColors.textColorProperty });
-    const arrow = new ArrowNode(0, 0, 20, -20, {
-      fill: QuantumAtom3DColors.radialCurveColorProperty,
-      stroke: null,
-      tailWidth: 3,
-      headWidth: 10,
-      headHeight: 10,
+    const axis = new Line(0, ZEEMAN_SCREEN_VIEW_SETTINGS.AXIS_START_Y, 0, ZEEMAN_SCREEN_VIEW_SETTINGS.AXIS_END_Y, {
+      stroke: QuantumAtom3DColors.textColorProperty,
     });
-    const precession = new Node({ children: [axis, arrow], x: controls.left + 70, y: this.layoutBounds.minY + 525 });
+    const arrow = new ArrowNode(
+      0,
+      0,
+      ZEEMAN_SCREEN_VIEW_SETTINGS.ARROW_END_X,
+      ZEEMAN_SCREEN_VIEW_SETTINGS.ARROW_END_Y,
+      {
+        fill: QuantumAtom3DColors.radialCurveColorProperty,
+        stroke: null,
+        tailWidth: ZEEMAN_SCREEN_VIEW_SETTINGS.ARROW_TAIL_WIDTH,
+        headWidth: ZEEMAN_SCREEN_VIEW_SETTINGS.ARROW_HEAD_WIDTH,
+        headHeight: ZEEMAN_SCREEN_VIEW_SETTINGS.ARROW_HEAD_HEIGHT,
+      },
+    );
+    const precession = new Node({
+      children: [axis, arrow],
+      x: controls.left + ZEEMAN_SCREEN_VIEW_SETTINGS.PRECESSION_X_OFFSET,
+      y: this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.PRECESSION_Y_OFFSET,
+    });
     const update = () => {
       const level = model.upperLevelsProperty.value[model.selectedIndexProperty.value];
       if (!level) {
@@ -220,16 +258,16 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     });
     playback.left = controls.left + 145;
     playback.centerY = precession.y;
-    const note = text(strings.noteStringProperty, 920);
+    const note = text(strings.noteStringProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.NOTE_TEXT_MAX_WIDTH);
     note.left = title.left;
-    note.bottom = this.layoutBounds.maxY - 12;
+    note.bottom = this.layoutBounds.maxY - ZEEMAN_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
     const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
       },
-      right: this.layoutBounds.maxX - 18,
-      bottom: this.layoutBounds.maxY - 18,
+      right: this.layoutBounds.maxX - ZEEMAN_SCREEN_VIEW_SETTINGS.RESET_RIGHT_OFFSET,
+      bottom: this.layoutBounds.maxY - ZEEMAN_SCREEN_VIEW_SETTINGS.RESET_BOTTOM_OFFSET,
     });
     const content = new Node({
       children: [

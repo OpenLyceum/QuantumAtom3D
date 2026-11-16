@@ -1,3 +1,4 @@
+import { ORBITALS_MODEL_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * OrbitalsModel.ts
  *
@@ -49,7 +50,9 @@ export class OrbitalsModel implements TModel {
   public readonly renderModeProperty = new StringUnionProperty<"volume" | "dots" | "isosurface">("volume", {
     validValues: ["volume", "dots", "isosurface"],
   });
-  public readonly enclosedFractionProperty = new NumberProperty(0.9, { validValues: [0.9, 0.95] });
+  public readonly enclosedFractionProperty = new NumberProperty(ORBITALS_MODEL_SETTINGS.ENCLOSED_FRACTION_DEFAULT, {
+    validValues: [0.9, 0.95],
+  });
   public readonly quantumNumbers: QuantumNumbersModel;
   public readonly nuclearChargeProperty: NumberProperty;
   public readonly basisProperty: StringUnionProperty<OrbitalBasis>;

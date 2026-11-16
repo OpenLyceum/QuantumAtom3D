@@ -1,10 +1,11 @@
 /** Hysteresis on completed GPU frame latency, excluding idle gaps. */
 import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
+import { RENDER_QUALITY_CONTROLLER_SETTINGS } from "../../QuantumAtom3DConstants.js";
 
-const SLOW_FRAME_MS = 40;
-const FAST_FRAME_MS = 18;
-const SLOW_FRAME_COUNT = 6;
-const FAST_FRAME_COUNT = 48;
+const SLOW_FRAME_MS: number = RENDER_QUALITY_CONTROLLER_SETTINGS.SLOW_FRAME_MS;
+const FAST_FRAME_MS: number = RENDER_QUALITY_CONTROLLER_SETTINGS.FAST_FRAME_MS;
+const SLOW_FRAME_COUNT: number = RENDER_QUALITY_CONTROLLER_SETTINGS.SLOW_FRAME_COUNT;
+const FAST_FRAME_COUNT: number = RENDER_QUALITY_CONTROLLER_SETTINGS.FAST_FRAME_COUNT;
 const RESOLUTIONS = [128, 256, 512] as const;
 export class RenderQualityController {
   public quality: RenderQuality = "high";

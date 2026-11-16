@@ -1,3 +1,4 @@
+import { ORBITALS_CONTROL_PANEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * OrbitalsControlPanel.ts
  *
@@ -30,17 +31,20 @@ import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import { MAX_NUCLEAR_CHARGE, MIN_NUCLEAR_CHARGE } from "../../QuantumAtom3DConstants.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const LABEL_FONT = new PhetFont(13);
-const ION_FONT = new PhetFont({ size: 16, weight: "bold" });
-const SECTION_SPACING = 7;
-const RADIO_SPACING = 6;
-const RADIO_RADIUS = 7;
-const ZOOM_ICON_SIZE = new Dimension2(10, 2);
-const PANEL_CONTENT_WIDTH = 230;
+const TITLE_FONT = new PhetFont({ size: ORBITALS_CONTROL_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const LABEL_FONT = new PhetFont(ORBITALS_CONTROL_PANEL_SETTINGS.LABEL_FONT_SIZE);
+const ION_FONT = new PhetFont({ size: ORBITALS_CONTROL_PANEL_SETTINGS.ION_FONT_SIZE, weight: "bold" });
+const SECTION_SPACING: number = ORBITALS_CONTROL_PANEL_SETTINGS.SECTION_SPACING;
+const RADIO_SPACING: number = ORBITALS_CONTROL_PANEL_SETTINGS.RADIO_SPACING;
+const RADIO_RADIUS: number = ORBITALS_CONTROL_PANEL_SETTINGS.RADIO_RADIUS;
+const ZOOM_ICON_SIZE = new Dimension2(
+  ORBITALS_CONTROL_PANEL_SETTINGS.ZOOM_ICON_SIZE_WIDTH,
+  ORBITALS_CONTROL_PANEL_SETTINGS.ZOOM_ICON_SIZE_HEIGHT,
+);
+const PANEL_CONTENT_WIDTH: number = ORBITALS_CONTROL_PANEL_SETTINGS.PANEL_CONTENT_WIDTH;
 
 /** Fixed slot for the ion symbol, wide enough for "Be³⁺", so the panel keeps its width as Z changes. */
-const ION_LABEL_WIDTH = 44;
+const ION_LABEL_WIDTH: number = ORBITALS_CONTROL_PANEL_SETTINGS.ION_LABEL_WIDTH;
 
 export class OrbitalsControlPanel extends QuantumAtom3DPanel {
   private readonly ionSymbolProperty: TReadOnlyProperty<string>;
@@ -169,7 +173,7 @@ export class OrbitalsControlPanel extends QuantumAtom3DPanel {
           children: [text(strings.zoomStringProperty), zoomButtons],
         }),
         new HBox({
-          spacing: 10,
+          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.CONTENT_SPACING,
           children: [
             nodesCheckbox,
             new Checkbox(model.nodes3DVisibleProperty, text(strings.volume.nodesStringProperty), {
@@ -179,8 +183,14 @@ export class OrbitalsControlPanel extends QuantumAtom3DPanel {
           ],
         }),
         text(strings.presets.titleStringProperty, TITLE_FONT),
-        new HBox({ spacing: 6, children: presetButtons.slice(0, 3) }),
-        new HBox({ spacing: 6, children: presetButtons.slice(3) }),
+        new HBox({
+          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_CONTENT_SPACING,
+          children: presetButtons.slice(0, 3),
+        }),
+        new HBox({
+          spacing: ORBITALS_CONTROL_PANEL_SETTINGS.CONSTRUCTOR_CONTENT_SPACING,
+          children: presetButtons.slice(3),
+        }),
       ],
     });
 

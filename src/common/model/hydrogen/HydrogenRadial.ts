@@ -1,3 +1,4 @@
+import { HYDROGEN_RADIAL_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * HydrogenRadial.ts
  *
@@ -14,10 +15,10 @@
 import { associatedLaguerre, factorial, findRoots } from "../math/specialFunctions.js";
 
 /** Grid points for the numerical P(r) integrals (cumulative probability, maximum). */
-const RADIAL_GRID_POINTS = 4000;
+const RADIAL_GRID_POINTS: number = HYDROGEN_RADIAL_SETTINGS.RADIAL_GRID_POINTS;
 
 /** Scan steps for the node search; far more than the at most four nodes at n ≤ 5. */
-const NODE_SCAN_SAMPLES = 2000;
+const NODE_SCAN_SAMPLES: number = HYDROGEN_RADIAL_SETTINGS.NODE_SCAN_SAMPLES;
 
 /** Normalization N_nl of R_nl. */
 function radialNorm(n: number, l: number, nuclearCharge: number): number {
@@ -43,8 +44,8 @@ export function hydrogenRadialDistribution(n: number, l: number, nuclearCharge: 
  * n²/Z, like the orbital itself.
  */
 export function hydrogenRadialCutoff(n: number, nuclearCharge: number): number {
-  const CUTOFF_N2_FACTOR = 4;
-  const CUTOFF_OFFSET = 10;
+  const CUTOFF_N2_FACTOR: number = HYDROGEN_RADIAL_SETTINGS.CUTOFF_N2_FACTOR;
+  const CUTOFF_OFFSET: number = HYDROGEN_RADIAL_SETTINGS.CUTOFF_OFFSET;
   return (CUTOFF_N2_FACTOR * n * n + CUTOFF_OFFSET) / nuclearCharge;
 }
 
@@ -63,7 +64,7 @@ export function hydrogenRadialNodes(n: number, l: number, nuclearCharge: number)
 
 /** The radius of the global maximum of P(r), found on a grid and refined by golden-section search. */
 export function hydrogenMostProbableRadius(n: number, l: number, nuclearCharge: number): number {
-  const GOLDEN_SECTION_STEPS = 60;
+  const GOLDEN_SECTION_STEPS: number = HYDROGEN_RADIAL_SETTINGS.GOLDEN_SECTION_STEPS;
   const INVERSE_GOLDEN_RATIO = (Math.sqrt(5) - 1) / 2;
   const cutoff = hydrogenRadialCutoff(n, nuclearCharge);
   const step = cutoff / RADIAL_GRID_POINTS;

@@ -8,13 +8,14 @@ import { Line, type Node, type NodeOptions, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ORBITAL_VIEWPORT_CHROME_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { Vec3 } from "./OrbitCamera.js";
 
 /** Camera orbit per arrow-key press, in radians. */
 export const KEYBOARD_ORBIT_ANGLE = Math.PI / 36;
 
 /** Camera orbit per pixel of drag, in radians. */
-export const DRAG_ORBIT_ANGLE = 0.008;
+export const DRAG_ORBIT_ANGLE: number = ORBITAL_VIEWPORT_CHROME_SETTINGS.DRAG_ORBIT_ANGLE;
 
 /** Options for a keyboard-operable square viewport of the given size, named by the volume strings. */
 export function orbitalViewportOptions(size: number): NodeOptions {
@@ -39,11 +40,11 @@ export function createPendingText(
   size: number,
 ): Text {
   return new Text(stringProperty, {
-    font: new PhetFont(12),
+    font: new PhetFont(ORBITAL_VIEWPORT_CHROME_SETTINGS.CREATE_PENDING_TEXT_FONT_SIZE),
     fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
-    left: 10,
-    top: 10,
-    maxWidth: size - 20,
+    left: ORBITAL_VIEWPORT_CHROME_SETTINGS.CREATE_PENDING_TEXT_LEFT,
+    top: ORBITAL_VIEWPORT_CHROME_SETTINGS.CREATE_PENDING_TEXT_TOP,
+    maxWidth: size - ORBITAL_VIEWPORT_CHROME_SETTINGS.CREATE_PENDING_TEXT_MAX_WIDTH_OFFSET,
     visibleProperty,
     tagName: "p",
     accessibleParagraph: stringProperty,
@@ -58,7 +59,7 @@ export function addOrientationAxes(parent: Node): OrientationAxis[] {
     const direction: Vec3 = [index === 0 ? 1 : 0, index === 1 ? 1 : 0, index === 2 ? 1 : 0];
     const line = new Line(0, 0, 0, 0, { stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty, pickable: false });
     const label = new Text(name, {
-      font: new PhetFont(12),
+      font: new PhetFont(ORBITAL_VIEWPORT_CHROME_SETTINGS.LABEL_FONT_SIZE),
       fill: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
       pickable: false,
     });

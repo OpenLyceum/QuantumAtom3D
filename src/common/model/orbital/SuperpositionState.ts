@@ -1,3 +1,4 @@
+import { SUPERPOSITION_NUMERICS } from "../../../QuantumAtom3DConstants.js";
 /** Normalized coherent hydrogenic states and their relative dynamical phases. */
 import { hydrogenEnergy } from "../hydrogen/HydrogenExpectations.js";
 import type { OrbitalTerm } from "./OrbitalTerm.js";
@@ -10,7 +11,9 @@ export function normalizeTerms(input: readonly OrbitalTerm[]): OrbitalTerm[] {
     const previous = combined.get(key);
     combined.set(key, { ...term, re: term.re + (previous?.re ?? 0), im: term.im + (previous?.im ?? 0) });
   }
-  const terms = [...combined.values()].filter((term) => term.re ** 2 + term.im ** 2 > 1e-24);
+  const terms = [...combined.values()].filter(
+    (term) => term.re ** 2 + term.im ** 2 > SUPERPOSITION_NUMERICS.MIN_COEFFICIENT_NORM_SQUARED,
+  );
   const norm = Math.sqrt(terms.reduce((sum, term) => sum + term.re ** 2 + term.im ** 2, 0));
   return norm > 0 ? terms.map((term) => ({ ...term, re: term.re / norm, im: term.im / norm })) : [];
 }

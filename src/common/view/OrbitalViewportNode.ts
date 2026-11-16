@@ -14,6 +14,7 @@ import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesMo
 import quantumAtom3DQueryParameters from "../../preferences/quantumAtom3DQueryParameters.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
+import { ORBITAL_VIEWPORT_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import { createOrbitalRenderer } from "../gpu/createOrbitalRenderer.js";
 import type { OrbitalRenderer } from "../gpu/OrbitalRenderer.js";
 import { hydrogenEnclosingRadius } from "../model/hydrogen/HydrogenRadial.js";
@@ -32,7 +33,7 @@ import {
 } from "./orbitalViewportChrome.js";
 import { ProgressiveSurface } from "./ProgressiveSurface.js";
 
-const AXIS_LENGTH = 28;
+const AXIS_LENGTH: number = ORBITAL_VIEWPORT_NODE_SETTINGS.AXIS_LENGTH;
 
 export class OrbitalViewportNode extends Node {
   public readonly surfacePendingProperty = new BooleanProperty(false);
@@ -71,11 +72,14 @@ export class OrbitalViewportNode extends Node {
       centerX: size / 2,
       centerY: size / 2,
       stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
-      lineDash: [4, 3],
+      lineDash: [
+        ORBITAL_VIEWPORT_NODE_SETTINGS.PROBE_SHELL_LINE_DASH_DASH,
+        ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_PROBE_SHELL_LINE_DASH_DASH,
+      ],
       pickable: false,
     });
     this.addChild(probeShell);
-    const planeHandle = new Circle(7, {
+    const planeHandle = new Circle(ORBITAL_VIEWPORT_NODE_SETTINGS.PLANE_HANDLE_RADIUS, {
       fill: QuantumAtom3DColors.accentColorProperty,
       stroke: QuantumAtom3DColors.sliceNodeOverlayColorProperty,
       pickable: false,
@@ -90,7 +94,7 @@ export class OrbitalViewportNode extends Node {
     this.addChild(
       new Rectangle(0, 0, size, size, {
         stroke: QuantumAtom3DColors.sliceFrameColorProperty,
-        lineWidth: 1.5,
+        lineWidth: ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_LINE_WIDTH,
         pickable: false,
       }),
     );
@@ -160,7 +164,7 @@ export class OrbitalViewportNode extends Node {
         },
       ),
       Multilink.multilink([model.probeFractionProperty], (fraction) => {
-        probeShell.radius = Math.max(0.01, (fraction * size) / 2);
+        probeShell.radius = Math.max(ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_RADIUS, (fraction * size) / 2);
         probeShell.visible = fraction > 0;
       }),
       Multilink.multilink(
@@ -188,8 +192,8 @@ export class OrbitalViewportNode extends Node {
           const originX = size - 48;
           const originY = size - 48;
           line.setLine(originX, originY, originX + x * AXIS_LENGTH, originY - y * AXIS_LENGTH);
-          label.centerX = originX + x * (AXIS_LENGTH + 10);
-          label.centerY = originY - y * (AXIS_LENGTH + 10);
+          label.centerX = originX + x * (AXIS_LENGTH + ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_CENTER_X_OFFSET);
+          label.centerY = originY - y * (AXIS_LENGTH + ORBITAL_VIEWPORT_NODE_SETTINGS.CONSTRUCTOR_CENTER_Y_OFFSET);
         }
       }),
     ];

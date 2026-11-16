@@ -11,6 +11,7 @@ import { DragListener, Image, KeyboardListener, Node, type OneKeyStroke, Rectang
 import { StringManager } from "../../i18n/StringManager.js";
 import type { RenderQuality } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { INTERACTIVE_ORBITAL_CANVAS_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import { createOrbitalRenderer } from "../gpu/createOrbitalRenderer.js";
 import { OrbitalHotkeyData } from "./OrbitalHotkeyData.js";
 import { OrbitCamera, projectToScreen } from "./OrbitCamera.js";
@@ -41,7 +42,7 @@ export class InteractiveOrbitalCanvas extends Node {
       this.canvasImage,
       new Rectangle(0, 0, size, size, {
         stroke: QuantumAtom3DColors.sliceFrameColorProperty,
-        lineWidth: 1.5,
+        lineWidth: INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CHILDREN_LINE_WIDTH,
         pickable: false,
       }),
     ];
@@ -53,8 +54,14 @@ export class InteractiveOrbitalCanvas extends Node {
       for (const { direction, line, label } of axes) {
         const [x, y] = projectToScreen(this.camera.frame, direction);
         line.setLine(size - 45, size - 45, size - 45 + 25 * x, size - 45 - 25 * y);
-        label.centerX = size - 45 + 35 * x;
-        label.centerY = size - 45 - 35 * y;
+        label.centerX =
+          size -
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_X_OFFSET +
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_X_FACTOR * x;
+        label.centerY =
+          size -
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_Y_OFFSET -
+          INTERACTIVE_ORBITAL_CANVAS_SETTINGS.CONSTRUCTOR_CENTER_Y_FACTOR * y;
       }
     });
     let previous: Vector2 | null = null;

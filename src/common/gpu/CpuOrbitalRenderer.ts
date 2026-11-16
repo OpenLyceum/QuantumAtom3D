@@ -1,3 +1,4 @@
+import { CPU_ORBITAL_RENDERER_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * CpuOrbitalRenderer.ts
  *
@@ -27,9 +28,9 @@ import { paintPointCloud } from "./PointCloudPainter.js";
 export const CPU_RESOLUTIONS = [32, 64, 128, 256] as const;
 
 /** Wall-clock budget per animation frame, in milliseconds. */
-const CPU_FRAME_BUDGET_MS = 12;
+const CPU_FRAME_BUDGET_MS: number = CPU_ORBITAL_RENDERER_SETTINGS.CPU_FRAME_BUDGET_MS;
 
-const BYTE = 255;
+const BYTE: number = CPU_ORBITAL_RENDERER_SETTINGS.BYTE;
 
 export class CpuOrbitalRenderer implements OrbitalRenderer {
   public readonly canvas: HTMLCanvasElement;

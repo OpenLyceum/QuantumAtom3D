@@ -1,3 +1,4 @@
+import { COLORMAP_LEGEND_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * ColormapLegendNode.ts
  *
@@ -18,14 +19,14 @@ import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 import { densityCssColor, phaseCssColor } from "./Colormaps.js";
 
-const RING_SEGMENTS = 72;
-const RING_OUTER_RADIUS = 24;
-const RING_INNER_RADIUS = 13;
-const BAR_WIDTH = 90;
-const BAR_HEIGHT = 12;
-const GRADIENT_STOPS = 16;
-const LABEL_FONT = new PhetFont(11);
-const AXIS_LABEL_GAP = 3;
+const RING_SEGMENTS: number = COLORMAP_LEGEND_NODE_SETTINGS.RING_SEGMENTS;
+const RING_OUTER_RADIUS: number = COLORMAP_LEGEND_NODE_SETTINGS.RING_OUTER_RADIUS;
+const RING_INNER_RADIUS: number = COLORMAP_LEGEND_NODE_SETTINGS.RING_INNER_RADIUS;
+const BAR_WIDTH: number = COLORMAP_LEGEND_NODE_SETTINGS.BAR_WIDTH;
+const BAR_HEIGHT: number = COLORMAP_LEGEND_NODE_SETTINGS.BAR_HEIGHT;
+const GRADIENT_STOPS: number = COLORMAP_LEGEND_NODE_SETTINGS.GRADIENT_STOPS;
+const LABEL_FONT = new PhetFont(COLORMAP_LEGEND_NODE_SETTINGS.LABEL_FONT_SIZE);
+const AXIS_LABEL_GAP: number = COLORMAP_LEGEND_NODE_SETTINGS.AXIS_LABEL_GAP;
 
 /** Ring of hue wedges; wedge k spans phase [k, k + 1]·2π/N, drawn counter-clockwise from +x. */
 function createPhaseRing(colormap: PhaseColormap): Node {
@@ -39,7 +40,13 @@ function createPhaseRing(colormap: PhaseColormap): Node {
       .arc(0, 0, RING_INNER_RADIUS, -end, -start, false)
       .close();
     const color = phaseCssColor((start + end) / 2, colormap);
-    wedges.push(new Path(shape, { fill: color, stroke: color, lineWidth: 0.5 }));
+    wedges.push(
+      new Path(shape, {
+        fill: color,
+        stroke: color,
+        lineWidth: COLORMAP_LEGEND_NODE_SETTINGS.CREATE_PHASE_RING_LINE_WIDTH,
+      }),
+    );
   }
   return new Node({ children: wedges });
 }

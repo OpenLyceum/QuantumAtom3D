@@ -1,3 +1,4 @@
+import { SLICE_CONTROL_PANEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * SliceControlPanel.ts
  *
@@ -20,15 +21,15 @@ import { QuantumAtom3DPanel } from "../../common/QuantumAtom3DPanel.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 
-const LABEL_FONT = new PhetFont(13);
-const PLANE_FONT = new PhetFont({ size: 14, style: "italic" });
-const ROW_SPACING = 8;
-const ITEM_SPACING = 12;
-const RADIO_RADIUS = 7;
+const LABEL_FONT = new PhetFont(SLICE_CONTROL_PANEL_SETTINGS.LABEL_FONT_SIZE);
+const PLANE_FONT = new PhetFont({ size: SLICE_CONTROL_PANEL_SETTINGS.PLANE_FONT_SIZE, style: "italic" });
+const ROW_SPACING: number = SLICE_CONTROL_PANEL_SETTINGS.ROW_SPACING;
+const ITEM_SPACING: number = SLICE_CONTROL_PANEL_SETTINGS.ITEM_SPACING;
+const RADIO_RADIUS: number = SLICE_CONTROL_PANEL_SETTINGS.RADIO_RADIUS;
 
 /** Slider keyboard steps, as fractions of the view half-width. */
-const OFFSET_KEYBOARD_STEP = 0.05;
-const OFFSET_SHIFT_KEYBOARD_STEP = 0.01;
+const OFFSET_KEYBOARD_STEP: number = SLICE_CONTROL_PANEL_SETTINGS.OFFSET_KEYBOARD_STEP;
+const OFFSET_SHIFT_KEYBOARD_STEP: number = SLICE_CONTROL_PANEL_SETTINGS.OFFSET_SHIFT_KEYBOARD_STEP;
 
 export class SliceControlPanel extends QuantumAtom3DPanel {
   public constructor(model: OrbitalsModel) {

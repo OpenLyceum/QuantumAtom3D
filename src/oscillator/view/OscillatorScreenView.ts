@@ -20,6 +20,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
+import { OSCILLATOR_SCREEN_VIEW_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
 import { BasisOverlapNode } from "./BasisOverlapNode.js";
 import { OscillatorScreenSummaryContent } from "./OscillatorScreenSummaryContent.js";
@@ -34,8 +35,15 @@ export class OscillatorScreenView extends ResponsiveScreenView {
     super({ ...options, screenSummaryContent: new OscillatorScreenSummaryContent(model) });
     const strings = StringManager.getInstance().getOscillatorStrings();
     const orbital = StringManager.getInstance().getOrbitalStrings();
-    const text = (value: string | TReadOnlyProperty<string>, maxWidth = 500) =>
-      new RichText(value, { font: new PhetFont(13), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const text = (
+      value: string | TReadOnlyProperty<string>,
+      maxWidth: number = OSCILLATOR_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ) =>
+      new RichText(value, {
+        font: new PhetFont(OSCILLATOR_SCREEN_VIEW_SETTINGS.TEXT_FONT_SIZE),
+        fill: QuantumAtom3DColors.textColorProperty,
+        maxWidth,
+      });
     const spinner = (
       property: typeof model.shellProperty,
       range: TReadOnlyProperty<Range>,
@@ -49,11 +57,11 @@ export class OscillatorScreenView extends ResponsiveScreenView {
       options.preferences?.qualityProperty,
     );
     const viewport = this.viewport;
-    viewport.left = this.layoutBounds.minX + 25;
-    viewport.top = this.layoutBounds.minY + 50;
-    const title = text(strings.unitsStringProperty, 340);
+    viewport.left = this.layoutBounds.minX + OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
+    viewport.top = this.layoutBounds.minY + OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
+    const title = text(strings.unitsStringProperty, OSCILLATOR_SCREEN_VIEW_SETTINGS.UNITS_TEXT_MAX_WIDTH);
     title.left = viewport.left;
-    title.bottom = viewport.top - 10;
+    title.bottom = viewport.top - OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
     const cameraRows = (
       [
         [orbital.volume.yawStringProperty, viewport.camera.yawProperty],
@@ -63,9 +71,9 @@ export class OscillatorScreenView extends ResponsiveScreenView {
     ).map(
       ([name, property]) =>
         new HBox({
-          spacing: 12,
+          spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CAMERA_ROWS_SPACING,
           children: [
-            text(name, 100),
+            text(name, OSCILLATOR_SCREEN_VIEW_SETTINGS.CAMERA_ROWS_MAX_WIDTH),
             new HSlider(property, property.range, {
               ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
               accessibleName: name,
@@ -84,18 +92,22 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         createNode: () => text(orbital.volume[`${value}StringProperty`]),
         options: { accessibleName: orbital.volume[`${value}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 15, radioButtonOptions: { radius: 6 } },
+      {
+        orientation: "horizontal",
+        spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.MODES_SPACING,
+        radioButtonOptions: { radius: OSCILLATOR_SCREEN_VIEW_SETTINGS.MODES_RADIUS },
+      },
     );
     const below = new VBox({
       align: "left",
-      spacing: 10,
+      spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.BELOW_SPACING,
       children: [
         modes,
         new OrbitalColorControl({ sliceColoringProperty: model.coloringProperty }, options.phaseColormapProperty),
         ...cameraRows,
       ],
       left: viewport.left,
-      top: viewport.bottom + 10,
+      top: viewport.bottom + OSCILLATOR_SCREEN_VIEW_SETTINGS.BELOW_TOP_OFFSET,
     });
     const right = this.layoutBounds.minX + 435;
     const bases = new AquaRadioButtonGroup(
@@ -105,7 +117,11 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         createNode: () => text(strings[`${value}StringProperty`]),
         options: { accessibleName: strings[`${value}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 20, radioButtonOptions: { radius: 7 } },
+      {
+        orientation: "horizontal",
+        spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.BASES_SPACING,
+        radioButtonOptions: { radius: OSCILLATOR_SCREEN_VIEW_SETTINGS.BASES_RADIUS },
+      },
     );
     const cartLabel = new DerivedProperty(
       [model.shellProperty, model.cartesianIndexProperty],
@@ -117,10 +133,10 @@ export class OscillatorScreenView extends ResponsiveScreenView {
     });
     const controls = new VBox({
       align: "left",
-      spacing: 10,
+      spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONTROLS_SPACING,
       children: [
         new HBox({
-          spacing: 15,
+          spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_CONTROLS_SPACING,
           children: [
             text(strings.shellStringProperty),
             spinner(model.shellProperty, model.shellProperty.rangeProperty, strings.shellStringProperty),
@@ -128,7 +144,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         }),
         bases,
         new HBox({
-          spacing: 12,
+          spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONTROLS_ITEM_3_SPACING,
           children: [
             text(strings.cartStateStringProperty),
             spinner(model.cartesianIndexProperty, model.indexRangeProperty, strings.cartStateStringProperty, 1),
@@ -136,7 +152,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
           ],
         }),
         new HBox({
-          spacing: 12,
+          spacing: OSCILLATOR_SCREEN_VIEW_SETTINGS.CONTROLS_ITEM_4_SPACING,
           children: [
             text(strings.sphereStateStringProperty),
             spinner(model.sphericalIndexProperty, model.indexRangeProperty, strings.sphereStateStringProperty, 1),
@@ -145,7 +161,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         }),
       ],
       left: right,
-      top: this.layoutBounds.minY + 20,
+      top: this.layoutBounds.minY + OSCILLATOR_SCREEN_VIEW_SETTINGS.CONTROLS_TOP_OFFSET,
     });
     const energy = text(
       new DerivedProperty(
@@ -168,7 +184,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
           c && s
             ? cartesianExpansion(c).find((entry) => entry.n === s.nr && entry.l === s.l && entry.m === s.m)
             : undefined;
-        return `⟨${c?.join(",") ?? ""}|${s ? `${s.nr},${s.l},${s.m}` : ""}⟩ = ${(t?.re ?? 0).toFixed(4)} ${-(t?.im ?? 0) < 0 ? "−" : "+"} ${Math.abs(t?.im ?? 0).toFixed(4)}i`;
+        return `⟨${c?.join(",") ?? ""}|${s ? `${s.nr},${s.l},${s.m}` : ""}⟩ = ${(t?.re ?? 0).toFixed(OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)} ${-(t?.im ?? 0) < 0 ? "−" : "+"} ${Math.abs(t?.im ?? 0).toFixed(OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)}i`;
       },
     );
     const coefficientLabel = text(coefficient);
@@ -183,13 +199,13 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         (N, caption) =>
           `${caption}<br>${Array.from({ length: 5 }, (_, shell) => `${shell === N ? "▶ " : ""}N=${shell}: ${oscillatorDegeneracy(shell)} / n=${shell + 1}: ${(shell + 1) ** 2}`).join("<br>")}`,
       ),
-      500,
+      OSCILLATOR_SCREEN_VIEW_SETTINGS.LADDER_MAX_WIDTH,
     );
     ladder.left = right + 390;
     ladder.top = this.layoutBounds.minY + 275;
-    ladder.maxWidth = 140;
-    ladder.lineWrap = 140;
-    const note = text(strings.noteStringProperty, 920);
+    ladder.maxWidth = OSCILLATOR_SCREEN_VIEW_SETTINGS.MAX_WIDTH_MAX_WIDTH;
+    ladder.lineWrap = OSCILLATOR_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LINE_WRAP;
+    const note = text(strings.noteStringProperty, OSCILLATOR_SCREEN_VIEW_SETTINGS.NOTE_TEXT_MAX_WIDTH);
     note.left = viewport.left;
     note.bottom = this.layoutBounds.maxY - 15;
     const reset = new ResetAllButton({
@@ -198,8 +214,8 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         model.reset();
         viewport.reset();
       },
-      right: this.layoutBounds.maxX - 18,
-      bottom: this.layoutBounds.maxY - 18,
+      right: this.layoutBounds.maxX - OSCILLATOR_SCREEN_VIEW_SETTINGS.RESET_RIGHT_OFFSET,
+      bottom: this.layoutBounds.maxY - OSCILLATOR_SCREEN_VIEW_SETTINGS.RESET_BOTTOM_OFFSET,
     });
     const content = new Node({
       children: [viewport, title, below, controls, energy, matrixTitle, coefficientLabel, overlap, ladder, note, reset],

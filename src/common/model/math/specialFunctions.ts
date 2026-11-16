@@ -1,3 +1,4 @@
+import { SPECIAL_FUNCTIONS_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * specialFunctions.ts
  *
@@ -44,7 +45,7 @@ export function associatedLaguerre(n: number, alpha: number, x: number): number 
  * in advance and the polynomials are well conditioned.
  */
 export function findRoots(f: (x: number) => number, a: number, b: number, samples: number): number[] {
-  const BISECTION_STEPS = 60;
+  const BISECTION_STEPS: number = SPECIAL_FUNCTIONS_SETTINGS.BISECTION_STEPS;
   const roots: number[] = [];
   const step = (b - a) / samples;
   let x0 = a;

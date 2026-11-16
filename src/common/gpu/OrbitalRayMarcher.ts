@@ -1,3 +1,4 @@
+import { ORBITAL_RAY_MARCHER_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * OrbitalRayMarcher.ts
  *
@@ -15,7 +16,7 @@ import { type OrbitalScene, pixelJitter, RENDER_STEPS, VOLUME_OPACITY_GAIN } fro
 import { compositeSurfaces, surfaceEvents } from "./SurfaceOverlays.js";
 
 /** Accumulated opacity past which the march stops; the rest cannot show. */
-const OPAQUE_ENOUGH = 0.99;
+const OPAQUE_ENOUGH: number = ORBITAL_RAY_MARCHER_SETTINGS.OPAQUE_ENOUGH;
 
 export class OrbitalRayMarcher {
   private readonly scene: OrbitalScene;

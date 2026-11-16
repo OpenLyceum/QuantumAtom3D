@@ -6,22 +6,40 @@ import { PhetFont } from "scenerystack/scenery-phet";
 import { coupledAngularWeights } from "../../common/model/angular/VectorModel.js";
 import { sphericalHarmonicTheta } from "../../common/model/math/sphericalHarmonics.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ANGULAR_DENSITY_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
 export class AngularDensityNode extends Node {
   private readonly link: UnknownMultilink;
   public constructor(model: AngularMomentumModel) {
-    const curve = new Path(null, { stroke: QuantumAtom3DColors.radialCurveColorProperty, lineWidth: 2 });
+    const curve = new Path(null, {
+      stroke: QuantumAtom3DColors.radialCurveColorProperty,
+      lineWidth: ANGULAR_DENSITY_NODE_SETTINGS.CURVE_LINE_WIDTH,
+    });
     super({
       children: [
-        new Circle(90, {
-          centerX: 100,
-          centerY: 100,
+        new Circle(ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_RADIUS, {
+          centerX: ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_CENTER_X,
+          centerY: ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_CENTER_Y,
           stroke: QuantumAtom3DColors.chartGridColorProperty,
-          lineDash: [4, 4],
+          lineDash: [
+            ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_LINE_DASH_DASH,
+            ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_LINE_DASH_DASH,
+          ],
         }),
-        new Line(100, 5, 100, 195, { stroke: QuantumAtom3DColors.chartGridColorProperty }),
+        new Line(
+          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_START_X,
+          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_START_Y,
+          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_END_X,
+          ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_END_Y,
+          { stroke: QuantumAtom3DColors.chartGridColorProperty },
+        ),
         curve,
-        new Text("z", { font: new PhetFont(12), fill: QuantumAtom3DColors.textColorProperty, left: 105, top: 0 }),
+        new Text("z", {
+          font: new PhetFont(ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_FONT_SIZE),
+          fill: QuantumAtom3DColors.textColorProperty,
+          left: ANGULAR_DENSITY_NODE_SETTINGS.CONSTRUCTOR_LEFT,
+          top: 0,
+        }),
       ],
     });
     this.link = Multilink.multilink(

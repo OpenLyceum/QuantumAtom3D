@@ -6,6 +6,7 @@ import { VerticalAquaRadioButtonGroup } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
 import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
+import { ORBITAL_COLOR_CONTROL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { OrbitalsModel, SliceColoring } from "../model/orbital/OrbitalsModel.js";
 import { ColormapLegendNode } from "./ColormapLegendNode.js";
 
@@ -18,9 +19,9 @@ export class OrbitalColorControl extends HBox {
     const a11y = StringManager.getInstance().getOrbitalsA11yStrings().controls;
     const label = (property: TReadOnlyProperty<string>) =>
       new RichText(property, {
-        font: new PhetFont(13),
+        font: new PhetFont(ORBITAL_COLOR_CONTROL_SETTINGS.LABEL_FONT_SIZE),
         fill: QuantumAtom3DColors.textColorProperty,
-        maxWidth: 150,
+        maxWidth: ORBITAL_COLOR_CONTROL_SETTINGS.LABEL_MAX_WIDTH,
       });
     const coloringRadioButtons = new VerticalAquaRadioButtonGroup<SliceColoring>(
       model.sliceColoringProperty,
@@ -37,8 +38,8 @@ export class OrbitalColorControl extends HBox {
         },
       ],
       {
-        spacing: 8,
-        radioButtonOptions: { radius: 7 },
+        spacing: ORBITAL_COLOR_CONTROL_SETTINGS.COLORING_RADIO_BUTTONS_SPACING,
+        radioButtonOptions: { radius: ORBITAL_COLOR_CONTROL_SETTINGS.COLORING_RADIO_BUTTONS_RADIUS },
         accessibleName: a11y.coloringStringProperty,
       },
     );
@@ -50,6 +51,10 @@ export class OrbitalColorControl extends HBox {
       densityCaptionProperty: strings.densityLegendStringProperty,
     });
 
-    super({ spacing: 24, align: "center", children: [coloringRadioButtons, legend] });
+    super({
+      spacing: ORBITAL_COLOR_CONTROL_SETTINGS.CONSTRUCTOR_SPACING,
+      align: "center",
+      children: [coloringRadioButtons, legend],
+    });
   }
 }

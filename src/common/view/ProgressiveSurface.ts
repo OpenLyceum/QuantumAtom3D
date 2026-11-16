@@ -1,8 +1,9 @@
+import { PROGRESSIVE_SURFACE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /** Owns one bounded-work surface request. Superseded paused states can never publish stale thresholds. */
 import { ProbabilitySurfaceTask } from "../model/orbital/ProbabilitySurfaceTask.js";
 import type { Wavefunction } from "../model/orbital/Wavefunction.js";
 
-const ANIMATION_REFRESH_MS = 250;
+const ANIMATION_REFRESH_MS: number = PROGRESSIVE_SURFACE_SETTINGS.ANIMATION_REFRESH_MS;
 export class ProgressiveSurface {
   private task: ProbabilitySurfaceTask | null = null;
   private snapshot: Wavefunction | null = null;

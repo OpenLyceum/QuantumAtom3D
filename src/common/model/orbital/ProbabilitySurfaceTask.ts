@@ -1,12 +1,13 @@
+import { PROBABILITY_SURFACE_TASK_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /** Cooperative spherical cubature: a square-root radial mesh resolves compact and diffuse terms together.
  * Unlike a uniform Cartesian box, its radial spacing does not discard the inner cloud in 1s + 5g.
  * The threshold search is also incremental; no large synchronous sort runs at completion.
  */
 import type { Wavefunction } from "./Wavefunction.js";
 
-const RADIAL_BINS = 128;
-const POLAR_BINS = 48;
-const AZIMUTH_BINS = 64;
+const RADIAL_BINS: number = PROBABILITY_SURFACE_TASK_SETTINGS.RADIAL_BINS;
+const POLAR_BINS: number = PROBABILITY_SURFACE_TASK_SETTINGS.POLAR_BINS;
+const AZIMUTH_BINS: number = PROBABILITY_SURFACE_TASK_SETTINGS.AZIMUTH_BINS;
 /** Gauss-Legendre nodes integrate all supported angular norms exactly, including l=4. */
 function polarQuadrature(): { nodes: number[]; weights: number[] } {
   const nodes: number[] = [],
@@ -14,7 +15,7 @@ function polarQuadrature(): { nodes: number[]; weights: number[] } {
   for (let i = 0; i < POLAR_BINS; i++) {
     let x = Math.cos((Math.PI * (i + 0.75)) / (POLAR_BINS + 0.5));
     let derivative = 0;
-    for (let iteration = 0; iteration < 20; iteration++) {
+    for (let iteration = 0; iteration < PROBABILITY_SURFACE_TASK_SETTINGS.ROOT_MAX_ITERATIONS; iteration++) {
       let a = 1,
         b = x;
       for (let l = 2; l <= POLAR_BINS; l++) {
@@ -25,7 +26,7 @@ function polarQuadrature(): { nodes: number[]; weights: number[] } {
       derivative = (POLAR_BINS * (x * b - a)) / (x * x - 1);
       const delta = b / derivative;
       x -= delta;
-      if (Math.abs(delta) < 1e-15) {
+      if (Math.abs(delta) < PROBABILITY_SURFACE_TASK_SETTINGS.ROOT_TOLERANCE) {
         break;
       }
     }
@@ -35,9 +36,9 @@ function polarQuadrature(): { nodes: number[]; weights: number[] } {
   return { nodes, weights };
 }
 const POLAR = polarQuadrature();
-const CHECK_INTERVAL = 256;
-const THRESHOLD_ITERATIONS = 26;
-const SURFACE_WORK_BUDGET_MS = 4;
+const CHECK_INTERVAL: number = PROBABILITY_SURFACE_TASK_SETTINGS.CHECK_INTERVAL;
+const THRESHOLD_ITERATIONS: number = PROBABILITY_SURFACE_TASK_SETTINGS.THRESHOLD_ITERATIONS;
+const SURFACE_WORK_BUDGET_MS: number = PROBABILITY_SURFACE_TASK_SETTINGS.SURFACE_WORK_BUDGET_MS;
 
 export class ProbabilitySurfaceTask {
   private readonly densities = new Float64Array(RADIAL_BINS * POLAR_BINS * AZIMUTH_BINS);

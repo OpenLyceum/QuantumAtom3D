@@ -17,6 +17,7 @@ import { createLeftRightSpinner } from "../../common/view/createLeftRightSpinner
 import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
 import { AngularDensityNode } from "./AngularDensityNode.js";
 import { AngularMomentumDiagramNode } from "./AngularMomentumDiagramNode.js";
@@ -25,28 +26,37 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
   public constructor(model: AngularMomentumModel, options?: ScreenViewOptions) {
     super({ ...options, screenSummaryContent: new AngularMomentumScreenSummaryContent(model) });
     const strings = StringManager.getInstance().getAngularStrings();
-    const label = (value: string | TReadOnlyProperty<string>, maxWidth = 420) =>
-      new RichText(value, { font: new PhetFont(14), fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const label = (
+      value: string | TReadOnlyProperty<string>,
+      maxWidth: number = ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ) =>
+      new RichText(value, {
+        font: new PhetFont(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.LABEL_FONT_SIZE),
+        fill: QuantumAtom3DColors.textColorProperty,
+        maxWidth,
+      });
     const spinner = (property: NumberProperty, range: TReadOnlyProperty<Range>, name: TReadOnlyProperty<string>) =>
-      createLeftRightSpinner(property, range, name, { fontSize: 15 });
+      createLeftRightSpinner(property, range, name, {
+        fontSize: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.SPINNER_FONT_SIZE,
+      });
     const diagram = new AngularMomentumDiagramNode(model);
-    diagram.left = this.layoutBounds.minX + 25;
-    diagram.top = this.layoutBounds.minY + 45;
+    diagram.left = this.layoutBounds.minX + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.DIAGRAM_LEFT_INSET;
+    diagram.top = this.layoutBounds.minY + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.DIAGRAM_TOP_INSET;
     const title = label(strings.titleStringProperty);
     title.left = diagram.left;
-    title.bottom = diagram.top - 10;
+    title.bottom = diagram.top - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.TITLE_GAP;
     const readouts = new DerivedProperty(
       [model.lProperty, model.mProperty, model.spinProperty, model.jProperty, model.mjProperty],
       (l, m, spin, j, mj) =>
         spin
-          ? `|L| = ${angularMagnitude(l).toFixed(3)} ℏ, |S| = ${Math.sqrt(0.75).toFixed(3)} ℏ<br>|J| = ${angularMagnitude(j).toFixed(3)} ℏ, J<sub>z</sub> = ${mj} ℏ`
-          : `|L| = ${angularMagnitude(l).toFixed(3)} ℏ, L<sub>z</sub> = ${m} ℏ<br>ΔL<sub>x</sub> ΔL<sub>y</sub> = ${orbitalUncertaintyProduct(l, m).toFixed(2)} ℏ² ≥ ${Math.abs(m) / 2} ℏ²`,
+          ? `|L| = ${angularMagnitude(l).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, |S| = ${Math.sqrt(0.75).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ<br>|J| = ${angularMagnitude(j).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, J<sub>z</sub> = ${mj} ℏ`
+          : `|L| = ${angularMagnitude(l).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, L<sub>z</sub> = ${m} ℏ<br>ΔL<sub>x</sub> ΔL<sub>y</sub> = ${orbitalUncertaintyProduct(l, m).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES_SEGMENT_2)} ℏ² ≥ ${Math.abs(m) / 2} ℏ²`,
     );
     const readout = label(readouts);
     readout.left = diagram.left;
-    readout.top = diagram.bottom + 15;
+    readout.top = diagram.bottom + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
     const mControl = new HBox({
-      spacing: 15,
+      spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.M_CONTROL_SPACING,
       children: [
         label(strings.mStringProperty),
         spinner(model.mProperty, model.mRangeProperty, strings.mStringProperty),
@@ -59,10 +69,14 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
         createNode: () => label(value === "upper" ? strings.upperStringProperty : strings.lowerStringProperty),
         options: { accessibleName: value === "upper" ? strings.upperStringProperty : strings.lowerStringProperty },
       })),
-      { orientation: "horizontal", spacing: 15, radioButtonOptions: { radius: 7 } },
+      {
+        orientation: "horizontal",
+        spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.J_CONTROL_SPACING,
+        radioButtonOptions: { radius: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.J_CONTROL_RADIUS },
+      },
     );
     const mjControl = new HBox({
-      spacing: 15,
+      spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.MJ_CONTROL_SPACING,
       children: [
         label(strings.mjStringProperty),
         spinner(model.mjProperty, model.mjRangeProperty, strings.mjStringProperty),
@@ -79,10 +93,10 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
     });
     const controls = new VBox({
       align: "left",
-      spacing: 15,
+      spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONTROLS_SPACING,
       children: [
         new HBox({
-          spacing: 15,
+          spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONTROLS_SPACING,
           children: [
             label(strings.lStringProperty),
             spinner(model.lProperty, model.lProperty.rangeProperty, strings.lStringProperty),
@@ -97,11 +111,11 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
         jReadout,
         mjControl,
       ],
-      left: diagram.right + 55,
+      left: diagram.right + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONTROLS_LEFT_OFFSET,
       top: diagram.top,
     });
     const phase = new HBox({
-      spacing: 20,
+      spacing: ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.PHASE_SPACING,
       children: [
         new TimeControlNode(model.timer.isPlayingProperty, {
           playPauseStepButtonOptions: {
@@ -123,27 +137,33 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
         }),
       ],
       left: diagram.left,
-      top: readout.bottom + 20,
+      top: readout.bottom + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.PHASE_TOP_OFFSET,
     });
     const density = new AngularDensityNode(model);
-    density.left = controls.left + 15;
+    density.left = controls.left + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_LEFT_OFFSET;
     density.top = this.layoutBounds.minY + 315;
-    const densityTitle = label(strings.densityStringProperty, 420);
+    const densityTitle = label(
+      strings.densityStringProperty,
+      ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.DENSITY_LABEL_MAX_WIDTH,
+    );
     densityTitle.left = controls.left;
-    densityTitle.bottom = density.top - 10;
-    const densityHelp = label(strings.densityHelpStringProperty, 430);
+    densityTitle.bottom = density.top - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.TITLE_GAP;
+    const densityHelp = label(
+      strings.densityHelpStringProperty,
+      ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.DENSITY_HELP_LABEL_MAX_WIDTH,
+    );
     densityHelp.left = controls.left;
     densityHelp.top = density.bottom + 8;
-    const note = label(strings.noteStringProperty, 930);
+    const note = label(strings.noteStringProperty, ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.NOTE_LABEL_MAX_WIDTH);
     note.left = diagram.left;
-    note.bottom = this.layoutBounds.maxY - 20;
+    note.bottom = this.layoutBounds.maxY - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
     const reset = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         model.reset();
       },
-      right: this.layoutBounds.maxX - 20,
-      bottom: this.layoutBounds.maxY - 20,
+      right: this.layoutBounds.maxX - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.RESET_RIGHT_OFFSET,
+      bottom: this.layoutBounds.maxY - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.RESET_BOTTOM_OFFSET,
     });
     const content = new Node({
       children: [diagram, title, readout, controls, phase, density, densityTitle, densityHelp, note, reset],

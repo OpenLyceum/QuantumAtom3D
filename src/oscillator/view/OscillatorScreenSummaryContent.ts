@@ -8,6 +8,7 @@ import {
 } from "../../common/model/oscillator/OscillatorStates.js";
 import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import { OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { OscillatorModel } from "../model/OscillatorModel.js";
 export class OscillatorScreenSummaryContent extends DisposableScreenSummaryContent {
   public constructor(model: OscillatorModel) {
@@ -37,8 +38,8 @@ export class OscillatorScreenSummaryContent extends DisposableScreenSummaryConte
           basis: basis === "cartesian" ? cartName : sphereName,
           cart: cart?.join(",") ?? "",
           sphere: sphere ? `${sphere.nr},${sphere.l},${sphere.m}` : "",
-          re: (coefficient?.re ?? 0).toFixed(4),
-          im: (-(coefficient?.im ?? 0)).toFixed(4),
+          re: (coefficient?.re ?? 0).toFixed(OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
+          im: (-(coefficient?.im ?? 0)).toFixed(OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
         });
       },
     );

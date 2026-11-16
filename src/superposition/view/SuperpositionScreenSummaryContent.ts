@@ -6,6 +6,7 @@ import { DisposableScreenSummaryContent } from "../../common/view/DisposableScre
 import { formatLength, lengthUnitSymbol } from "../../common/view/formatters.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
+import { SUPERPOSITION_SCREEN_SUMMARY_CONTENT_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
 
 export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryContent {
@@ -25,7 +26,7 @@ export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryCo
       (terms, time, values, pattern, unit) =>
         StringUtils.fillIn(pattern, {
           count: terms.length,
-          time: atomicTimeToFs(time).toFixed(3),
+          time: atomicTimeToFs(time).toFixed(SUPERPOSITION_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
           z: formatLength(values.z, unit),
           r: formatLength(values.r, unit),
           unit: lengthUnitSymbol(unit),

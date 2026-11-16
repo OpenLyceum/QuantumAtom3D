@@ -5,6 +5,7 @@ import { PhetFont } from "scenerystack/scenery-phet";
 import { hartreeToEv } from "../../common/model/AtomicUnits.js";
 import type { Polarization, ZeemanLevel } from "../../common/model/angular/ZeemanLevels.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { ZEEMAN_DIAGRAM_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
 
 export const polarizationColor = (polarization: Polarization) =>
@@ -60,7 +61,10 @@ export class ZeemanDiagramNode extends Node {
         const position = (levels: readonly ZeemanLevel[], level: ZeemanLevel, centreY: number) => {
           const groups = [...new Set(levels.map((entry) => `${entry.l},${entry.j}`))];
           const column = groups.indexOf(`${level.l},${level.j}`);
-          return { x: 35 + column * 112, y: centreY - (level.energy - level.zeroEnergy) * scale };
+          return {
+            x: ZEEMAN_DIAGRAM_NODE_SETTINGS.POSITION_X_OFFSET + column * ZEEMAN_DIAGRAM_NODE_SETTINGS.POSITION_X_FACTOR,
+            y: centreY - (level.energy - level.zeroEnergy) * scale,
+          };
         };
         const drawBand = (levels: readonly ZeemanLevel[], centreY: number, isUpper: boolean) => {
           const keys = new Set<string>();
@@ -72,19 +76,22 @@ export class ZeemanDiagramNode extends Node {
               keys.add(key);
               layer.addChild(
                 new Text(mode === "normal" ? `l=${level.l}` : `l=${level.l}, j=${level.j}`, {
-                  font: new PhetFont(11),
+                  font: new PhetFont(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_FONT_SIZE),
                   fill: QuantumAtom3DColors.textColorProperty,
                   centerX: p.x,
-                  top: centreY - 105,
+                  top: centreY - ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_TOP_OFFSET,
                 }),
               );
               layer.addChild(
-                new Text(`${hartreeToEv(level.zeroEnergy).toFixed(6)} eV`, {
-                  font: new PhetFont(9),
-                  fill: QuantumAtom3DColors.textColorProperty,
-                  centerX: p.x,
-                  top: centreY - 88,
-                }),
+                new Text(
+                  `${hartreeToEv(level.zeroEnergy).toFixed(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_DECIMAL_PLACES)} eV`,
+                  {
+                    font: new PhetFont(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_FONT_SIZE_SEGMENT_2),
+                    fill: QuantumAtom3DColors.textColorProperty,
+                    centerX: p.x,
+                    top: centreY - ZEEMAN_DIAGRAM_NODE_SETTINGS.CONSTRUCTOR_DRAW_BAND_TOP_OFFSET,
+                  },
+                ),
               );
             }
             const zeroField = model.fieldProperty.value === 0;
@@ -99,14 +106,14 @@ export class ZeemanDiagramNode extends Node {
             layer.addChild(
               new Line(p.x - 18, p.y, p.x + 18, p.y, {
                 stroke: color,
-                lineWidth: highlighted ? 3 : 1,
+                lineWidth: highlighted ? ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_LINE_WIDTH : 1,
               }),
             );
             layer.addChild(
               new Text(projectionLabel(level, zeroField), {
-                font: new PhetFont(9),
+                font: new PhetFont(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_FONT_SIZE_SEGMENT_2),
                 fill: color,
-                left: p.x + 20,
+                left: p.x + ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_LEFT_OFFSET,
                 centerY: p.y,
               }),
             );
@@ -118,7 +125,10 @@ export class ZeemanDiagramNode extends Node {
             const a = position(upper, transition.upper, 110);
             const b = position(lower, transition.lower, 340);
             layer.addChild(
-              new Line(a.x, a.y, b.x, b.y, { stroke: polarizationColor(transition.polarization), lineWidth: 1.5 }),
+              new Line(a.x, a.y, b.x, b.y, {
+                stroke: polarizationColor(transition.polarization),
+                lineWidth: ZEEMAN_DIAGRAM_NODE_SETTINGS.LINK_LINE_WIDTH,
+              }),
             );
           }
         }

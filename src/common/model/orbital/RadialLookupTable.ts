@@ -1,3 +1,4 @@
+import { OSCILLATOR_DOMAIN, RADIAL_LOOKUP_TABLE_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * RadialLookupTable.ts
  *
@@ -16,7 +17,7 @@ import { hydrogenRadial, hydrogenRadialCutoff } from "../hydrogen/HydrogenRadial
 import { OSCILLATOR_RADIAL_STATES, oscillatorRadial } from "../oscillator/OscillatorStates.js";
 
 /** Samples per row. */
-const RADIAL_TABLE_SAMPLES = 1024;
+const RADIAL_TABLE_SAMPLES: number = RADIAL_LOOKUP_TABLE_SETTINGS.RADIAL_TABLE_SAMPLES;
 
 /** Row of (n, l) in the table: rows for n = 1 come first, then n = 2, … */
 export function radialRowIndex(n: number, l: number): number {
@@ -52,10 +53,14 @@ export class RadialLookupTable {
     if (includeOscillator) {
       OSCILLATOR_RADIAL_STATES.forEach((state, index) => {
         const row = hydrogenRows + index;
-        this.rowMaxRadius[row] = 9;
+        this.rowMaxRadius[row] = OSCILLATOR_DOMAIN.RADIAL_CUTOFF;
         for (let i = 0; i < RADIAL_TABLE_SAMPLES; i++) {
           const s = i / (RADIAL_TABLE_SAMPLES - 1);
-          this.values[row * RADIAL_TABLE_SAMPLES + i] = oscillatorRadial(state.nr, state.l, 9 * s * s);
+          this.values[row * RADIAL_TABLE_SAMPLES + i] = oscillatorRadial(
+            state.nr,
+            state.l,
+            OSCILLATOR_DOMAIN.RADIAL_CUTOFF * s * s,
+          );
         }
       });
     }

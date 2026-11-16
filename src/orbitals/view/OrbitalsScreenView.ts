@@ -22,18 +22,18 @@ import { SliceHeatmapNode } from "../../common/view/SliceHeatmapNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
+import { ORBITALS_SCREEN_VIEW_SETTINGS, type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
 import { OrbitalsControlPanel } from "./OrbitalsControlPanel.js";
 import { OrbitalsScreenSummaryContent } from "./OrbitalsScreenSummaryContent.js";
 import { SliceControlPanel } from "./SliceControlPanel.js";
 
-const VIEW_SIZE = 340;
-const DETAIL_SIZE = 275;
-const CHART_HEIGHT = 150;
-const COLUMN_GAP = 30;
-const GAP = 12;
-const TITLE_ROOM = 30;
-const LABEL_FONT = new PhetFont(13);
+const VIEW_SIZE: number = ORBITALS_SCREEN_VIEW_SETTINGS.VIEW_SIZE;
+const DETAIL_SIZE: number = ORBITALS_SCREEN_VIEW_SETTINGS.DETAIL_SIZE;
+const CHART_HEIGHT: number = ORBITALS_SCREEN_VIEW_SETTINGS.CHART_HEIGHT;
+const COLUMN_GAP: number = ORBITALS_SCREEN_VIEW_SETTINGS.COLUMN_GAP;
+const GAP: number = ORBITALS_SCREEN_VIEW_SETTINGS.GAP;
+const TITLE_ROOM: number = ORBITALS_SCREEN_VIEW_SETTINGS.TITLE_ROOM;
+const LABEL_FONT = new PhetFont(ORBITALS_SCREEN_VIEW_SETTINGS.LABEL_FONT_SIZE);
 
 type SelfOptions = {
   readonly preferences?: QuantumAtom3DPreferencesModel;
@@ -53,7 +53,10 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
     const { phaseColormapProperty } = options;
     const unitProperty = options.preferences?.lengthUnitProperty ?? DEFAULT_LENGTH_UNIT_PROPERTY;
     const strings = StringManager.getInstance().getOrbitalStrings();
-    const label = (text: TReadOnlyProperty<string>, maxWidth = 150) =>
+    const label = (
+      text: TReadOnlyProperty<string>,
+      maxWidth: number = ORBITALS_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ) =>
       new RichText(text, {
         font: LABEL_FONT,
         fill: QuantumAtom3DColors.textColorProperty,
@@ -93,10 +96,13 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
         new HBox({
           spacing: GAP,
           children: [
-            label(name, 100),
+            label(name, ORBITALS_SCREEN_VIEW_SETTINGS.CAMERA_ROWS_MAX_WIDTH),
             new HSlider(property, property.range, {
               ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
-              trackSize: new Dimension2(170, 3),
+              trackSize: new Dimension2(
+                ORBITALS_SCREEN_VIEW_SETTINGS.CAMERA_ROWS_WIDTH,
+                ORBITALS_SCREEN_VIEW_SETTINGS.CAMERA_ROWS_HEIGHT,
+              ),
               keyboardStep: Math.PI / 36,
               shiftKeyboardStep: Math.PI / 180,
               accessibleName: name,
@@ -112,10 +118,15 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
       model.renderModeProperty,
       RENDER_MODES.map((value) => ({
         value,
-        createNode: () => label(strings.volume[`${value}StringProperty`], 100),
+        createNode: () =>
+          label(strings.volume[`${value}StringProperty`], ORBITALS_SCREEN_VIEW_SETTINGS.MODES_MAX_WIDTH),
         options: { accessibleName: strings.volume[`${value}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 8, radioButtonOptions: { radius: 6 } },
+      {
+        orientation: "horizontal",
+        spacing: ORBITALS_SCREEN_VIEW_SETTINGS.MODES_SPACING,
+        radioButtonOptions: { radius: ORBITALS_SCREEN_VIEW_SETTINGS.MODES_RADIUS },
+      },
     );
     const fraction = new AquaRadioButtonGroup(
       model.enclosedFractionProperty,
@@ -125,7 +136,11 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
           new RichText(`${100 * value}%`, { font: LABEL_FONT, fill: QuantumAtom3DColors.textColorProperty }),
         options: { accessibleName: `${100 * value}%` },
       })),
-      { orientation: "horizontal", spacing: 8, radioButtonOptions: { radius: 6 } },
+      {
+        orientation: "horizontal",
+        spacing: ORBITALS_SCREEN_VIEW_SETTINGS.FRACTION_SPACING,
+        radioButtonOptions: { radius: ORBITALS_SCREEN_VIEW_SETTINGS.FRACTION_RADIUS },
+      },
     );
     model.renderModeProperty.link((mode) => {
       fraction.visible = mode === "isosurface";
@@ -150,12 +165,14 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
       [
         {
           value: "radial",
-          createNode: () => label(strings.volume.radialTabStringProperty, 140),
+          createNode: () =>
+            label(strings.volume.radialTabStringProperty, ORBITALS_SCREEN_VIEW_SETTINGS.RADIAL_TAB_LABEL_MAX_WIDTH),
           options: { accessibleName: strings.volume.radialTabStringProperty },
         },
         {
           value: "slice",
-          createNode: () => label(strings.volume.sliceTabStringProperty, 110),
+          createNode: () =>
+            label(strings.volume.sliceTabStringProperty, ORBITALS_SCREEN_VIEW_SETTINGS.SLICE_TAB_LABEL_MAX_WIDTH),
           options: { accessibleName: strings.volume.sliceTabStringProperty },
         },
         {
@@ -164,7 +181,11 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
           options: { accessibleName: strings.volume.angularTabStringProperty },
         },
       ],
-      { orientation: "horizontal", spacing: 10, radioButtonOptions: { radius: 6 } },
+      {
+        orientation: "horizontal",
+        spacing: ORBITALS_SCREEN_VIEW_SETTINGS.DETAIL_CHOICE_SPACING,
+        radioButtonOptions: { radius: ORBITALS_SCREEN_VIEW_SETTINGS.DETAIL_CHOICE_RADIUS },
+      },
     );
     detailChoice.left = viewport.right + COLUMN_GAP;
     detailChoice.top = this.layoutBounds.minY + SCREEN_VIEW_MARGIN;
@@ -187,9 +208,9 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
         label(probeValue, DETAIL_SIZE),
         new HSlider(model.probeFractionProperty, model.probeFractionProperty.range, {
           ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
-          trackSize: new Dimension2(DETAIL_SIZE - 25, 3),
-          keyboardStep: 0.01,
-          shiftKeyboardStep: 0.001,
+          trackSize: new Dimension2(DETAIL_SIZE - 25, ORBITALS_SCREEN_VIEW_SETTINGS.PROBE_CONTROL_HEIGHT),
+          keyboardStep: ORBITALS_SCREEN_VIEW_SETTINGS.PROBE_CONTROL_KEYBOARD_STEP,
+          shiftKeyboardStep: ORBITALS_SCREEN_VIEW_SETTINGS.PROBE_CONTROL_SHIFT_KEYBOARD_STEP,
           accessibleName: strings.volume.probeStringProperty,
           accessibleHelpText: strings.volume.probeHelpStringProperty,
         }),

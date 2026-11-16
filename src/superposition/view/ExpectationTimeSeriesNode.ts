@@ -10,6 +10,7 @@ import { formatLength, lengthUnitSymbol } from "../../common/view/formatters.js"
 import { StringManager } from "../../i18n/StringManager.js";
 import type { LengthUnit } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
+import { EXPECTATION_TIME_SERIES_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
 
 export class ExpectationTimeSeriesNode extends Node {
@@ -26,10 +27,16 @@ export class ExpectationTimeSeriesNode extends Node {
       viewWidth: width,
       viewHeight: height,
       modelXRange: new Range(0, 1),
-      modelYRange: new Range(-1, 5),
+      modelYRange: new Range(-1, EXPECTATION_TIME_SERIES_NODE_SETTINGS.CHART_RANGE_MAX),
     });
-    const rPlot = new LinePlot(chart, [], { stroke: QuantumAtom3DColors.radialCurveColorProperty, lineWidth: 2 });
-    const zPlot = new LinePlot(chart, [], { stroke: QuantumAtom3DColors.meanRadiusColorProperty, lineWidth: 2 });
+    const rPlot = new LinePlot(chart, [], {
+      stroke: QuantumAtom3DColors.radialCurveColorProperty,
+      lineWidth: EXPECTATION_TIME_SERIES_NODE_SETTINGS.R_PLOT_LINE_WIDTH,
+    });
+    const zPlot = new LinePlot(chart, [], {
+      stroke: QuantumAtom3DColors.meanRadiusColorProperty,
+      lineWidth: EXPECTATION_TIME_SERIES_NODE_SETTINGS.Z_PLOT_LINE_WIDTH,
+    });
     const labels = [strings.meanRadiusStringProperty, strings.meanZStringProperty].map(
       (pattern) =>
         new DerivedProperty([pattern, unitProperty], (p, unit) =>
@@ -37,29 +44,37 @@ export class ExpectationTimeSeriesNode extends Node {
         ),
     );
     const title = new HBox({
-      spacing: 20,
+      spacing: EXPECTATION_TIME_SERIES_NODE_SETTINGS.TITLE_SPACING,
       children: [
         new Text(labels[0] ?? "", {
-          font: new PhetFont(13),
+          font: new PhetFont(EXPECTATION_TIME_SERIES_NODE_SETTINGS.TITLE_FONT_SIZE),
           fill: QuantumAtom3DColors.radialCurveColorProperty,
         }),
         new Text(labels[1] ?? "", {
-          font: new PhetFont(13),
+          font: new PhetFont(EXPECTATION_TIME_SERIES_NODE_SETTINGS.TITLE_FONT_SIZE),
           fill: QuantumAtom3DColors.meanRadiusColorProperty,
         }),
       ],
-      bottom: -5,
+      bottom: EXPECTATION_TIME_SERIES_NODE_SETTINGS.TITLE_BOTTOM,
     });
     const timeLabel = new Text("", {
-      font: new PhetFont(12),
+      font: new PhetFont(EXPECTATION_TIME_SERIES_NODE_SETTINGS.TIME_LABEL_FONT_SIZE),
       fill: QuantumAtom3DColors.textColorProperty,
-      top: height + 5,
+      top: height + EXPECTATION_TIME_SERIES_NODE_SETTINGS.TIME_LABEL_TOP_OFFSET,
     });
     const zeroLine = new Line(0, height / 2, width, height / 2, { stroke: QuantumAtom3DColors.chartGridColorProperty });
-    const rDot = new Circle(3, { fill: QuantumAtom3DColors.radialCurveColorProperty });
-    const zDot = new Circle(3, { fill: QuantumAtom3DColors.meanRadiusColorProperty });
+    const rDot = new Circle(EXPECTATION_TIME_SERIES_NODE_SETTINGS.R_DOT_RADIUS, {
+      fill: QuantumAtom3DColors.radialCurveColorProperty,
+    });
+    const zDot = new Circle(EXPECTATION_TIME_SERIES_NODE_SETTINGS.Z_DOT_RADIUS, {
+      fill: QuantumAtom3DColors.meanRadiusColorProperty,
+    });
     const yLabels = [-1, 0, 1].map(
-      () => new Text("", { font: new PhetFont(10), fill: QuantumAtom3DColors.textColorProperty }),
+      () =>
+        new Text("", {
+          font: new PhetFont(EXPECTATION_TIME_SERIES_NODE_SETTINGS.Y_LABELS_FONT_SIZE),
+          fill: QuantumAtom3DColors.textColorProperty,
+        }),
     );
     super({
       children: [
@@ -112,7 +127,7 @@ export class ExpectationTimeSeriesNode extends Node {
           const label = yLabels[index];
           if (label) {
             label.string = formatLength(value, unitProperty.value);
-            label.right = -4;
+            label.right = EXPECTATION_TIME_SERIES_NODE_SETTINGS.RIGHT_RIGHT;
             label.centerY = chart.modelToViewY(value);
           }
         });
@@ -120,7 +135,7 @@ export class ExpectationTimeSeriesNode extends Node {
         zDot.center = new Vector2(chart.modelToViewX(atomicTimeToFs(time)), chart.modelToViewY(values.z));
         rPlot.setDataSet(samples.map((s) => new Vector2(atomicTimeToFs(s.t), s.r)));
         zPlot.setDataSet(samples.map((s) => new Vector2(atomicTimeToFs(s.t), s.z)));
-        timeLabel.string = `${axis}: ${atomicTimeToFs(start).toFixed(3)} – ${atomicTimeToFs(end).toFixed(3)}`;
+        timeLabel.string = `${axis}: ${atomicTimeToFs(start).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.CONSTRUCTOR_DECIMAL_PLACES)} – ${atomicTimeToFs(end).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.CONSTRUCTOR_DECIMAL_PLACES)}`;
       },
     );
   }

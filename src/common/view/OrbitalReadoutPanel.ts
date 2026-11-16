@@ -1,3 +1,4 @@
+import { ORBITAL_READOUT_PANEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * OrbitalReadoutPanel.ts
  *
@@ -18,15 +19,15 @@ import { QuantumAtom3DPanel, type QuantumAtom3DPanelOptions } from "../QuantumAt
 import { DEFAULT_LENGTH_UNIT_PROPERTY } from "./DisplayDefaults.js";
 import { formatAngles, formatEnergyEv, formatLength, lengthUnitSymbol } from "./formatters.js";
 
-const TITLE_FONT = new PhetFont({ size: 14, weight: "bold" });
-const READOUT_FONT = new PhetFont(13);
-const DETAIL_FONT = new PhetFont(11);
-const COLUMN_SPACING = 12;
-const ROW_SPACING = 4;
-const VALUE_MAX_WIDTH = 150;
+const TITLE_FONT = new PhetFont({ size: ORBITAL_READOUT_PANEL_SETTINGS.TITLE_FONT_SIZE, weight: "bold" });
+const READOUT_FONT = new PhetFont(ORBITAL_READOUT_PANEL_SETTINGS.READOUT_FONT_SIZE);
+const DETAIL_FONT = new PhetFont(ORBITAL_READOUT_PANEL_SETTINGS.DETAIL_FONT_SIZE);
+const COLUMN_SPACING: number = ORBITAL_READOUT_PANEL_SETTINGS.COLUMN_SPACING;
+const ROW_SPACING: number = ORBITAL_READOUT_PANEL_SETTINGS.ROW_SPACING;
+const VALUE_MAX_WIDTH: number = ORBITAL_READOUT_PANEL_SETTINGS.VALUE_MAX_WIDTH;
 
 /** A polar node within this of θ = 90° (radians) is the xy-plane. */
-const EQUATORIAL_TOLERANCE = 1e-6;
+const EQUATORIAL_TOLERANCE: number = ORBITAL_READOUT_PANEL_SETTINGS.EQUATORIAL_TOLERANCE;
 
 export class OrbitalReadoutPanel extends QuantumAtom3DPanel {
   private readonly disposables: { dispose(): void }[];

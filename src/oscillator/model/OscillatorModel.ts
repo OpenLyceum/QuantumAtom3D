@@ -7,8 +7,12 @@ import {
   oscillatorDegeneracy,
   sphericalStates,
 } from "../../common/model/oscillator/OscillatorStates.js";
+import { OSCILLATOR_DOMAIN, OSCILLATOR_MODEL_SETTINGS } from "../../QuantumAtom3DConstants.js";
 export class OscillatorModel {
-  public readonly shellProperty = new NumberProperty(1, { range: new Range(0, 4), numberType: "Integer" });
+  public readonly shellProperty = new NumberProperty(1, {
+    range: new Range(0, OSCILLATOR_MODEL_SETTINGS.SHELL_RANGE_MAX),
+    numberType: "Integer",
+  });
   public readonly basisProperty = new StringUnionProperty<"cartesian" | "spherical">("cartesian", {
     validValues: ["cartesian", "spherical"],
   });
@@ -18,8 +22,14 @@ export class OscillatorModel {
     [this.shellProperty],
     (N) => new Range(0, oscillatorDegeneracy(N) - 1),
   );
-  public readonly zoomProperty = new NumberProperty(0, { range: new Range(-2, 3), numberType: "Integer" });
-  public readonly viewHalfWidthProperty = new DerivedProperty([this.zoomProperty], (zoom) => 5.5 / Math.SQRT2 ** zoom);
+  public readonly zoomProperty = new NumberProperty(0, {
+    range: new Range(OSCILLATOR_MODEL_SETTINGS.ZOOM_RANGE_MIN, OSCILLATOR_MODEL_SETTINGS.ZOOM_RANGE_MAX),
+    numberType: "Integer",
+  });
+  public readonly viewHalfWidthProperty = new DerivedProperty(
+    [this.zoomProperty],
+    (zoom) => OSCILLATOR_DOMAIN.VIEW_HALF_WIDTH / Math.SQRT2 ** zoom,
+  );
   public readonly modeProperty = new StringUnionProperty<"volume" | "isosurface">("volume", {
     validValues: ["volume", "isosurface"],
   });

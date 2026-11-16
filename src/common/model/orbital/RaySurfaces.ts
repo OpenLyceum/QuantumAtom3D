@@ -1,8 +1,9 @@
+import { RAY_SURFACES_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /** Analytic intersections in atomic units. Rays have a unit direction. */
 import type { NodalSurfaceSet } from "./NodalSurfaces.js";
 
 export type Point3 = readonly [number, number, number];
-const EPSILON = 1e-10;
+const EPSILON: number = RAY_SURFACES_SETTINGS.EPSILON;
 
 function quadraticRoots(a: number, b: number, c: number): number[] {
   if (Math.abs(a) < EPSILON) {

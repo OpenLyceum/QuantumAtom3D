@@ -1,3 +1,4 @@
+import { COLORMAPS_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * Colormaps.ts
  *
@@ -22,14 +23,14 @@ import type { PhaseColormap } from "../../QuantumAtom3DConstants.js";
 type Rgb = readonly [number, number, number];
 
 /** OKLCH lightness and chroma of the uniform wheel; this chroma stays inside sRGB at every hue. */
-const UNIFORM_LIGHTNESS = 0.72;
-const UNIFORM_CHROMA = 0.11;
+const UNIFORM_LIGHTNESS: number = COLORMAPS_SETTINGS.UNIFORM_LIGHTNESS;
+const UNIFORM_CHROMA: number = COLORMAPS_SETTINGS.UNIFORM_CHROMA;
 
 /** OKLCH hue (radians) shown at phase 0: a warm red, like the HSV wheel. */
-const UNIFORM_HUE_AT_ZERO_PHASE = 0.5;
+const UNIFORM_HUE_AT_ZERO_PHASE: number = COLORMAPS_SETTINGS.UNIFORM_HUE_AT_ZERO_PHASE;
 
 /** Entries in the precomputed uniform wheel. */
-const UNIFORM_TABLE_SIZE = 720;
+const UNIFORM_TABLE_SIZE: number = COLORMAPS_SETTINGS.UNIFORM_TABLE_SIZE;
 
 /** sRGB transfer function (linear → encoded), clamped to [0, 1]. */
 function encodeSrgb(linear: number): number {
@@ -71,7 +72,7 @@ const INFERNO_ANCHORS: readonly Rgb[] = [
 ];
 
 const TWO_PI = 2 * Math.PI;
-const BYTE = 255;
+const BYTE: number = COLORMAPS_SETTINGS.BYTE;
 
 /** Linear interpolation along a list of anchors, t ∈ [0, 1]. */
 function sampleAnchors(anchors: readonly Rgb[], t: number, out: number[]): void {
@@ -152,7 +153,7 @@ export function writePixel(data: Uint8ClampedArray, offset: number, rgb: readonl
 }
 
 /** Entries per colour lookup table handed to the 3D renderers. */
-export const COLOR_LUT_SIZE = 256;
+export const COLOR_LUT_SIZE: number = COLORMAPS_SETTINGS.COLOR_LUT_SIZE;
 
 /**
  * The two lookup tables the 3D renderers share, as RGBA floats: entries

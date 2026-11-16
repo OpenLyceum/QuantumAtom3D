@@ -24,7 +24,11 @@ import { ResponsiveScreenView } from "../../common/view/ResponsiveScreenView.js"
 import { StringManager } from "../../i18n/StringManager.js";
 import type { QuantumAtom3DPreferencesModel } from "../../preferences/QuantumAtom3DPreferencesModel.js";
 import QuantumAtom3DColors from "../../QuantumAtom3DColors.js";
-import { type PhaseColormap, SCREEN_VIEW_MARGIN } from "../../QuantumAtom3DConstants.js";
+import {
+  type PhaseColormap,
+  SCREEN_VIEW_MARGIN,
+  SUPERPOSITION_SCREEN_VIEW_SETTINGS,
+} from "../../QuantumAtom3DConstants.js";
 import type { SuperpositionModel } from "../model/SuperpositionModel.js";
 import { ExpectationTimeSeriesNode } from "./ExpectationTimeSeriesNode.js";
 import { SuperpositionScreenSummaryContent } from "./SuperpositionScreenSummaryContent.js";
@@ -34,8 +38,8 @@ type Options = ScreenViewOptions & {
   preferences?: QuantumAtom3DPreferencesModel;
   phaseColormapProperty: TReadOnlyProperty<PhaseColormap>;
 };
-const FONT = new PhetFont(13);
-const SIZE = 340;
+const FONT = new PhetFont(SUPERPOSITION_SCREEN_VIEW_SETTINGS.FONT_FONT_SIZE);
+const SIZE: number = SUPERPOSITION_SCREEN_VIEW_SETTINGS.SIZE;
 export class SuperpositionScreenView extends ResponsiveScreenView {
   public readonly viewport: SuperpositionViewportNode;
   public constructor(model: SuperpositionModel, options: Options) {
@@ -46,12 +50,18 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     const unitProperty = options.preferences?.lengthUnitProperty ?? DEFAULT_LENGTH_UNIT_PROPERTY;
     const strings = StringManager.getInstance().getSuperpositionStrings();
     const orbital = StringManager.getInstance().getOrbitalStrings();
-    const text = (value: string | TReadOnlyProperty<string>, maxWidth = 180) =>
-      new RichText(value, { font: FONT, fill: QuantumAtom3DColors.textColorProperty, maxWidth });
-    const slider = (property: NumberProperty, name: TReadOnlyProperty<string>, width = 110) =>
+    const text = (
+      value: string | TReadOnlyProperty<string>,
+      maxWidth: number = SUPERPOSITION_SCREEN_VIEW_SETTINGS.DEFAULT_MAX_WIDTH,
+    ) => new RichText(value, { font: FONT, fill: QuantumAtom3DColors.textColorProperty, maxWidth });
+    const slider = (
+      property: NumberProperty,
+      name: TReadOnlyProperty<string>,
+      width: number = SUPERPOSITION_SCREEN_VIEW_SETTINGS.DEFAULT_WIDTH,
+    ) =>
       new HSlider(property, property.range, {
         ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
-        trackSize: new Dimension2(width, 3),
+        trackSize: new Dimension2(width, SUPERPOSITION_SCREEN_VIEW_SETTINGS.SLIDER_HEIGHT),
         accessibleName: name,
         keyboardStep:
           property === model.zoomProperty || property === model.nuclearChargeProperty
@@ -70,16 +80,16 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
       options.preferences?.qualityProperty,
     );
     this.viewport.left = this.layoutBounds.minX + SCREEN_VIEW_MARGIN;
-    this.viewport.top = this.layoutBounds.minY + 35;
+    this.viewport.top = this.layoutBounds.minY + SUPERPOSITION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_TOP_OFFSET;
     const viewport = this.viewport;
     const timeText = new DerivedProperty(
       [model.timeProperty, model.expectationsProperty, strings.timeStringProperty, unitProperty],
       (time, expectation, name, unit) =>
-        `${name}: ${atomicTimeToFs(time).toFixed(3)} fs   ⟨z⟩ = ${formatLength(expectation.z, unit)} ${lengthUnitSymbol(unit)}   ⟨r⟩ = ${formatLength(expectation.r, unit)} ${lengthUnitSymbol(unit)}`,
+        `${name}: ${atomicTimeToFs(time).toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.TIME_TEXT_DECIMAL_PLACES)} fs   ⟨z⟩ = ${formatLength(expectation.z, unit)} ${lengthUnitSymbol(unit)}   ⟨r⟩ = ${formatLength(expectation.r, unit)} ${lengthUnitSymbol(unit)}`,
     );
     const timeLabel = text(timeText, SIZE);
     timeLabel.left = viewport.left;
-    timeLabel.bottom = viewport.top - 8;
+    timeLabel.bottom = viewport.top - SUPERPOSITION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BOTTOM_OFFSET;
     const timeControls = new TimeControlNode(model.timer.isPlayingProperty, {
       playPauseStepButtonOptions: {
         ...FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
@@ -96,7 +106,11 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
         createNode: () => text(orbital.volume[`${mode}StringProperty`]),
         options: { accessibleName: orbital.volume[`${mode}StringProperty`] },
       })),
-      { orientation: "horizontal", spacing: 8, radioButtonOptions: { radius: 6 } },
+      {
+        orientation: "horizontal",
+        spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.MODES_SPACING,
+        radioButtonOptions: { radius: SUPERPOSITION_SCREEN_VIEW_SETTINGS.MODES_RADIUS },
+      },
     );
     const coloring = new OrbitalColorControl(
       { sliceColoringProperty: model.coloringProperty },
@@ -104,36 +118,56 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     );
     const below = new VBox({
       align: "left",
-      spacing: 9,
+      spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.BELOW_SPACING,
       left: viewport.left,
-      top: viewport.bottom + 10,
+      top: viewport.bottom + SUPERPOSITION_SCREEN_VIEW_SETTINGS.BELOW_TOP_OFFSET,
       children: [
         new HBox({
-          spacing: 16,
+          spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.CONSTRUCTOR_BELOW_SPACING,
           children: [
             timeControls,
             text(strings.speedStringProperty),
-            slider(model.speedProperty, strings.speedStringProperty, 95),
+            slider(
+              model.speedProperty,
+              strings.speedStringProperty,
+              SUPERPOSITION_SCREEN_VIEW_SETTINGS.SPEED_SLIDER_WIDTH,
+            ),
           ],
         }),
         modes,
         coloring,
         new HBox({
-          spacing: 10,
+          spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.BELOW_ITEM_4_SPACING,
           children: [
-            text(orbital.volume.yawStringProperty, 70),
-            slider(viewport.camera.yawProperty, orbital.volume.yawStringProperty, 95),
-            text(orbital.volume.pitchStringProperty, 70),
-            slider(viewport.camera.pitchProperty, orbital.volume.pitchStringProperty, 95),
+            text(orbital.volume.yawStringProperty, SUPERPOSITION_SCREEN_VIEW_SETTINGS.YAW_TEXT_MAX_WIDTH),
+            slider(
+              viewport.camera.yawProperty,
+              orbital.volume.yawStringProperty,
+              SUPERPOSITION_SCREEN_VIEW_SETTINGS.YAW_SLIDER_WIDTH,
+            ),
+            text(orbital.volume.pitchStringProperty, SUPERPOSITION_SCREEN_VIEW_SETTINGS.PITCH_TEXT_MAX_WIDTH),
+            slider(
+              viewport.camera.pitchProperty,
+              orbital.volume.pitchStringProperty,
+              SUPERPOSITION_SCREEN_VIEW_SETTINGS.PITCH_SLIDER_WIDTH,
+            ),
           ],
         }),
         new HBox({
-          spacing: 10,
+          spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.BELOW_ITEM_5_SPACING,
           children: [
-            text(orbital.zoomStringProperty, 70),
-            slider(model.zoomProperty, orbital.zoomStringProperty, 95),
-            text(orbital.nuclearChargeStringProperty, 90),
-            slider(model.nuclearChargeProperty, orbital.nuclearChargeStringProperty, 70),
+            text(orbital.zoomStringProperty, SUPERPOSITION_SCREEN_VIEW_SETTINGS.ZOOM_TEXT_MAX_WIDTH),
+            slider(
+              model.zoomProperty,
+              orbital.zoomStringProperty,
+              SUPERPOSITION_SCREEN_VIEW_SETTINGS.ZOOM_SLIDER_WIDTH,
+            ),
+            text(orbital.nuclearChargeStringProperty, SUPERPOSITION_SCREEN_VIEW_SETTINGS.NUCLEAR_CHARGE_TEXT_MAX_WIDTH),
+            slider(
+              model.nuclearChargeProperty,
+              orbital.nuclearChargeStringProperty,
+              SUPERPOSITION_SCREEN_VIEW_SETTINGS.NUCLEAR_CHARGE_SLIDER_WIDTH,
+            ),
           ],
         }),
       ],
@@ -147,7 +181,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
         accessibleName: name,
       });
     const count = new HBox({
-      spacing: 10,
+      spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.COUNT_SPACING,
       children: [
         text(strings.termsStringProperty),
         spinner(model.termCountProperty, model.termCountProperty.rangeProperty, strings.termsStringProperty),
@@ -160,7 +194,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
           content: new Text(strings.presets[`${key}StringProperty`], {
             font: FONT,
             fill: LIGHT_SURFACE_TEXT_FILL,
-            maxWidth: 100,
+            maxWidth: SUPERPOSITION_SCREEN_VIEW_SETTINGS.PRESET_BUTTONS_MAX_WIDTH,
           }),
           accessibleName: strings.presets[`${key}StringProperty`],
           listener: () => {
@@ -168,7 +202,11 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
           },
         }),
     );
-    const presetBox = new HBox({ spacing: 6, lineSpacing: 8, children: presetButtons });
+    const presetBox = new HBox({
+      spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.PRESET_BOX_SPACING,
+      lineSpacing: 8,
+      children: presetButtons,
+    });
     const presetRow = new Node({ children: [presetBox] });
     this.portraitProperty.link((portrait) => {
       presetBox.wrap = portrait;
@@ -178,11 +216,16 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
       const box = new HBox({
         wrap: false,
         lineSpacing: 12,
-        spacing: 7,
+        spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.BOX_SPACING,
         children: children.map(
           (child, index) =>
             new AlignBox(child, {
-              alignBounds: new Bounds2(0, 0, [15, 80, 80, 80, 120, 120][index] ?? 80, 30),
+              alignBounds: new Bounds2(
+                0,
+                0,
+                [15, 80, 80, 80, 120, 120][index] ?? 80,
+                SUPERPOSITION_SCREEN_VIEW_SETTINGS.BOX_MAX_Y,
+              ),
               xAlign: "center",
               yAlign: "center",
             }),
@@ -199,13 +242,17 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
         spacing: 1,
         children: [
           new RichText(name, {
-            font: new PhetFont(11),
+            font: new PhetFont(SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_FONT_SIZE),
             fill: QuantumAtom3DColors.textColorProperty,
-            maxWidth: 110,
+            maxWidth: SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_MAX_WIDTH,
             visibleProperty: this.portraitProperty,
           }),
-          text(new DerivedProperty([property], (value) => value.toFixed(2))),
-          slider(property, name, 95),
+          text(
+            new DerivedProperty([property], (value) =>
+              value.toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_DECIMAL_PLACES),
+            ),
+          ),
+          slider(property, name, SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_WIDTH),
         ],
       });
     const rows = model.rows.map((row, index) => {
@@ -235,10 +282,10 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     ]);
     const mixer = new VBox({
       align: "left",
-      spacing: 9,
+      spacing: SUPERPOSITION_SCREEN_VIEW_SETTINGS.MIXER_SPACING,
       children: [presetRow, count, columns, ...rows],
       left: rightX,
-      top: this.layoutBounds.minY + 20,
+      top: this.layoutBounds.minY + SUPERPOSITION_SCREEN_VIEW_SETTINGS.MIXER_TOP_OFFSET,
     });
     const status = new DerivedProperty(
       [
@@ -264,16 +311,19 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
           return `${pair}: ΔE = 0`;
         }
         const period = atomicTimeToFs((2 * Math.PI) / gap);
-        return `${pair}: T = ${period.toFixed(3)} fs, f = ${(1 / period).toFixed(3)} PHz, λ = ${wavelengthNmForEnergy(gap).toFixed(1)} nm<br>${dipoleAllowed(a, b) ? allowed : forbidden}`;
+        return `${pair}: T = ${period.toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} fs, f = ${(1 / period).toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} PHz, λ = ${wavelengthNmForEnergy(gap).toFixed(1)} nm<br>${dipoleAllowed(a, b) ? allowed : forbidden}`;
       },
     );
-    const statusLabel = text(status, 500);
+    const statusLabel = text(status, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_LABEL_MAX_WIDTH);
     statusLabel.left = rightX;
     statusLabel.top = this.layoutBounds.minY + 388;
     const chart = new ExpectationTimeSeriesNode(470, 105, model, unitProperty);
     chart.left = rightX;
     chart.top = this.layoutBounds.minY + 455;
-    const normalization = text(strings.normalizationStringProperty, 510);
+    const normalization = text(
+      strings.normalizationStringProperty,
+      SUPERPOSITION_SCREEN_VIEW_SETTINGS.NORMALIZATION_TEXT_MAX_WIDTH,
+    );
     normalization.left = rightX;
     normalization.top = this.layoutBounds.minY + 355;
     const reset = new ResetAllButton({

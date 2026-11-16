@@ -1,3 +1,4 @@
+import { SLICE_NODAL_CURVES_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * SliceNodalCurves.ts
  *
@@ -19,10 +20,10 @@ import type { NodalSurfaceSet } from "./NodalSurfaces.js";
 import type { SlicePlane } from "./SliceSampler.js";
 
 /** Points per sampled curve (circles and hyperbolas). */
-const CURVE_SAMPLES = 96;
+const CURVE_SAMPLES: number = SLICE_NODAL_CURVES_SETTINGS.CURVE_SAMPLES;
 
 /** Below this, an angle or offset counts as exactly zero. */
-const EPSILON = 1e-9;
+const EPSILON: number = SLICE_NODAL_CURVES_SETTINGS.EPSILON;
 
 /** @internal Exported for unit tests; not part of the application API. */
 export type SlicePoint = readonly [number, number];

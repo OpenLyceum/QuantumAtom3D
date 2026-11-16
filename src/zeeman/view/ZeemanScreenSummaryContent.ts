@@ -4,6 +4,7 @@ import { atomicFieldToTesla, wavelengthNmForEnergy } from "../../common/model/At
 import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
 import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import { ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS } from "../../QuantumAtom3DConstants.js";
 import type { ZeemanModel } from "../model/ZeemanModel.js";
 export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
   public constructor(model: ZeemanModel) {
@@ -22,13 +23,21 @@ export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
         const selected = levels[index];
         const wavelengths = transitions.map((t) => wavelengthNmForEnergy(t.photonEnergy));
         return StringUtils.fillIn(pattern, {
-          field: atomicFieldToTesla(field).toPrecision(4),
-          cap: atomicFieldToTesla(cap).toPrecision(4),
+          field: atomicFieldToTesla(field).toPrecision(
+            ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_SIGNIFICANT_FIGURES,
+          ),
+          cap: atomicFieldToTesla(cap).toPrecision(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_SIGNIFICANT_FIGURES),
           count: distinctPhotonEnergies(transitions).length,
-          minimum: wavelengths.length > 0 ? Math.min(...wavelengths).toFixed(6) : "—",
-          maximum: wavelengths.length > 0 ? Math.max(...wavelengths).toFixed(6) : "—",
+          minimum:
+            wavelengths.length > 0
+              ? Math.min(...wavelengths).toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
+              : "—",
+          maximum:
+            wavelengths.length > 0
+              ? Math.max(...wavelengths).toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
+              : "—",
           state: selected
-            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${selected.g.toFixed(4)}` : ""}`
+            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${selected.g.toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.CONSTRUCTOR_DETAILS_DECIMAL_PLACES)}` : ""}`
             : "—",
         });
       },

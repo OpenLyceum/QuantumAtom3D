@@ -1,3 +1,4 @@
+import { OSCILLATOR_DOMAIN, PEAK_DENSITY_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * PeakDensity.ts
  *
@@ -16,10 +17,10 @@ import { sphericalHarmonicTheta } from "../math/sphericalHarmonics.js";
 import { oscillatorRadial } from "../oscillator/OscillatorStates.js";
 import type { Wavefunction } from "./Wavefunction.js";
 
-const RADIAL_SAMPLES = 4000;
-const POLAR_SAMPLES = 181;
-const AZIMUTH_SAMPLES = 360;
-const GRID_SAMPLES = 41;
+const RADIAL_SAMPLES: number = PEAK_DENSITY_SETTINGS.RADIAL_SAMPLES;
+const POLAR_SAMPLES: number = PEAK_DENSITY_SETTINGS.POLAR_SAMPLES;
+const AZIMUTH_SAMPLES: number = PEAK_DENSITY_SETTINGS.AZIMUTH_SAMPLES;
+const GRID_SAMPLES: number = PEAK_DENSITY_SETTINGS.GRID_SAMPLES;
 
 /** max over the sphere of |Σ c_k Y_{l m_k}|², for terms sharing l. */
 function angularPeak(wavefunction: Wavefunction): number {
@@ -60,7 +61,7 @@ function radialPeak(n: number, l: number, nuclearCharge: number, family: Wavefun
   if (cached !== undefined) {
     return cached * scale;
   }
-  const cutoff = family === "oscillator" ? 9 : hydrogenRadialCutoff(n, 1);
+  const cutoff = family === "oscillator" ? OSCILLATOR_DOMAIN.RADIAL_CUTOFF : hydrogenRadialCutoff(n, 1);
   let peak = 0;
   for (let i = 0; i <= RADIAL_SAMPLES; i++) {
     const r = (cutoff * i) / RADIAL_SAMPLES;
@@ -81,7 +82,10 @@ export function peakDensity(wavefunction: Wavefunction): number {
     return radialPeak(first.n, first.l, wavefunction.nuclearCharge, wavefunction.family) * angularPeak(wavefunction);
   }
   const maxN = Math.max(...wavefunction.terms.map((term) => term.n));
-  const half = wavefunction.family === "oscillator" ? 5.5 : hydrogenRadialCutoff(maxN, wavefunction.nuclearCharge) / 2;
+  const half =
+    wavefunction.family === "oscillator"
+      ? OSCILLATOR_DOMAIN.VIEW_HALF_WIDTH
+      : hydrogenRadialCutoff(maxN, wavefunction.nuclearCharge) / 2;
   const sample: ComplexSample = { re: 0, im: 0 };
   let peak = 0;
   for (let i = 0; i < GRID_SAMPLES; i++) {

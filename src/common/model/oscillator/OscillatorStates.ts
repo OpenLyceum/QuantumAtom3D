@@ -1,3 +1,4 @@
+import { OSCILLATOR_NUMERICS } from "../../../QuantumAtom3DConstants.js";
 /** Isotropic oscillator in reduced coordinates x/sqrt(hbar/m omega), energy in hbar omega. */
 import { associatedLaguerre, factorial } from "../math/specialFunctions.js";
 import { type ComplexSample, sphericalHarmonic } from "../math/sphericalHarmonics.js";
@@ -105,7 +106,13 @@ export function cartesianExpansion(state: CartesianState): readonly OrbitalTerm[
           });
         });
       });
-      return { n: s.nr, l: s.l, m: s.m, re: Math.abs(re) < 1e-12 ? 0 : re, im: Math.abs(im) < 1e-12 ? 0 : im };
+      return {
+        n: s.nr,
+        l: s.l,
+        m: s.m,
+        re: Math.abs(re) < OSCILLATOR_NUMERICS.COEFFICIENT_EPSILON ? 0 : re,
+        im: Math.abs(im) < OSCILLATOR_NUMERICS.COEFFICIENT_EPSILON ? 0 : im,
+      };
     })
     .filter((term) => term.re !== 0 || term.im !== 0);
   expansionCache.set(key, terms);
@@ -125,9 +132,9 @@ export function cartesianPeakDensity(state: CartesianState): number {
     let one = cartesianPeaks.get(n);
     if (one === undefined) {
       one = 0;
-      const samples = 4000;
+      const samples: number = OSCILLATOR_NUMERICS.PEAK_SAMPLES;
       for (let i = 0; i <= samples; i++) {
-        const x = (6 * i) / samples;
+        const x = (OSCILLATOR_NUMERICS.PEAK_RADIUS_LIMIT * i) / samples;
         const h = hermite(n, x);
         one = Math.max(one, (h * h * Math.exp(-x * x)) / (Math.sqrt(Math.PI) * 2 ** n * factorial(n)));
       }

@@ -1,3 +1,4 @@
+import { SLICE_HEATMAP_NODE_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * SliceHeatmapNode.ts
  *
@@ -39,8 +40,8 @@ export type SliceHeatmapNodeOptions = NodeOptions & {
   readonly nodesVisibleProperty: TReadOnlyProperty<boolean>;
 };
 
-const FRAME_LINE_WIDTH = 1.5;
-const NODE_LINE_WIDTH = 1.2;
+const FRAME_LINE_WIDTH: number = SLICE_HEATMAP_NODE_SETTINGS.FRAME_LINE_WIDTH;
+const NODE_LINE_WIDTH: number = SLICE_HEATMAP_NODE_SETTINGS.NODE_LINE_WIDTH;
 const NODE_LINE_DASH = [4, 3];
 
 /** Paints the latest samples into an offscreen canvas and draws it scaled to the node's size. */

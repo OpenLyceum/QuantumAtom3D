@@ -1,3 +1,4 @@
+import { QUANTUM_ATOM3_D_QUERY_PARAMETERS_SETTINGS } from "../QuantumAtom3DConstants.js";
 /**
  * quantumAtom3DQueryParameters.ts
  *
@@ -52,7 +53,7 @@ const quantumAtom3DQueryParameters = QueryStringMachine.getAll({
   /** Reproducible probability samples, independent of other simulation randomness. */
   seed: {
     type: "number",
-    defaultValue: 173,
+    defaultValue: QUANTUM_ATOM3_D_QUERY_PARAMETERS_SETTINGS.QUANTUM_ATOM3_D_QUERY_PARAMETERS_DEFAULT_VALUE,
     isValidValue: (value: number) => Number.isSafeInteger(value),
     public: true,
   },

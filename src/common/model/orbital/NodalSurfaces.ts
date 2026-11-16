@@ -1,3 +1,4 @@
+import { NODAL_SURFACES_SETTINGS } from "../../../QuantumAtom3DConstants.js";
 /**
  * NodalSurfaces.ts
  *
@@ -19,7 +20,7 @@ import { associatedLegendrePolynomialPart } from "../math/sphericalHarmonics.js"
 import type { OrbitalBasis } from "./OrbitalCatalog.js";
 
 /** Scan steps on (−1, 1) for the polar-node search (at most four roots for l ≤ 4). */
-const POLAR_SCAN_SAMPLES = 2000;
+const POLAR_SCAN_SAMPLES: number = NODAL_SURFACES_SETTINGS.POLAR_SCAN_SAMPLES;
 
 export type NodalSurfaceSet = {
   /** Radii of the spherical nodes, in a0. */
@@ -36,7 +37,7 @@ export type NodalSurfaceSet = {
  */
 export function polarNodeAngles(l: number, m: number): number[] {
   // Nudge the scan off ±1, where the sin^|m| factor (not a cone) would vanish.
-  const EDGE = 1e-9;
+  const EDGE: number = NODAL_SURFACES_SETTINGS.EDGE;
   const roots = findRoots((x) => associatedLegendrePolynomialPart(l, m, x), -1 + EDGE, 1 - EDGE, POLAR_SCAN_SAMPLES);
   return roots.map((x) => Math.acos(x)).sort((a, b) => a - b);
 }
