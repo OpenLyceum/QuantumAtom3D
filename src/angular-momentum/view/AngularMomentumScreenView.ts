@@ -1,5 +1,6 @@
 import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import type { Range } from "scenerystack/dot";
+import { toFixed } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
@@ -49,8 +50,8 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
       [model.lProperty, model.mProperty, model.spinProperty, model.jProperty, model.mjProperty],
       (l, m, spin, j, mj) =>
         spin
-          ? `|L| = ${angularMagnitude(l).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, |S| = ${Math.sqrt(0.75).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ<br>|J| = ${angularMagnitude(j).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, J<sub>z</sub> = ${mj} ℏ`
-          : `|L| = ${angularMagnitude(l).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, L<sub>z</sub> = ${m} ℏ<br>ΔL<sub>x</sub> ΔL<sub>y</sub> = ${orbitalUncertaintyProduct(l, m).toFixed(ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES_SEGMENT_2)} ℏ² ≥ ${Math.abs(m) / 2} ℏ²`,
+          ? `|L| = ${toFixed(angularMagnitude(l), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, |S| = ${toFixed(Math.sqrt(0.75), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ<br>|J| = ${toFixed(angularMagnitude(j), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, J<sub>z</sub> = ${mj} ℏ`
+          : `|L| = ${toFixed(angularMagnitude(l), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, L<sub>z</sub> = ${m} ℏ<br>ΔL<sub>x</sub> ΔL<sub>y</sub> = ${toFixed(orbitalUncertaintyProduct(l, m), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES_SEGMENT_2)} ℏ² ≥ ${Math.abs(m) / 2} ℏ²`,
     );
     const readout = label(readouts);
     readout.left = diagram.left;

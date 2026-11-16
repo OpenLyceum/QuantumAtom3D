@@ -1,6 +1,6 @@
 /** Coherent-state mixer, animated 3D view and expectation-value history. */
 import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
-import { Bounds2, Dimension2, type Range } from "scenerystack/dot";
+import { Bounds2, Dimension2, type Range, toFixed } from "scenerystack/dot";
 import { AlignBox, HBox, Node, RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
@@ -83,7 +83,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     const timeText = new DerivedProperty(
       [model.timeProperty, model.expectationsProperty, strings.timeStringProperty, unitProperty],
       (time, expectation, name, unit) =>
-        `${name}: ${atomicTimeToFs(time).toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.TIME_TEXT_DECIMAL_PLACES)} fs   ⟨z⟩ = ${formatLength(expectation.z, unit)} ${lengthUnitSymbol(unit)}   ⟨r⟩ = ${formatLength(expectation.r, unit)} ${lengthUnitSymbol(unit)}`,
+        `${name}: ${toFixed(atomicTimeToFs(time), SUPERPOSITION_SCREEN_VIEW_SETTINGS.TIME_TEXT_DECIMAL_PLACES)} fs   ⟨z⟩ = ${formatLength(expectation.z, unit)} ${lengthUnitSymbol(unit)}   ⟨r⟩ = ${formatLength(expectation.r, unit)} ${lengthUnitSymbol(unit)}`,
     );
     const timeLabel = text(timeText, SIZE);
     timeLabel.left = viewport.left;
@@ -247,7 +247,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
           }),
           text(
             new DerivedProperty([property], (value) =>
-              value.toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_DECIMAL_PLACES),
+              toFixed(value, SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_DECIMAL_PLACES),
             ),
           ),
           slider(property, name, SUPERPOSITION_SCREEN_VIEW_SETTINGS.COEFFICIENT_SLIDER_WIDTH),
@@ -305,7 +305,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
           return `${pair}: ΔE = 0`;
         }
         const period = atomicTimeToFs(dynamics.period);
-        return `${pair}: T = ${period.toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} fs, f = ${(1 / period).toFixed(SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} PHz, λ = ${wavelengthNmForEnergy(dynamics.energyGap).toFixed(1)} nm<br>${dynamics.isDipoleAllowed ? allowed : forbidden}`;
+        return `${pair}: T = ${toFixed(period, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} fs, f = ${toFixed(1 / period, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} PHz, λ = ${toFixed(wavelengthNmForEnergy(dynamics.energyGap), 1)} nm<br>${dynamics.isDipoleAllowed ? allowed : forbidden}`;
       },
     );
     const statusLabel = text(status, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_LABEL_MAX_WIDTH);

@@ -1,4 +1,5 @@
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { HBox, Line, Node, RichText, VBox } from "scenerystack/scenery";
 import { ArrowNode, PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
@@ -154,7 +155,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
       (levels, index, mode) => {
         const level = levels[index];
         return level
-          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${level.g.toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.SELECTED_DECIMAL_PLACES)}, E=${hartreeToEv(level.energy).toFixed(ZEEMAN_SCREEN_VIEW_SETTINGS.ENERGY_DECIMAL_PLACES)} eV`
+          ? `n=${level.n}, l=${level.l}${mode === "anomalous" ? `, j=${level.j}` : ""}, m=${level.m}<br>g=${toFixed(level.g, ZEEMAN_SCREEN_VIEW_SETTINGS.SELECTED_DECIMAL_PLACES)}, E=${toFixed(hartreeToEv(level.energy), ZEEMAN_SCREEN_VIEW_SETTINGS.ENERGY_DECIMAL_PLACES)} eV`
           : "";
       },
     );

@@ -1,4 +1,5 @@
 import { DerivedProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { atomicFieldToTesla, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
 import { distinctPhotonEnergies } from "../../common/model/angular/ZeemanLevels.js";
@@ -30,14 +31,14 @@ export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
           count: distinctPhotonEnergies(transitions).length,
           minimum:
             wavelengths.length > 0
-              ? Math.min(...wavelengths).toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
+              ? toFixed(Math.min(...wavelengths), ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
               : "—",
           maximum:
             wavelengths.length > 0
-              ? Math.max(...wavelengths).toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
+              ? toFixed(Math.max(...wavelengths), ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
               : "—",
           state: selected
-            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${selected.g.toFixed(ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.G_FACTOR_DECIMAL_PLACES)}` : ""}`
+            ? `n=${selected.n}, l=${selected.l}, m=${selected.m}${mode === "anomalous" ? `, j=${selected.j}, g=${toFixed(selected.g, ZEEMAN_SCREEN_SUMMARY_CONTENT_SETTINGS.G_FACTOR_DECIMAL_PLACES)}` : ""}`
             : "—",
         });
       },

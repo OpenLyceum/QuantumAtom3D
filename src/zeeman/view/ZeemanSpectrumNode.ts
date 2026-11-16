@@ -1,5 +1,7 @@
 /** Wavelength positions, without intensities or a line-broadening model. */
+
 import { Multilink, type UnknownMultilink } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { Line, Node, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
@@ -47,7 +49,7 @@ export class ZeemanSpectrumNode extends Node {
           const wavelength = wavelengthNmForEnergy(transition.photonEnergy);
           const x = (width * (wavelength - low)) / (high - low);
           const row = transition.polarization === "pi" ? 0 : transition.polarization === "sigmaPlus" ? 1 : 2;
-          const key = `${row},${wavelength.toFixed(ZEEMAN_SPECTRUM_NODE_SETTINGS.KEY_DECIMAL_PLACES)}`;
+          const key = `${row},${toFixed(wavelength, ZEEMAN_SPECTRUM_NODE_SETTINGS.KEY_DECIMAL_PLACES)}`;
           if (seen.has(key)) {
             continue;
           }

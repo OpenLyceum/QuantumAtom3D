@@ -1,4 +1,5 @@
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { atomicTimeToFs } from "../../common/model/AtomicUnits.js";
 import { DEFAULT_LENGTH_UNIT_PROPERTY } from "../../common/view/DisplayDefaults.js";
@@ -26,7 +27,7 @@ export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryCo
       (terms, time, values, pattern, unit) =>
         StringUtils.fillIn(pattern, {
           count: terms.length,
-          time: atomicTimeToFs(time).toFixed(SUPERPOSITION_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
+          time: toFixed(atomicTimeToFs(time), SUPERPOSITION_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
           z: formatLength(values.z, unit),
           r: formatLength(values.r, unit),
           unit: lengthUnitSymbol(unit),

@@ -1,5 +1,7 @@
 /** Magnetic sublevels grouped by l,j. Each group is centred at its own zero-field energy. */
+
 import { Multilink, type UnknownMultilink } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { Line, Node, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { hartreeToEv } from "../../common/model/AtomicUnits.js";
@@ -84,7 +86,7 @@ export class ZeemanDiagramNode extends Node {
               );
               layer.addChild(
                 new Text(
-                  `${hartreeToEv(level.zeroEnergy).toFixed(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_DECIMAL_PLACES)} eV`,
+                  `${toFixed(hartreeToEv(level.zeroEnergy), ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_DECIMAL_PLACES)} eV`,
                   {
                     font: new PhetFont(ZEEMAN_DIAGRAM_NODE_SETTINGS.DRAW_BAND_FONT_SIZE_SEGMENT_2),
                     fill: QuantumAtom3DColors.textColorProperty,

@@ -1,5 +1,6 @@
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import type { Range } from "scenerystack/dot";
+import { toFixed } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
@@ -184,7 +185,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
           c && s
             ? cartesianExpansion(c).find((entry) => entry.n === s.nr && entry.l === s.l && entry.m === s.m)
             : undefined;
-        return `⟨${c?.join(",") ?? ""}|${s ? `${s.nr},${s.l},${s.m}` : ""}⟩ = ${(t?.re ?? 0).toFixed(OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)} ${-(t?.im ?? 0) < 0 ? "−" : "+"} ${Math.abs(t?.im ?? 0).toFixed(OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)}i`;
+        return `⟨${c?.join(",") ?? ""}|${s ? `${s.nr},${s.l},${s.m}` : ""}⟩ = ${toFixed(t?.re ?? 0, OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)} ${-(t?.im ?? 0) < 0 ? "−" : "+"} ${toFixed(Math.abs(t?.im ?? 0), OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)}i`;
       },
     );
     const coefficientLabel = text(coefficient);

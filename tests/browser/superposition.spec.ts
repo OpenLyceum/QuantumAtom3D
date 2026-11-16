@@ -74,6 +74,7 @@ for (const cpu of [true, false]) {
 test("GPU coherent wavefunctions match the CPU at multiple phases", async ({ page }) => {
   await page.goto("/?screens=2&ea");
   await page.getByRole("button", { name: "Reset All" }).waitFor();
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: in-page GPU-vs-CPU comparison must be one serialized closure
   const error = await page.evaluate(async () => {
     const load = (file: string) => import(`/src/${file}.ts`);
     const [

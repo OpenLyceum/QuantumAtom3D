@@ -1,4 +1,5 @@
 import { DerivedProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { angularMagnitude, orbitalUncertaintyProduct } from "../../common/model/angular/VectorModel.js";
 import { DisposableScreenSummaryContent } from "../../common/view/DisposableScreenSummaryContent.js";
@@ -23,16 +24,17 @@ export class AngularMomentumScreenSummaryContent extends DisposableScreenSummary
           m: spin ? "—" : m,
           j: spin ? j : "—",
           mj: spin ? mj : "—",
-          L: angularMagnitude(l).toFixed(ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
+          L: toFixed(angularMagnitude(l), ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
           S: spin
-            ? angularMagnitude(0.5).toFixed(ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
+            ? toFixed(angularMagnitude(0.5), ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
             : "—",
           J: spin
-            ? angularMagnitude(j).toFixed(ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
+            ? toFixed(angularMagnitude(j), ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES)
             : "—",
           uncertainty: spin
             ? "—"
-            : orbitalUncertaintyProduct(l, m).toFixed(
+            : toFixed(
+                orbitalUncertaintyProduct(l, m),
                 ANGULAR_MOMENTUM_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES,
               ),
         }),

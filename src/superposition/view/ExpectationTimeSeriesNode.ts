@@ -1,6 +1,6 @@
 import { DerivedProperty, Multilink, type TReadOnlyProperty, type UnknownMultilink } from "scenerystack/axon";
 import { ChartRectangle, ChartTransform, LinePlot } from "scenerystack/bamboo";
-import { Range, Vector2 } from "scenerystack/dot";
+import { Range, toFixed, Vector2 } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { Circle, HBox, Line, Node, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
@@ -135,7 +135,7 @@ export class ExpectationTimeSeriesNode extends Node {
         zDot.center = new Vector2(chart.modelToViewX(atomicTimeToFs(time)), chart.modelToViewY(values.z));
         rPlot.setDataSet(samples.map((s) => new Vector2(atomicTimeToFs(s.t), s.r)));
         zPlot.setDataSet(samples.map((s) => new Vector2(atomicTimeToFs(s.t), s.z)));
-        timeLabel.string = `${axis}: ${atomicTimeToFs(start).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.DECIMAL_PLACES)} – ${atomicTimeToFs(end).toFixed(EXPECTATION_TIME_SERIES_NODE_SETTINGS.DECIMAL_PLACES)}`;
+        timeLabel.string = `${axis}: ${toFixed(atomicTimeToFs(start), EXPECTATION_TIME_SERIES_NODE_SETTINGS.DECIMAL_PLACES)} – ${toFixed(atomicTimeToFs(end), EXPECTATION_TIME_SERIES_NODE_SETTINGS.DECIMAL_PLACES)}`;
       },
     );
   }

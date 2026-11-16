@@ -1,4 +1,5 @@
 import { DerivedProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import {
   cartesianExpansion,
@@ -38,8 +39,8 @@ export class OscillatorScreenSummaryContent extends DisposableScreenSummaryConte
           basis: basis === "cartesian" ? cartName : sphereName,
           cart: cart?.join(",") ?? "",
           sphere: sphere ? `${sphere.nr},${sphere.l},${sphere.m}` : "",
-          re: (coefficient?.re ?? 0).toFixed(OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
-          im: (-(coefficient?.im ?? 0)).toFixed(OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
+          re: toFixed(coefficient?.re ?? 0, OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
+          im: toFixed(-(coefficient?.im ?? 0), OSCILLATOR_SCREEN_SUMMARY_CONTENT_SETTINGS.DETAILS_DECIMAL_PLACES),
         });
       },
     );
