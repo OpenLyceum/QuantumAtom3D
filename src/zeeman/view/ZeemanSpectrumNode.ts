@@ -67,7 +67,7 @@ export class ZeemanSpectrumNode extends Node {
           [width, high],
         ]) {
           layer.addChild(
-            new Text(`${value?.toFixed(6)}`, {
+            new Text(value === undefined ? "" : toFixed(value, 6), {
               font: new PhetFont(ZEEMAN_SPECTRUM_NODE_SETTINGS.LINK_FONT_SIZE),
               fill: QuantumAtom3DColors.textColorProperty,
               centerX: x ?? 0,
