@@ -81,8 +81,8 @@ describeDisposalLeaks([
       new ColormapLegendNode({
         coloringProperty,
         phaseColormapProperty: colormap,
-        phaseCaptionProperty: orbitalStrings.phaseLegendStringProperty,
-        densityCaptionProperty: orbitalStrings.densityLegendStringProperty,
+        phaseCaptionProperty: orbitalStrings.slice.phaseLegendStringProperty,
+        densityCaptionProperty: orbitalStrings.slice.densityLegendStringProperty,
       }),
     keepAlive: () => [coloringProperty, colormap, orbitalStrings],
   },
