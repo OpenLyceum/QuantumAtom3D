@@ -55,6 +55,7 @@ const oscillatorModel = new OscillatorModel();
 const orbitalStrings = StringManager.getInstance().getOrbitalStrings();
 
 describeDisposalLeaks([
+  // memory-leak-covers: InteractiveOrbitalCanvas (inherited dispose via OscillatorViewportNode and SuperpositionViewportNode)
   { name: "OscillatorScreenSummaryContent", create: () => new OscillatorScreenSummaryContent(oscillatorModel) },
   { name: "ZeemanScreenSummaryContent", create: () => new ZeemanScreenSummaryContent(zeemanModel) },
   { name: "AngularMomentumScreenSummaryContent", create: () => new AngularMomentumScreenSummaryContent(angularModel) },

@@ -81,7 +81,6 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
   from `QuantumAtom3DColors.ts`.
 
 - `src/common/gpu/`: GPU-only state, as in FluidDynamics.
-- `memory-leak:InteractiveOrbitalCanvas` — WebGPU/canvas orbital display; needs a live GPU context to exercise dispose.
 - `memory-leak:OrbitalReadoutPanel` — panel Text nodes retain via sim-lifetime StringManager Properties after dispose.
 - `memory-leak:OrbitalsControlPanel` — panel chrome / NumberControl retain via StringManager and model Properties after dispose.
 - `memory-leak:RadialDistributionChartNode` — chart axis Text / TickLabelSet retain via StringManager Properties after dispose.
