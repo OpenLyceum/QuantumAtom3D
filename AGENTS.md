@@ -81,8 +81,6 @@ Each screen ships PDOM names, a `*ScreenSummaryContent`, and a `*KeyboardHelpCon
   from `QuantumAtom3DColors.ts`.
 
 - `src/common/gpu/`: GPU-only state, as in FluidDynamics.
-- `src/common/gpu/webgpu-globals.d.ts`: an ambient declaration of the WebGPU flag namespaces. It is
-  copied from HeatTransfer, and `tsconfig.test.json` includes it.
 - `memory-leak:HeatmapCanvasNode` — private CanvasNode helper inside SliceHeatmapNode; not constructible alone.
 - `memory-leak:InteractiveOrbitalCanvas` — WebGPU/canvas orbital display; needs a live GPU context to exercise dispose.
 - `memory-leak:OrbitalReadoutPanel` — panel Text nodes retain via sim-lifetime StringManager Properties after dispose.

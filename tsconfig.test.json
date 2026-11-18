@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client", "@webgpu/types"]
   },
   "include": ["tests", "src/**/*.d.ts"]
 }

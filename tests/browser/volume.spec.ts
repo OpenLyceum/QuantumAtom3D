@@ -331,7 +331,7 @@ test("shader diagnostics select CPU without preventing startup", async ({ page }
               length: 1,
             },
           ],
-        }) as GPUCompilationInfo;
+        }) as unknown as GPUCompilationInfo;
     }
   });
   await page.goto("/?screens=1&ea");
