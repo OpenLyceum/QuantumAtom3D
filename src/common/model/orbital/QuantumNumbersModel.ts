@@ -7,7 +7,7 @@
  * before its range shrinks, so a value never sits outside its range.
  */
 
-import { NumberProperty, Property } from "scenerystack/axon";
+import { NumberProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import type { Tandem } from "scenerystack/tandem";
 
@@ -25,10 +25,12 @@ export class QuantumNumbersModel {
   public readonly mProperty: NumberProperty;
 
   /** [0, n − 1], following n. */
-  public readonly lRangeProperty: Property<Range>;
+  public readonly lRangeProperty: TReadOnlyProperty<Range>;
+  private readonly _lRangeProperty: Property<Range>;
 
   /** [−l, l], following l. */
-  public readonly mRangeProperty: Property<Range>;
+  public readonly mRangeProperty: TReadOnlyProperty<Range>;
+  private readonly _mRangeProperty: Property<Range>;
 
   public constructor(options: QuantumNumbersModelOptions) {
     const { tandem } = options;
@@ -45,16 +47,18 @@ export class QuantumNumbersModel {
       numberType: "Integer",
       ...(tandem && { tandem: tandem.createTandem("mProperty") }),
     });
-    this.lRangeProperty = new Property(new Range(0, options.initialN - 1));
-    this.mRangeProperty = new Property(new Range(-options.initialL, options.initialL));
+    this._lRangeProperty = new Property(new Range(0, options.initialN - 1));
+    this._mRangeProperty = new Property(new Range(-options.initialL, options.initialL));
+    this.lRangeProperty = this._lRangeProperty;
+    this.mRangeProperty = this._mRangeProperty;
 
     this.nProperty.lazyLink((n) => {
       this.lProperty.value = Math.min(this.lProperty.value, n - 1);
-      this.lRangeProperty.value = new Range(0, n - 1);
+      this._lRangeProperty.value = new Range(0, n - 1);
     });
     this.lProperty.lazyLink((l) => {
       this.mProperty.value = Math.max(-l, Math.min(this.mProperty.value, l));
-      this.mRangeProperty.value = new Range(-l, l);
+      this._mRangeProperty.value = new Range(-l, l);
     });
   }
 
@@ -76,7 +80,7 @@ export class QuantumNumbersModel {
     this.nProperty.dispose();
     this.lProperty.dispose();
     this.mProperty.dispose();
-    this.lRangeProperty.dispose();
-    this.mRangeProperty.dispose();
+    this._lRangeProperty.dispose();
+    this._mRangeProperty.dispose();
   }
 }
