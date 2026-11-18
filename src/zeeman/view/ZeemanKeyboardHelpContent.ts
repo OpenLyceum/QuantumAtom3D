@@ -2,13 +2,14 @@ import {
   BasicActionsKeyboardHelpSection,
   SliderControlsKeyboardHelpSection,
   SpinnerControlsKeyboardHelpSection,
+  TimeControlsKeyboardHelpSection,
   TwoColumnKeyboardHelpContent,
 } from "scenerystack/scenery-phet";
 export class ZeemanKeyboardHelpContent extends TwoColumnKeyboardHelpContent {
   public constructor() {
     super(
       [new SpinnerControlsKeyboardHelpSection(), new SliderControlsKeyboardHelpSection()],
-      [new BasicActionsKeyboardHelpSection()],
+      [new TimeControlsKeyboardHelpSection(), new BasicActionsKeyboardHelpSection()],
     );
   }
 }
