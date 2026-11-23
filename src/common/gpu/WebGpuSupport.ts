@@ -17,13 +17,10 @@ export type WebGpuContext = {
   readonly presentationFormat: GPUTextureFormat;
 };
 
-/**
- * `canvas.getContext("webgpu")`, typed. TypeScript 7's DOM lib has every WebGPU
- * interface but no `"webgpu"` overload on `getContext`, so the cast lives here,
- * in one place.
- */
+/** Requests a WebGPU context and narrows the DOM library's generic getContext result. */
 export function requestCanvasContext(canvas: HTMLCanvasElement): GPUCanvasContext | null {
-  return (canvas.getContext("webgpu") as unknown as GPUCanvasContext | null) ?? null;
+  const context = canvas.getContext("webgpu");
+  return typeof GPUCanvasContext !== "undefined" && context instanceof GPUCanvasContext ? context : null;
 }
 
 /** Whether this browser exposes the WebGPU entry point at all. */
