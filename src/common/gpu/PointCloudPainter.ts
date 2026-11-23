@@ -5,6 +5,14 @@ import { type CameraFrame, projectToScreen, type Vec3 } from "../view/OrbitCamer
 import type { OrbitalScene } from "./OrbitalScene.js";
 import { compositeSurfaces, surfaceEvents } from "./SurfaceOverlays.js";
 
+function screenRayOrigin(frame: CameraFrame, u: number, v: number): Vec3 {
+  return [
+    frame.right[0] * u + frame.up[0] * v,
+    frame.right[1] * u + frame.up[1] * v,
+    frame.right[2] * u + frame.up[2] * v,
+  ];
+}
+
 function paintSurfaceBackground(
   context: CanvasRenderingContext2D,
   resolution: number,
@@ -22,9 +30,7 @@ function paintSurfaceBackground(
         const chord = Math.sqrt(Math.max(0, scene.radius ** 2 - u * u - v * v));
         const rgb = [0, 0, 0];
         if (chord > 0) {
-          const origin: Vec3 = [0, 1, 2].map(
-            (i) => (frame.right[i] ?? 0) * u + (frame.up[i] ?? 0) * v,
-          ) as unknown as Vec3;
+          const origin = screenRayOrigin(frame, u, v);
           compositeSurfaces(surfaceEvents(scene, origin, frame.forward, chord, wavefunction, luts), chord, rgb);
         }
         const offset = 4 * (y * resolution + x);
@@ -74,7 +80,7 @@ export function paintPointCloud(
     const offset = 4 * lutIndex;
     const rgb = [luts[offset] ?? 0, luts[offset + 1] ?? 0, luts[offset + 2] ?? 0];
     if (scene.nodes || scene.cuttingPlane) {
-      const origin: Vec3 = [0, 1, 2].map((i) => (frame.right[i] ?? 0) * u + (frame.up[i] ?? 0) * v) as unknown as Vec3;
+      const origin = screenRayOrigin(frame, u, v);
       const chord = Math.sqrt(Math.max(0, scene.radius ** 2 - u * u - v * v));
       compositeSurfaces(surfaceEvents(scene, origin, frame.forward, chord, wavefunction, luts), depth(index), rgb);
     }

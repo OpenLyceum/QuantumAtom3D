@@ -37,10 +37,11 @@ export function surfaceEvents(
             )
           : COLOR_LUT_SIZE + Math.round(amplitude ** 2 * (COLOR_LUT_SIZE - 1));
       const gain = scene.coloring === "phase" ? amplitude : 1;
+      const offset = 4 * index;
       events.push({
         t,
         alpha: 0.9,
-        color: [0, 1, 2].map((c) => gain * (luts[4 * index + c] ?? 0)) as unknown as Point3,
+        color: [gain * (luts[offset] ?? 0), gain * (luts[offset + 1] ?? 0), gain * (luts[offset + 2] ?? 0)],
       });
     }
   }

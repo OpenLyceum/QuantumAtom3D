@@ -3,6 +3,10 @@ import { ANGULAR_NUMERICS } from "../../../QuantumAtom3DConstants.js";
 export type AngularVector = readonly [number, number, number];
 export const angularMagnitude = (q: number): number => Math.sqrt(q * (q + 1));
 
+function mapAngularVector(vector: AngularVector, map: (value: number, axis: 0 | 1 | 2) => number): AngularVector {
+  return [map(vector[0], 0), map(vector[1], 1), map(vector[2], 2)];
+}
+
 export function orbitalVector(l: number, m: number, phase: number): AngularVector {
   const transverse = Math.sqrt(Math.max(0, l * (l + 1) - m * m));
   return [transverse * Math.cos(phase), transverse * Math.sin(phase), m];
@@ -37,13 +41,13 @@ export function coupledVectors(
   const e2: AngularVector = [-Math.sin(outerPhase), Math.cos(outerPhase), 0];
   const parallel = (j * (j + 1) + l * (l + 1) - 0.75) / (2 * lengthJ);
   const perpendicular = Math.sqrt(Math.max(0, l * (l + 1) - parallel * parallel));
-  const J = unit.map((value) => value * lengthJ) as unknown as AngularVector;
-  const L = unit.map(
-    (value, index) =>
-      value * parallel +
-      perpendicular * ((e1[index] ?? 0) * Math.cos(innerPhase) + (e2[index] ?? 0) * Math.sin(innerPhase)),
-  ) as unknown as AngularVector;
-  const S = J.map((value, index) => value - (L[index] ?? 0)) as unknown as AngularVector;
+  const J = mapAngularVector(unit, (value) => value * lengthJ);
+  const L = mapAngularVector(
+    unit,
+    (value, axis) =>
+      value * parallel + perpendicular * (e1[axis] * Math.cos(innerPhase) + e2[axis] * Math.sin(innerPhase)),
+  );
+  const S = mapAngularVector(J, (value, axis) => value - L[axis]);
   return { orbital: L, spin: S, total: J };
 }
 
