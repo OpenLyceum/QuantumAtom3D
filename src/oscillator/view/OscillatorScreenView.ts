@@ -1,6 +1,6 @@
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import type { Range } from "scenerystack/dot";
-import { toFixed } from "scenerystack/dot";
+import { roundSymmetric, toFixed } from "scenerystack/dot";
 import { HBox, Node, RichText, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
@@ -81,7 +81,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
               keyboardStep: property === model.zoomProperty ? 1 : Math.PI / 36,
               shiftKeyboardStep: property === model.zoomProperty ? 1 : Math.PI / 180,
               pageKeyboardStep: property === model.zoomProperty ? 1 : Math.PI / 6,
-              ...(property === model.zoomProperty && { constrainValue: (value: number) => Math.round(value) }),
+              ...(property === model.zoomProperty && { constrainValue: (value: number) => roundSymmetric(value) }),
             }),
           ],
         }),
@@ -124,11 +124,11 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         radioButtonOptions: { radius: OSCILLATOR_SCREEN_VIEW_SETTINGS.BASES_RADIUS },
       },
     );
-    const cartLabel = new DerivedProperty(
+    const cartLabelProperty = new DerivedProperty(
       [model.shellProperty, model.cartesianIndexProperty],
       (N, index) => `(${(cartesianStates(N)[index] ?? cartesianStates(N)[0])?.join(",")})`,
     );
-    const sphereLabel = new DerivedProperty([model.shellProperty, model.sphericalIndexProperty], (N, index) => {
+    const sphereLabelProperty = new DerivedProperty([model.shellProperty, model.sphericalIndexProperty], (N, index) => {
       const s = sphericalStates(N)[index] ?? sphericalStates(N)[0];
       return s ? `(${s.nr},${s.l},${s.m})` : "";
     });
@@ -149,7 +149,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
           children: [
             text(strings.cartStateStringProperty),
             spinner(model.cartesianIndexProperty, model.indexRangeProperty, strings.cartStateStringProperty, 1),
-            text(cartLabel),
+            text(cartLabelProperty),
           ],
         }),
         new HBox({
@@ -157,7 +157,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
           children: [
             text(strings.sphereStateStringProperty),
             spinner(model.sphericalIndexProperty, model.indexRangeProperty, strings.sphereStateStringProperty, 1),
-            text(sphereLabel),
+            text(sphereLabelProperty),
           ],
         }),
       ],
@@ -176,7 +176,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
     const matrixTitle = text(strings.overlapStringProperty);
     matrixTitle.left = right;
     matrixTitle.top = this.layoutBounds.minY + 195;
-    const coefficient = new DerivedProperty(
+    const coefficientProperty = new DerivedProperty(
       [model.shellProperty, model.cartesianIndexProperty, model.sphericalIndexProperty],
       (N, row, column) => {
         const c = cartesianStates(N)[row];
@@ -188,7 +188,7 @@ export class OscillatorScreenView extends ResponsiveScreenView {
         return `⟨${c?.join(",") ?? ""}|${s ? `${s.nr},${s.l},${s.m}` : ""}⟩ = ${toFixed(t?.re ?? 0, OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)} ${-(t?.im ?? 0) < 0 ? "−" : "+"} ${toFixed(Math.abs(t?.im ?? 0), OSCILLATOR_SCREEN_VIEW_SETTINGS.COEFFICIENT_DECIMAL_PLACES)}i`;
       },
     );
-    const coefficientLabel = text(coefficient);
+    const coefficientLabel = text(coefficientProperty);
     coefficientLabel.left = right;
     coefficientLabel.top = this.layoutBounds.minY + 220;
     const overlap = new BasisOverlapNode(model);

@@ -75,12 +75,12 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
     const title = label(strings.volume.titleStringProperty);
     title.left = viewport.left;
     title.bottom = viewport.top - GAP / 2;
-    const scale = new DerivedProperty(
+    const scaleProperty = new DerivedProperty(
       [model.viewHalfWidthProperty, strings.slice.scaleStringProperty, unitProperty],
       (width, pattern, unit) =>
         StringUtils.fillIn(pattern, { value: formatLength(width, unit), unit: lengthUnitSymbol(unit) }),
     );
-    const scaleLabel = label(scale);
+    const scaleLabel = label(scaleProperty);
     scaleLabel.boundsProperty.link(() => {
       scaleLabel.right = viewport.right;
       scaleLabel.bottom = viewport.top - GAP / 2;
@@ -196,7 +196,7 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
       probeFractionProperty: model.probeFractionProperty,
       lengthUnitProperty: unitProperty,
     });
-    const probeValue = new DerivedProperty(
+    const probeValueProperty = new DerivedProperty(
       [model.probeFractionProperty, model.viewHalfWidthProperty, strings.volume.probeStringProperty, unitProperty],
       (probeFraction, width, name, unit) =>
         `${name}: ${formatLength(probeFraction * width, unit)} ${lengthUnitSymbol(unit)}`,
@@ -205,7 +205,7 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
       align: "left",
       spacing: GAP / 2,
       children: [
-        label(probeValue, DETAIL_SIZE),
+        label(probeValueProperty, DETAIL_SIZE),
         new HSlider(model.probeFractionProperty, model.probeFractionProperty.range, {
           ...QUANTUM_ATOM_3D_SLIDER_OPTIONS,
           trackSize: new Dimension2(DETAIL_SIZE - 25, ORBITALS_SCREEN_VIEW_SETTINGS.PROBE_CONTROL_HEIGHT),

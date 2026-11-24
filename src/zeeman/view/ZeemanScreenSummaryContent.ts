@@ -10,7 +10,7 @@ import type { ZeemanModel } from "../model/ZeemanModel.js";
 export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
   public constructor(model: ZeemanModel) {
     const s = StringManager.getInstance().getZeemanA11yStrings();
-    const details = new DerivedProperty(
+    const detailsProperty = new DerivedProperty(
       [
         model.fieldProperty,
         model.capProperty,
@@ -43,6 +43,6 @@ export class ZeemanScreenSummaryContent extends DisposableScreenSummaryContent {
         });
       },
     );
-    super(s.screenSummary, details);
+    super(s.screenSummary, detailsProperty);
   }
 }

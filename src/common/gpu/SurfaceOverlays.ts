@@ -1,4 +1,6 @@
 /** Exact surface events, composited in depth order with the sampled field. */
+
+import { roundSymmetric } from "scenerystack/dot";
 import { nodalRayHits, type Point3, planeHit } from "../model/orbital/RaySurfaces.js";
 import type { Wavefunction } from "../model/orbital/Wavefunction.js";
 import { COLOR_LUT_SIZE } from "../view/Colormaps.js";
@@ -35,7 +37,7 @@ export function surfaceEvents(
               COLOR_LUT_SIZE - 1,
               Math.floor(((Math.atan2(sample.im, sample.re) + Math.PI) / (2 * Math.PI)) * COLOR_LUT_SIZE),
             )
-          : COLOR_LUT_SIZE + Math.round(amplitude ** 2 * (COLOR_LUT_SIZE - 1));
+          : COLOR_LUT_SIZE + roundSymmetric(amplitude ** 2 * (COLOR_LUT_SIZE - 1));
       const gain = scene.coloring === "phase" ? amplitude : 1;
       const offset = 4 * index;
       events.push({

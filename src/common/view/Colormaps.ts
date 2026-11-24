@@ -1,3 +1,4 @@
+import { roundSymmetric } from "scenerystack/dot";
 import { COLORMAPS_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * Colormaps.ts
@@ -140,7 +141,7 @@ export function densityCssColor(t: number): string {
 }
 
 function toCss(rgb: readonly number[]): string {
-  const channel = (value: number | undefined) => Math.round((value ?? 0) * BYTE);
+  const channel = (value: number | undefined) => roundSymmetric((value ?? 0) * BYTE);
   return `rgb(${channel(rgb[0])}, ${channel(rgb[1])}, ${channel(rgb[2])})`;
 }
 

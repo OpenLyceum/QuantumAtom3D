@@ -46,14 +46,14 @@ export class AngularMomentumScreenView extends ResponsiveScreenView {
     const title = label(strings.titleStringProperty);
     title.left = diagram.left;
     title.bottom = diagram.top - ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.TITLE_GAP;
-    const readouts = new DerivedProperty(
+    const readoutsProperty = new DerivedProperty(
       [model.lProperty, model.mProperty, model.spinProperty, model.jProperty, model.mjProperty],
       (l, m, spin, j, mj) =>
         spin
           ? `|L| = ${toFixed(angularMagnitude(l), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, |S| = ${toFixed(Math.sqrt(0.75), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ<br>|J| = ${toFixed(angularMagnitude(j), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, J<sub>z</sub> = ${mj} ℏ`
           : `|L| = ${toFixed(angularMagnitude(l), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES)} ℏ, L<sub>z</sub> = ${m} ℏ<br>ΔL<sub>x</sub> ΔL<sub>y</sub> = ${toFixed(orbitalUncertaintyProduct(l, m), ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.READOUTS_DECIMAL_PLACES_SEGMENT_2)} ℏ² ≥ ${Math.abs(m) / 2} ℏ²`,
     );
-    const readout = label(readouts);
+    const readout = label(readoutsProperty);
     readout.left = diagram.left;
     readout.top = diagram.bottom + ANGULAR_MOMENTUM_SCREEN_VIEW_SETTINGS.TOP_OFFSET;
     const mControl = new HBox({

@@ -9,7 +9,7 @@ import type { AngularMomentumModel } from "../model/AngularMomentumModel.js";
 export class AngularMomentumScreenSummaryContent extends DisposableScreenSummaryContent {
   public constructor(model: AngularMomentumModel) {
     const strings = StringManager.getInstance().getAngularMomentumA11yStrings();
-    const details = new DerivedProperty(
+    const detailsProperty = new DerivedProperty(
       [
         model.lProperty,
         model.mProperty,
@@ -39,6 +39,6 @@ export class AngularMomentumScreenSummaryContent extends DisposableScreenSummary
               ),
         }),
     );
-    super(strings.screenSummary, details);
+    super(strings.screenSummary, detailsProperty);
   }
 }

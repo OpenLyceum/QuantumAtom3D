@@ -1,6 +1,6 @@
 /** Coherent-state mixer, animated 3D view and expectation-value history. */
 import { DerivedProperty, type NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
-import { Bounds2, Dimension2, type Range, toFixed } from "scenerystack/dot";
+import { Bounds2, Dimension2, type Range, roundSymmetric, toFixed } from "scenerystack/dot";
 import { AlignBox, HBox, Node, RichText, Text, VBox } from "scenerystack/scenery";
 import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-phet";
 import type { ScreenViewOptions } from "scenerystack/sim";
@@ -68,7 +68,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
         ...((property === model.zoomProperty || property === model.nuclearChargeProperty) && {
           shiftKeyboardStep: 1,
           pageKeyboardStep: 1,
-          constrainValue: (v: number) => Math.round(v),
+          constrainValue: (v: number) => roundSymmetric(v),
         }),
       });
     this.viewport = new SuperpositionViewportNode(
@@ -80,12 +80,12 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
     this.viewport.left = this.layoutBounds.minX + SCREEN_VIEW_MARGIN;
     this.viewport.top = this.layoutBounds.minY + SUPERPOSITION_SCREEN_VIEW_SETTINGS.TOP_OFFSET;
     const viewport = this.viewport;
-    const timeText = new DerivedProperty(
+    const timeTextProperty = new DerivedProperty(
       [model.timeProperty, model.expectationsProperty, strings.timeStringProperty, unitProperty],
       (time, expectation, name, unit) =>
         `${name}: ${toFixed(atomicTimeToFs(time), SUPERPOSITION_SCREEN_VIEW_SETTINGS.TIME_TEXT_DECIMAL_PLACES)} fs   ⟨z⟩ = ${formatLength(expectation.z, unit)} ${lengthUnitSymbol(unit)}   ⟨r⟩ = ${formatLength(expectation.r, unit)} ${lengthUnitSymbol(unit)}`,
     );
-    const timeLabel = text(timeText, SIZE);
+    const timeLabel = text(timeTextProperty, SIZE);
     timeLabel.left = viewport.left;
     timeLabel.bottom = viewport.top - SUPERPOSITION_SCREEN_VIEW_SETTINGS.BOTTOM_OFFSET;
     const timeControls = new TimeControlNode(model.timer.isPlayingProperty, {
@@ -285,7 +285,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
       left: rightX,
       top: this.layoutBounds.minY + SUPERPOSITION_SCREEN_VIEW_SETTINGS.MIXER_TOP_OFFSET,
     });
-    const status = new DerivedProperty(
+    const statusProperty = new DerivedProperty(
       [
         model.dynamicsProperty,
         strings.emptyStringProperty,
@@ -308,7 +308,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
         return `${pair}: T = ${toFixed(period, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} fs, f = ${toFixed(1 / period, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_DECIMAL_PLACES)} PHz, λ = ${toFixed(wavelengthNmForEnergy(dynamics.energyGap), 1)} nm<br>${dynamics.isDipoleAllowed ? allowed : forbidden}`;
       },
     );
-    const statusLabel = text(status, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_LABEL_MAX_WIDTH);
+    const statusLabel = text(statusProperty, SUPERPOSITION_SCREEN_VIEW_SETTINGS.STATUS_LABEL_MAX_WIDTH);
     statusLabel.left = rightX;
     statusLabel.top = this.layoutBounds.minY + 388;
     const chart = new ExpectationTimeSeriesNode(470, 105, model, unitProperty);

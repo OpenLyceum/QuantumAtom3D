@@ -16,7 +16,7 @@ export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryCo
     unitProperty: TReadOnlyProperty<LengthUnit> = DEFAULT_LENGTH_UNIT_PROPERTY,
   ) {
     const strings = StringManager.getInstance().getSuperpositionA11yStrings();
-    const details = new DerivedProperty(
+    const detailsProperty = new DerivedProperty(
       [
         model.termsProperty,
         model.timeProperty,
@@ -33,6 +33,6 @@ export class SuperpositionScreenSummaryContent extends DisposableScreenSummaryCo
           unit: lengthUnitSymbol(unit),
         }),
     );
-    super(strings.screenSummary, details);
+    super(strings.screenSummary, detailsProperty);
   }
 }
