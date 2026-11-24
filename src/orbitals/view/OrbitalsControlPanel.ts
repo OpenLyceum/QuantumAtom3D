@@ -8,7 +8,7 @@ import { ORBITALS_CONTROL_PANEL_SETTINGS } from "../../QuantumAtom3DConstants.js
  */
 
 import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
-import { Bounds2, Dimension2 } from "scenerystack/dot";
+import { Bounds2, Dimension2, roundSymmetric } from "scenerystack/dot";
 import { AlignBox, HBox, HSeparator, RichText, Text, VBox } from "scenerystack/scenery";
 import { NumberControl, PhetFont, PlusMinusZoomButtonGroup } from "scenerystack/scenery-phet";
 import { Checkbox, RectangularPushButton, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
@@ -92,7 +92,7 @@ export class OrbitalsControlPanel extends QuantumAtom3DPanel {
         numberDisplayOptions: { decimalPlaces: 0 },
         sliderOptions: {
           ...QUANTUM_ATOM_3D_NUMBER_CONTROL_OPTIONS.sliderOptions,
-          constrainValue: (value: number) => Math.round(value),
+          constrainValue: (value: number) => roundSymmetric(value),
           // The default step is a fraction of the range, which the rounding above would undo.
           keyboardStep: 1,
           shiftKeyboardStep: 1,

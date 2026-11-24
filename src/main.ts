@@ -131,13 +131,13 @@ function launch(): void {
       if (!sim.simScreens.includes(screen)) {
         continue;
       }
-      const selected = new Property(sim.simScreens[0] ?? screen);
+      const selectedProperty = new Property(sim.simScreens[0] ?? screen);
       sim.selectedScreenProperty.link((value) => {
         if (sim.simScreens.includes(value)) {
-          selected.value = value;
+          selectedProperty.value = value;
         }
       });
-      selected.lazyLink((value) => {
+      selectedProperty.lazyLink((value) => {
         sim.selectedScreenProperty.value = value;
       });
       const label = (text: import("scenerystack/axon").TReadOnlyProperty<string>) =>
@@ -147,7 +147,7 @@ function launch(): void {
           maxWidth: MAIN_SETTINGS.LABEL_MAX_WIDTH,
         });
       const selector = new ComboBox(
-        selected,
+        selectedProperty,
         sim.simScreens.map((value) => ({ value, createNode: () => label(value.nameProperty) })),
         screen.view,
         {

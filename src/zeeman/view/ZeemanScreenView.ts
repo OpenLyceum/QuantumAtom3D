@@ -48,7 +48,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     const diagram = new ZeemanDiagramNode(model);
     diagram.left = title.left + 5;
     diagram.top = this.layoutBounds.minY + 70;
-    const fieldValue = new DerivedProperty(
+    const fieldValueProperty = new DerivedProperty(
       [model.fieldProperty, model.capProperty, strings.fieldStringProperty],
       (field, cap, label) =>
         `${label}: ${atomicFieldToTesla(field).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_VALUE_SIGNIFICANT_FIGURES)} T / ${atomicFieldToTesla(cap).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_VALUE_SIGNIFICANT_FIGURES)} T`,
@@ -67,7 +67,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     const fieldControl = new VBox({
       align: "left",
       spacing: ZEEMAN_SCREEN_VIEW_SETTINGS.FIELD_CONTROL_SPACING,
-      children: [text(fieldValue), fieldSlider],
+      children: [text(fieldValueProperty), fieldSlider],
     });
     const modes = new AquaRadioButtonGroup(
       model.modeProperty,
@@ -150,7 +150,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
       left: this.layoutBounds.maxX - ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROLS_LEFT_OFFSET,
       top: this.layoutBounds.minY + ZEEMAN_SCREEN_VIEW_SETTINGS.CONTROLS_TOP_OFFSET,
     });
-    const selected = new DerivedProperty(
+    const selectedProperty = new DerivedProperty(
       [model.upperLevelsProperty, model.selectedIndexProperty, model.modeProperty],
       (levels, index, mode) => {
         const level = levels[index];
@@ -159,7 +159,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
           : "";
       },
     );
-    const selectedLabel = text(selected);
+    const selectedLabel = text(selectedProperty);
     selectedLabel.left = controls.left;
     selectedLabel.top = this.layoutBounds.minY + 370;
     const spectrumTitle = text(
@@ -186,7 +186,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
     });
     legend.left = title.left;
     legend.top = spectrum.bottom + 6;
-    const period = new DerivedProperty(
+    const periodProperty = new DerivedProperty(
       [model.larmorStatusProperty, strings.periodStringProperty, strings.offStringProperty],
       (status, label, off) => {
         if (status.kind === "off") {
@@ -198,7 +198,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         return `${label}: ${atomicTimeToFs(status.period).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_SIGNIFICANT_FIGURES)} fs`;
       },
     );
-    const periodLabel = text(period, ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_LABEL_MAX_WIDTH);
+    const periodLabel = text(periodProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_LABEL_MAX_WIDTH);
     periodLabel.left = controls.left;
     periodLabel.top = this.layoutBounds.minY + 435;
     const axis = new Line(0, ZEEMAN_SCREEN_VIEW_SETTINGS.AXIS_START_Y, 0, ZEEMAN_SCREEN_VIEW_SETTINGS.AXIS_END_Y, {

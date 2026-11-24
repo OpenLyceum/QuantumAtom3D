@@ -6,7 +6,7 @@ import {
   type TReadOnlyProperty,
   type UnknownMultilink,
 } from "scenerystack/axon";
-import { Dimension2, Range } from "scenerystack/dot";
+import { Dimension2, Range, roundSymmetric } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { StringUtils } from "scenerystack/phetcommon";
 import { Circle, Line, Node, Path, RichText, VBox } from "scenerystack/scenery";
@@ -25,7 +25,7 @@ const RADIUS: number = ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.RADIUS;
 const SAMPLES: number = ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.SAMPLES;
 export class OrbitalAngularDetailNode extends VBox {
   private readonly link: UnknownMultilink;
-  private readonly description: TReadOnlyProperty<string>;
+  private readonly descriptionProperty: TReadOnlyProperty<string>;
   public readonly phiProperty = new NumberProperty(0, {
     range: new Range(0, ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.PHI_RANGE_MAX),
   });
@@ -56,8 +56,9 @@ export class OrbitalAngularDetailNode extends VBox {
       ],
     });
     super({ spacing: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.SPACING, align: "left" });
-    this.description = new DerivedProperty([this.phiProperty, strings.descriptionStringProperty], (phi, pattern) =>
-      StringUtils.fillIn(pattern, { phi: Math.round(phi) }),
+    this.descriptionProperty = new DerivedProperty(
+      [this.phiProperty, strings.descriptionStringProperty],
+      (phi, pattern) => StringUtils.fillIn(pattern, { phi: roundSymmetric(phi) }),
     );
     this.children = [
       new RichText(strings.titleStringProperty, {
@@ -82,12 +83,12 @@ export class OrbitalAngularDetailNode extends VBox {
         shiftKeyboardStep: 1,
         accessibleName: strings.phiStringProperty,
       }),
-      new RichText(this.description, {
+      new RichText(this.descriptionProperty, {
         font: new PhetFont(ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.FONT_SIZE_SEGMENT_2),
         fill: QuantumAtom3DColors.textColorProperty,
         lineWrap: ORBITAL_ANGULAR_DETAIL_NODE_SETTINGS.LINE_WRAP,
         tagName: "p",
-        accessibleParagraph: this.description,
+        accessibleParagraph: this.descriptionProperty,
       }),
     ];
     this.link = Multilink.multilink([model.summaryProperty, this.phiProperty], (summary, phiDegrees) => {
@@ -132,7 +133,7 @@ export class OrbitalAngularDetailNode extends VBox {
     for (const child of this.children.slice()) {
       child.disposeSubtree();
     }
-    this.description.dispose();
+    this.descriptionProperty.dispose();
     this.phiProperty.dispose();
     super.dispose();
   }

@@ -15,7 +15,7 @@ export class OscillatorScreenSummaryContent extends DisposableScreenSummaryConte
   public constructor(model: OscillatorModel) {
     const s = StringManager.getInstance().getOscillatorA11yStrings();
     const labels = StringManager.getInstance().getOscillatorStrings();
-    const details = new DerivedProperty(
+    const detailsProperty = new DerivedProperty(
       [
         model.shellProperty,
         model.basisProperty,
@@ -44,6 +44,6 @@ export class OscillatorScreenSummaryContent extends DisposableScreenSummaryConte
         });
       },
     );
-    super(s.screenSummary, details);
+    super(s.screenSummary, detailsProperty);
   }
 }

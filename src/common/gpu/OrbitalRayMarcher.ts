@@ -1,3 +1,4 @@
+import { roundSymmetric } from "scenerystack/dot";
 import { ORBITAL_RAY_MARCHER_SETTINGS } from "../../QuantumAtom3DConstants.js";
 /**
  * OrbitalRayMarcher.ts
@@ -90,7 +91,7 @@ export class OrbitalRayMarcher {
       const lutIndex =
         coloring === "phase"
           ? Math.min(COLOR_LUT_SIZE - 1, Math.floor(((Math.atan2(im, re) + Math.PI) / (2 * Math.PI)) * COLOR_LUT_SIZE))
-          : COLOR_LUT_SIZE + Math.round(amplitude * amplitude * (COLOR_LUT_SIZE - 1));
+          : COLOR_LUT_SIZE + roundSymmetric(amplitude * amplitude * (COLOR_LUT_SIZE - 1));
       const weight = transmittance * alpha;
       out[0] += weight * (this.colorLuts[4 * lutIndex] ?? 0);
       out[1] += weight * (this.colorLuts[4 * lutIndex + 1] ?? 0);
@@ -152,7 +153,7 @@ export class OrbitalRayMarcher {
                 Math.floor(((Math.atan2(this.sample.im, this.sample.re) + Math.PI) / (2 * Math.PI)) * COLOR_LUT_SIZE),
               )
             : COLOR_LUT_SIZE +
-              Math.round(Math.min(1, level * this.scene.inversePeakAmplitude ** 2) * (COLOR_LUT_SIZE - 1));
+              roundSymmetric(Math.min(1, level * this.scene.inversePeakAmplitude ** 2) * (COLOR_LUT_SIZE - 1));
         for (let c = 0; c < 3; c++) {
           out[c] = (this.colorLuts[4 * index + c] ?? 0) * (0.35 + 0.65 * facing);
         }

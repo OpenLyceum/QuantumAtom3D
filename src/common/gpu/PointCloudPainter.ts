@@ -1,4 +1,6 @@
 /** CPU reference for probability dots. Samples are static measurements, never trajectories. */
+
+import { roundSymmetric } from "scenerystack/dot";
 import { Wavefunction } from "../model/orbital/Wavefunction.js";
 import { COLOR_LUT_SIZE } from "../view/Colormaps.js";
 import { type CameraFrame, projectToScreen, type Vec3 } from "../view/OrbitCamera.js";
@@ -76,7 +78,7 @@ export function paintPointCloud(
             COLOR_LUT_SIZE - 1,
             Math.floor(((Math.atan2(sample.im, sample.re) + Math.PI) / (2 * Math.PI)) * COLOR_LUT_SIZE),
           )
-        : COLOR_LUT_SIZE + Math.round(relative * (COLOR_LUT_SIZE - 1));
+        : COLOR_LUT_SIZE + roundSymmetric(relative * (COLOR_LUT_SIZE - 1));
     const offset = 4 * lutIndex;
     const rgb = [luts[offset] ?? 0, luts[offset + 1] ?? 0, luts[offset + 2] ?? 0];
     if (scene.nodes || scene.cuttingPlane) {

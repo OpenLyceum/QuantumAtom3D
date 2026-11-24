@@ -18,6 +18,10 @@ export function hybridTerms(k: number, direction: readonly [number, number, numb
 const pair = (a: readonly [number, number, number], b: readonly [number, number, number]) =>
   normalizeTerms([a, b].map(([n, l, m]) => ({ n, l, m, re: 1, im: 0 })));
 
+/** Preset IDs in the order shown on the Superposition screen. */
+export const SUPERPOSITION_PRESET_IDS = ["dipole", "breathing", "rotating", "sp", "sp2", "sp3"] as const;
+export type SuperpositionPreset = (typeof SUPERPOSITION_PRESET_IDS)[number];
+
 export const SUPERPOSITION_PRESETS = {
   dipole: pair([1, 0, 0], [2, 1, 0]),
   breathing: pair([1, 0, 0], [2, 0, 0]),
@@ -25,5 +29,4 @@ export const SUPERPOSITION_PRESETS = {
   sp: hybridTerms(1, [0, 0, 1]),
   sp2: hybridTerms(2, [1, 0, 0]),
   sp3: hybridTerms(3, [1 / Math.sqrt(3), 1 / Math.sqrt(3), 1 / Math.sqrt(3)]),
-} as const;
-export type SuperpositionPreset = keyof typeof SUPERPOSITION_PRESETS;
+} as const satisfies Readonly<Record<SuperpositionPreset, readonly OrbitalTerm[]>>;
