@@ -6,7 +6,7 @@ import { PhetFont, ResetAllButton, TimeControlNode } from "scenerystack/scenery-
 import type { ScreenViewOptions } from "scenerystack/sim";
 import { AquaRadioButtonGroup, HSlider, NumberSpinner, RectangularPushButton } from "scenerystack/sun";
 import { atomicTimeToFs, wavelengthNmForEnergy } from "../../common/model/AtomicUnits.js";
-import { SUPERPOSITION_PRESETS, type SuperpositionPreset } from "../../common/model/orbital/SuperpositionPresets.js";
+import { SUPERPOSITION_PRESET_IDS } from "../../common/model/orbital/SuperpositionPresets.js";
 import {
   FLAT_PANEL_PUSH_BUTTON_OPTIONS,
   FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS,
@@ -185,7 +185,7 @@ export class SuperpositionScreenView extends ResponsiveScreenView {
         spinner(model.termCountProperty, model.termCountProperty.rangeProperty, strings.termsStringProperty),
       ],
     });
-    const presetButtons = (Object.keys(SUPERPOSITION_PRESETS) as SuperpositionPreset[]).map(
+    const presetButtons = SUPERPOSITION_PRESET_IDS.map(
       (key) =>
         new RectangularPushButton({
           ...FLAT_PANEL_PUSH_BUTTON_OPTIONS,
