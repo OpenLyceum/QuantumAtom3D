@@ -110,7 +110,7 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
           ],
         }),
     );
-    const backend = new DerivedProperty(
+    const backendLabelProperty = new DerivedProperty(
       [viewport.backendProperty, strings.volume.gpuStringProperty, strings.volume.cpuStringProperty],
       (value, gpu, cpu) => (value === "gpu" ? gpu : cpu),
     );
@@ -151,7 +151,7 @@ export class OrbitalsScreenView extends ResponsiveScreenView {
       children: [
         modes,
         fraction,
-        label(backend, VIEW_SIZE),
+        label(backendLabelProperty, VIEW_SIZE),
         ...cameraRows,
         new OrbitalColorControl(model, phaseColormapProperty),
       ],

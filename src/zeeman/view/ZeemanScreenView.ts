@@ -195,7 +195,7 @@ export class ZeemanScreenView extends ResponsiveScreenView {
         if (status.kind === "zeroQ") {
           return `${label}: — (L=0)`;
         }
-        return `${label}: ${atomicTimeToFs(status.periodProperty).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_SIGNIFICANT_FIGURES)} fs`;
+        return `${label}: ${atomicTimeToFs(status.period).toPrecision(ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_SIGNIFICANT_FIGURES)} fs`;
       },
     );
     const periodLabel = text(periodProperty, ZEEMAN_SCREEN_VIEW_SETTINGS.PERIOD_LABEL_MAX_WIDTH);
